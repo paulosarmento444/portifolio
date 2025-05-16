@@ -1,0 +1,16 @@
+services:
+  wordpress:
+    image: wordpress:6.5.4-php8.3-apache
+    ports:
+      - "8080:80"
+    volumes:
+      - ./wordpress:/var/www/html
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_ROOT_PASSWORD: wordpress
+
+    volumes:
+      - ./mysql:/var/lib/mysql

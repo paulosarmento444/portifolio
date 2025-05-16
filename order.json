@@ -1,0 +1,196 @@
+{
+  "id": 1215,
+  "parent_id": 0,
+  "status": "cancelled",
+  "currency": "BRL",
+  "customer_id": 1,
+  "customer_note": "",
+  "billing": {
+    "first_name": "Paulo",
+    "last_name": "Sarmento",
+    "company": "",
+    "address_1": "Travessa Manoel Salgado",
+    "address_2": "",
+    "city": "Brasopolis",
+    "state": "MG",
+    "postcode": "37530-000",
+    "country": "BR",
+    "email": "paulosarment@gmail.com",
+    "phone": "(35) 99999-9999",
+    "number": "90",
+    "neighborhood": "centro",
+    "persontype": "M",
+    "cpf": "12",
+    "rg": "",
+    "cnpj": "",
+    "ie": "",
+    "birthdate": "",
+    "gender": "",
+    "cellphone": ""
+  },
+  "shipping": {
+    "first_name": "Paulo",
+    "last_name": "Sarmento",
+    "company": "",
+    "address_1": "Travessa Manoel Salgado",
+    "address_2": "",
+    "city": "Brasopolis",
+    "state": "MG",
+    "postcode": "37530-000",
+    "country": "BR",
+    "phone": "",
+    "number": "90",
+    "neighborhood": "centro"
+  },
+  "payment_method": "asaas-pix",
+  "payment_method_title": "Pix",
+  "transaction_id": "",
+
+  "prices_include_tax": false,
+  "date_created": "2024-06-01T01:57:26",
+  "date_modified": "2024-06-01T03:13:22",
+  "discount_total": "0.00",
+  "discount_tax": "0.00",
+  "shipping_total": "23.58",
+  "shipping_tax": "0.00",
+  "cart_tax": "0.00",
+  "total": "1139.58",
+  "total_tax": "0.00",
+  "order_key": "wc_order_QIipgSZg",
+  "meta_data": [
+    { "key": "example_key", "value": "example_value" },
+    { "key": "example_key", "value": "example_value" }
+  ],
+  "line_items": [
+    {
+      "id": 1,
+      "name": "Product 1",
+      "quantity": 2,
+      "price": "500.00",
+      "image": {
+        "src": "https://example.com/image1.jpg"
+      }
+    },
+    {
+      "id": 2,
+      "name": "Product 2",
+      "quantity": 1,
+      "price": "639.58",
+      "image": {
+        "src": "https://example.com/image2.jpg"
+      }
+    }
+  ],
+  "shipping_lines": [
+    {
+      "id": 1,
+      "method": "Standard Shipping",
+      "total": "23.58"
+    }
+  ],
+  "fee_lines": [],
+  "coupon_lines": [],
+
+  "customer_ip_address": "177.104.444.70",
+  "customer_user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Chrome/125.0.0.0 Safari/537.36",
+  "created_via": "checkout",
+  "date_completed": null,
+  "date_paid": null,
+  "cart_hash": "9467d9c09461ab3",
+  "number": "1215",
+
+  "tax_lines": [],
+
+  "refunds": [],
+  "payment_url": "https://solarsports.com.br/finalizar-compra/order-pay/1215/?pay_for_order=true&key=wc_order_QIipg1VxGSZg",
+  "is_editable": false,
+  "needs_payment": false,
+  "needs_processing": true,
+  "date_created_gmt": "2024-06-01T01:57:26",
+  "date_modified_gmt": "2024-06-01T03:13:22",
+  "date_completed_gmt": null,
+  "date_paid_gmt": null,
+  "correios_tracking_code": "",
+  "currency_symbol": "R$",
+  "_links": {
+    "self": [{ "href": "https://example.com/api/orders/1215" }],
+    "collection": [{ "href": "https://example.com/api/orders" }],
+    "customer": [{ "href": "https://example.com/api/customers/1" }]
+  }
+}
+
+
+{
+  "customer_id": 1,
+	"payment_method": "asaas-pix",
+  "billing": {
+    "first_name": "Paulo",
+    "last_name": "Sarmento",
+    "company": "",
+    "address_1": "Travessa Manoel Salgado",
+    "address_2": "",
+    "city": "Brasopolis",
+    "state": "MG",
+    "postcode": "37530-000",
+    "country": "BR",
+    "email": "paulosarment@gmail.com",
+    "phone": "(35) 99999-9999",
+    "number": "90",
+    "neighborhood": "centro",
+    "persontype": "M",
+    "cpf": "12",
+    "rg": "",
+    "cnpj": "",
+    "ie": "",
+    "birthdate": "",
+    "gender": "",
+    "cellphone": ""
+  },
+  "shipping": {
+    "first_name": "Paulo",
+    "last_name": "Sarmento",
+    "company": "",
+    "address_1": "Travessa Manoel Salgado",
+    "address_2": "",
+    "city": "Brasopolis",
+    "state": "MG",
+    "postcode": "37530-444",
+    "country": "BR",
+    "phone": "",
+    "number": "99",
+    "neighborhood": "centro"
+  },
+	"line_items": [
+    {
+			"product_id": 104,
+      "variation_id": 444,
+   
+      "name": "Product 1",
+      "quantity": 2,
+     
+			"total": "1000.00",
+      "image": {
+        "src": "https://example.com/image1.jpg"
+      }
+    },
+    {
+			"product_id": 44,
+      "variation_id": 33,
+
+      "name": "Product 2",
+      "quantity": 2,
+    
+			
+			"total": "1000.00",
+      "image": {
+        "src": "https://example.com/image2.jpg"
+      }
+    }
+  ]
+  
+}
+
+  
+  
+  
+

@@ -1,0 +1,131 @@
+###
+
+GET https://solarsports.com.br/wp-json/wc/v3/
+
+###
+
+PATCH https://solarsports.com.br/wp-json/wc/v3/customers/1
+Content-Type: application/json
+Authorization: Basic ck_ca06b727e37e3cc63fff017a4068aedd9ca0f6ad:cs_ed5275b8e1b6bbe2fa808220df6be06af7fcd643
+
+{
+  "billing": {
+    "first_name": "Paulo",
+    "last_name": "Sarmento",
+    "company": "Empresa Exemplo",
+    "address_1": "123 Main St",
+    "address_2": "Apto 456",
+    "city": "Anytown",
+    "postcode": "12345",
+    "country": "US",
+    "state": "CA",
+    "email": "paulo.sarmento@example.com",
+    "phone": "+1-555-555-5555",
+    "number": "123",
+    "neighborhood": "Bairro Central",
+    "persontype": "F",
+    "cpf": "123.456.789-00",
+    "rg": "MG-12.345.678",
+    "cnpj": "",
+    "ie": "",
+    "birthdate": "1990-01-01",
+    "gender": "M",
+    "cellphone": "+1-555-555-5556"
+  },
+  "shipping": {
+    "first_name": "John",
+    "last_name": "Doe",
+    "company": "Another Company",
+    "address_1": "456 Secondary St",
+    "address_2": "",
+    "city": "Othertown",
+    "postcode": "67890",
+    "country": "US",
+    "state": "NY",
+    "phone": "+1-555-555-5557",
+    "number": "456",
+    "neighborhood": "Outro Bairro"
+  }
+}
+
+###
+GET https://reimagined-space-meme-xvgg556ppgr395r-3000.app.github.dev/events
+
+###
+# @name createEvent
+POST https://reimagined-space-meme-xvgg556ppgr395r-3000.app.github.dev/events
+Content-Type: application/json
+
+{
+  "name": "New Eventss",
+  "description": "This is a new event",
+  "date": "2024-08-30",
+  "price": 100
+ 
+}
+
+###
+@eventId = {{ createEvent.response.body.id }}
+
+###
+GET https://reimagined-space-meme-xvgg556ppgr395r-3000.app.github.dev/events/{{eventId}}
+
+###
+DELETE https://reimagined-space-meme-xvgg556ppgr395r-3000.app.github.dev/events/{{eventId}}
+
+###
+PATCH  https://reimagined-space-meme-xvgg556ppgr395r-3000.app.github.dev/events/{{eventId}}
+Content-Type: application/json
+
+{
+  "name": "New Eventsss",
+  "price": 2
+}
+
+
+###
+GET https://reimagined-space-meme-xvgg556ppgr395r-3000.app.github.dev/events/{{eventId}}/spots
+
+
+###
+# @name createSpot
+POST https://reimagined-space-meme-xvgg556ppgr395r-3000.app.github.dev/events/{{eventId}}/spots
+Content-Type: application/json
+
+{
+  "name": "A1"
+}
+
+###
+@spotId = {{ createSpot.response.body.id }}
+
+
+###
+GET https://reimagined-space-meme-xvgg556ppgr395r-3000.app.github.dev/events/{{eventId}}/spots/{{spotId}}
+
+
+###
+
+PATCH https://reimagined-space-meme-xvgg556ppgr395r-3000.app.github.dev/events/{{eventId}}/spots/{{spotId}}
+Content-Type: application/json
+
+{
+  "name": "A4"
+}
+
+###
+DELETE https://reimagined-space-meme-xvgg556ppgr395r-3000.app.github.dev/events/{{eventId}}/spots/{{spotId}}
+
+
+###
+@spotName = {{ createSpot.response.body.name}}
+
+POST https://reimagined-space-meme-xvgg556ppgr395r-3000.app.github.dev/events/{{eventId}}/reserve
+Content-Type: application/json
+X-Api-Token: 444
+
+{
+  "spots": ["{{spotName}}"],
+  "ticket_kind": "full",
+  "email": "teste@test.com"
+}
