@@ -19,6 +19,19 @@ export type Product = {
   image: string;
   price_html: string;
   purchasable: boolean;
+  short_description: string;
+  sale_price: string;
+  on_sale: boolean;
+  regular_price: string;
+  featured: boolean;
+  weight: string;
+  dimensions: {
+    length: string;
+    width: string;
+    height: string;
+  };
+  categories: Category[];
+  stock_status: string;
 };
 
 export type Attribute = {

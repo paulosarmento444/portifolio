@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { getProduct } from "./ProductService";
+
 export type CartItem = {
   product_id: number;
   quantity: number;
@@ -25,7 +26,7 @@ export const addToCart = async (input: {
   quantity: number;
 }) => {
   const cookieStore = getCookieStore();
-  let cart = getCart();
+  const cart = getCart();
 
   const { product_id, quantity } = input;
 
@@ -63,8 +64,7 @@ export const addToCart = async (input: {
 
 export const removeItemFromCart = (index: number) => {
   const cookieStore = getCookieStore();
-  let cart = getCart();
-  console.log("cart", cart);
+  const cart = getCart();
 
   if (cart.items[index]) {
     cart.total -= cart.items[index].total;
