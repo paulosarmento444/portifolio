@@ -1,22 +1,19 @@
-import { Box } from "@mui/material";
-import Header from "../components/Header";
+import Header from "@/app/components/Header";
+import AboutHero from "./components/about-hero";
+import MissionValues from "./components/mission-values";
+import TeamSection from "./components/team-section";
+import { ContactForm } from "../components/contact-form";
+import { Toaster } from "react-hot-toast";
 
-export default function AboutPage() {
+export default async function About() {
   return (
     <>
       <Header />
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "100vh",
-          gap: "8px",
-        }}
-      >
-        About page
-      </Box>
+      <AboutHero />
+      <MissionValues />
+      <TeamSection />
+      <ContactForm />
+      <Toaster />
     </>
   );
 }

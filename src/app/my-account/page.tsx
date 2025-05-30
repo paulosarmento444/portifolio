@@ -1,29 +1,15 @@
-import {
-  authenticateUser,
-  getCustomer,
-  getOrders,
-} from "../service/MyAccountService";
-import { redirect } from "next/navigation";
-import { MyAccountPage } from "./MyAccountPage";
+import Header from "@/app/components/Header"
+import { MyAccountContainer } from "./components/MyAccountContainer"
+import { Toaster } from "@/app/components/toaster"
 
-const MyAccountData = async () => {
-  try {
-    const viewer = await authenticateUser();
-    const orders = await getOrders(viewer.databaseId);
-    const customer = await getCustomer(viewer.databaseId);
-    // console.log(customer);
-
-    return (
-      <MyAccountPage
-        viewer={viewer}
-        orders={orders}
-        posts={viewer.posts.nodes}
-        customer={customer}
-      />
-    );
-  } catch (error) {
-    redirect("/auth/login");
-  }
-};
-
-export default MyAccountData;
+export default async function MyAccountPage() {
+  return (
+    <>
+      <Header />
+      <div className="mt-20">
+        <MyAccountContainer />
+      </div>
+      <Toaster />
+    </>
+  )
+}
