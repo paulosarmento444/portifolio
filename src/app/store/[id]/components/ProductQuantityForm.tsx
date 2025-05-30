@@ -113,10 +113,7 @@ export function ProductQuantityForm({
                 <ShoppingCart className="w-6 h-6 group-hover:scale-110 transition-transform" />
                 Adicionar ao Carrinho
                 <span className="text-sm opacity-80">
-                  R${" "}
-                  {(Number.parseFloat(product.price || "0") * quantity).toFixed(
-                    2
-                  )}
+                  R$ {(Number(product.price || 0) * quantity).toFixed(2)}
                 </span>
               </>
             )}
