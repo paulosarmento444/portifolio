@@ -1,6 +1,11 @@
-import React from "react";
-import RegisterForm from "./RegisterForm";
+import Header from "@/app/components/Header";
+import { RegisterContainer } from "./components/RegisterContainer";
 
-export default function Register() {
-  return <RegisterForm />;
+export default function RegisterPage() {
+  return (
+    <>
+      <Header />
+      <RegisterContainer />
+    </>
+  );
 }

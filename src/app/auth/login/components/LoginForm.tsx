@@ -1,7 +1,7 @@
 "use client";
-import { FormEvent, useState } from "react";
-import { AuthForm } from "@/app/components/AuthForm";
+import { type FormEvent, useState } from "react";
 import { loginAction } from "@/app/server-actions/auth.action";
+import { AuthForm } from "@/app/auth/components/AuthForm";
 
 export default function LoginForm() {
   const [state, setState] = useState({ error: "", pending: false });
@@ -26,13 +26,11 @@ export default function LoginForm() {
   };
 
   return (
-    <>
-      <AuthForm
-        formType="login"
-        onSubmit={handleSubmit}
-        error={state.error}
-        pending={state.pending}
-      />
-    </>
+    <AuthForm
+      formType="login"
+      onSubmit={handleSubmit}
+      error={state.error}
+      pending={state.pending}
+    />
   );
 }

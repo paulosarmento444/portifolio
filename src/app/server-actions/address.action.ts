@@ -26,3 +26,26 @@ export const addShippingAddress = async (viewerId: number, shipping: any) => {
     throw new Error();
   }
 };
+
+export async function updateCustomerAddress(
+  customerId: string,
+  addressData: any
+) {
+  try {
+    const response = await woocommerceClient.put(`/customers/${customerId}`, {
+      billing: addressData,
+      shipping: addressData,
+    });
+
+    return {
+      success: true,
+      customer: response.data,
+    };
+  } catch (error: any) {
+    console.error("Erro ao atualizar endereço:", error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Erro ao salvar endereço",
+    };
+  }
+}
