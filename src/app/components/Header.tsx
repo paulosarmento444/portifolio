@@ -17,6 +17,7 @@ import {
   Zap,
   Crown,
   Sparkles,
+  Newspaper,
 } from "lucide-react";
 
 export default function Header() {
@@ -262,6 +263,27 @@ export default function Header() {
                       <p className="text-yellow-100 text-sm">
                         Perfil e pedidos
                       </p>
+                    </div>
+                  </Link>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <Link
+                    href="/blog"
+                    onClick={closeMobileMenu}
+                    className="flex items-center space-x-4 p-4 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 transition-all duration-300 backdrop-blur-sm group"
+                  >
+                    <div className="w-12 h-12 bg-gradient-to-r from-orange-400/30 to-red-400/30 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30 group-hover:scale-110 transition-transform">
+                      <Newspaper className="w-6 h-6 text-white drop-shadow-sm" />
+                    </div>
+                    <div>
+                      <span className="text-white font-semibold text-lg drop-shadow-sm">
+                        Blog
+                      </span>
+                      <p className="text-yellow-100 text-sm">Notícias</p>
                     </div>
                   </Link>
                 </motion.div>

@@ -1,5 +1,5 @@
 import Header from "@/app/components/Header";
-import { ContactForm } from "./components/contact-form";
+import { ContactForm } from "./contact/components";
 import { Toaster } from "./components/toaster";
 import SportsBanner from "./components/Banner";
 

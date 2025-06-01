@@ -18,7 +18,7 @@ import {
   Sparkles,
   Zap,
 } from "lucide-react";
-import { Button } from "../button/FormButton";
+import { Button } from "../../components/button/FormButton";
 
 const contactFormSchema = z.object({
   name: z.string().min(3).max(100),
