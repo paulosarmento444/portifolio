@@ -1,15 +1,27 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { User, Mail, Phone, MapPin, Calendar, Shield, Edit } from "lucide-react"
+import { motion } from "framer-motion";
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Shield,
+  Edit,
+} from "lucide-react";
 
 interface AccountSectionProps {
-  username: string
-  billing: any
-  role: string
+  username: string;
+  billing: any;
+  role: string;
 }
 
-export function AccountSection({ username, billing, role }: AccountSectionProps) {
+export function AccountSection({
+  username,
+  billing,
+  role,
+}: AccountSectionProps) {
   const accountInfo = [
     {
       icon: User,
@@ -47,7 +59,7 @@ export function AccountSection({ username, billing, role }: AccountSectionProps)
       value: role || "Cliente",
       color: "from-yellow-500 to-orange-600",
     },
-  ]
+  ];
 
   return (
     <div className="space-y-8">
@@ -63,7 +75,9 @@ export function AccountSection({ username, billing, role }: AccountSectionProps)
             Informações da Conta
           </span>
         </h2>
-        <p className="text-gray-300 text-lg">Gerencie suas informações pessoais e configurações</p>
+        <p className="text-gray-300 text-lg">
+          Gerencie suas informações pessoais e configurações
+        </p>
       </motion.div>
 
       {/* Account Info Grid */}
@@ -93,8 +107,12 @@ export function AccountSection({ username, billing, role }: AccountSectionProps)
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-medium text-gray-400 mb-1">{info.label}</h3>
-                  <p className="text-lg font-semibold text-white truncate">{info.value}</p>
+                  <h3 className="text-sm font-medium text-gray-400 mb-1">
+                    {info.label}
+                  </h3>
+                  <p className="text-lg font-semibold text-white truncate">
+                    {info.value}
+                  </p>
                 </div>
 
                 <button className="p-2 text-gray-400 hover:text-white transition-colors">
@@ -128,20 +146,12 @@ export function AccountSection({ username, billing, role }: AccountSectionProps)
             <div className="flex items-center justify-between p-4 bg-gray-800/30 rounded-xl">
               <div>
                 <h4 className="text-white font-medium">Alterar Senha</h4>
-                <p className="text-gray-400 text-sm">Última alteração há 30 dias</p>
+                <p className="text-gray-400 text-sm">
+                  Última alteração há 30 dias
+                </p>
               </div>
               <button className="px-4 py-2 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-400/30 rounded-lg text-cyan-400 hover:border-cyan-400/50 transition-all duration-300">
                 Alterar
-              </button>
-            </div>
-
-            <div className="flex items-center justify-between p-4 bg-gray-800/30 rounded-xl">
-              <div>
-                <h4 className="text-white font-medium">Autenticação em Duas Etapas</h4>
-                <p className="text-gray-400 text-sm">Adicione uma camada extra de segurança</p>
-              </div>
-              <button className="px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-400/30 rounded-lg text-green-400 hover:border-green-400/50 transition-all duration-300">
-                Ativar
               </button>
             </div>
           </div>
@@ -163,5 +173,5 @@ export function AccountSection({ username, billing, role }: AccountSectionProps)
         </button>
       </motion.div>
     </div>
-  )
+  );
 }

@@ -1,26 +1,68 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { Home, Package, FileText, User, MapPin, Calendar, ShoppingBag, LogOut, Sparkles } from "lucide-react"
+import { motion } from "framer-motion";
+import {
+  Home,
+  Package,
+  FileText,
+  User,
+  MapPin,
+  Calendar,
+  ShoppingBag,
+  LogOut,
+  Sparkles,
+} from "lucide-react";
 
 interface AccountSidebarProps {
-  selectedMenu: string
-  onMenuClick: (menu: string) => void
-  userName: string
+  selectedMenu: string;
+  onMenuClick: (menu: string) => void;
+  userName: string;
 }
 
 const menuItems = [
-  { id: "welcome", label: "Início", icon: Home, color: "from-cyan-500 to-blue-600" },
-  { id: "orders", label: "Pedidos", icon: Package, color: "from-purple-500 to-pink-600" },
-  { id: "posts", label: "Posts", icon: FileText, color: "from-green-500 to-emerald-600" },
-  { id: "account", label: "Conta", icon: User, color: "from-orange-500 to-red-600" },
-  { id: "addresses", label: "Endereços", icon: MapPin, color: "from-blue-500 to-cyan-600" },
-  { id: "events", label: "Eventos", icon: Calendar, color: "from-purple-500 to-indigo-600" },
-  { id: "products", label: "Produtos", icon: ShoppingBag, color: "from-pink-500 to-rose-600" },
-  { id: "logout", label: "Sair", icon: LogOut, color: "from-red-500 to-pink-600" },
-]
+  {
+    id: "welcome",
+    label: "Início",
+    icon: Home,
+    color: "from-cyan-500 to-blue-600",
+  },
+  {
+    id: "orders",
+    label: "Pedidos",
+    icon: Package,
+    color: "from-purple-500 to-pink-600",
+  },
+  {
+    id: "posts",
+    label: "Posts",
+    icon: FileText,
+    color: "from-green-500 to-emerald-600",
+  },
+  {
+    id: "account",
+    label: "Conta",
+    icon: User,
+    color: "from-orange-500 to-red-600",
+  },
+  {
+    id: "addresses",
+    label: "Endereços",
+    icon: MapPin,
+    color: "from-blue-500 to-cyan-600",
+  },
+  {
+    id: "logout",
+    label: "Sair",
+    icon: LogOut,
+    color: "from-red-500 to-pink-600",
+  },
+];
 
-export function AccountSidebar({ selectedMenu, onMenuClick, userName }: AccountSidebarProps) {
+export function AccountSidebar({
+  selectedMenu,
+  onMenuClick,
+  userName,
+}: AccountSidebarProps) {
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
@@ -74,7 +116,10 @@ export function AccountSidebar({ selectedMenu, onMenuClick, userName }: AccountS
               <span className="font-medium">{item.label}</span>
 
               {selectedMenu === item.id && (
-                <motion.div className="ml-auto w-2 h-2 bg-cyan-400 rounded-full" layoutId="activeIndicator" />
+                <motion.div
+                  className="ml-auto w-2 h-2 bg-cyan-400 rounded-full"
+                  layoutId="activeIndicator"
+                />
               )}
             </motion.button>
           ))}
@@ -88,13 +133,18 @@ export function AccountSidebar({ selectedMenu, onMenuClick, userName }: AccountS
 
       <style jsx>{`
         @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-8px) rotate(3deg); }
+          0%,
+          100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          50% {
+            transform: translateY(-8px) rotate(3deg);
+          }
         }
         .animate-float {
           animation: float 4s ease-in-out infinite;
         }
       `}</style>
     </motion.div>
-  )
+  );
 }

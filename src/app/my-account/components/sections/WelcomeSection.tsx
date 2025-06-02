@@ -1,14 +1,28 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { Package, TrendingUp, Star, Calendar, ArrowRight } from "lucide-react"
+import { motion } from "framer-motion";
+import { Package, TrendingUp, Star, Calendar, ArrowRight } from "lucide-react";
+import { useState } from "react";
 
 interface WelcomeSectionProps {
-  viewer: any
-  orders: any[]
+  viewer: any;
+  orders: any[];
 }
 
 export function WelcomeSection({ viewer, orders }: WelcomeSectionProps) {
+  const [selectedMenu, setSelectedMenu] = useState<string>("welcome");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+
+  const handleMenuClick = (menu: string) => {
+    setSelectedMenu(menu);
+    setIsMobileMenuOpen(false);
+
+    // Update URL without page reload
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.set("menu", menu);
+    window.history.pushState({}, "", newUrl.toString());
+  };
+
   const stats = [
     {
       icon: Package,
@@ -20,9 +34,9 @@ export function WelcomeSection({ viewer, orders }: WelcomeSectionProps) {
       icon: TrendingUp,
       label: "Este Mês",
       value: orders.filter((order) => {
-        const orderDate = new Date(order.date_created)
-        const currentMonth = new Date().getMonth()
-        return orderDate.getMonth() === currentMonth
+        const orderDate = new Date(order.date_created);
+        const currentMonth = new Date().getMonth();
+        return orderDate.getMonth() === currentMonth;
       }).length,
       color: "from-purple-500 to-pink-600",
     },
@@ -38,9 +52,9 @@ export function WelcomeSection({ viewer, orders }: WelcomeSectionProps) {
       value: new Date(viewer.date || Date.now()).getFullYear(),
       color: "from-green-500 to-emerald-600",
     },
-  ]
+  ];
 
-  const recentOrders = orders.slice(0, 3)
+  const recentOrders = orders.slice(0, 3);
 
   return (
     <div className="space-y-8">
@@ -58,7 +72,9 @@ export function WelcomeSection({ viewer, orders }: WelcomeSectionProps) {
           </span>
           !
         </h2>
-        <p className="text-gray-300 text-lg">Aqui está um resumo da sua conta e atividades recentes</p>
+        <p className="text-gray-300 text-lg">
+          Aqui está um resumo da sua conta e atividades recentes
+        </p>
       </motion.div>
 
       {/* Stats Grid */}
@@ -85,7 +101,9 @@ export function WelcomeSection({ viewer, orders }: WelcomeSectionProps) {
               >
                 <stat.icon className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2">{stat.value}</h3>
+              <h3 className="text-2xl font-bold text-white mb-2">
+                {stat.value}
+              </h3>
               <p className="text-gray-400 text-sm">{stat.label}</p>
             </div>
           </motion.div>
@@ -102,7 +120,12 @@ export function WelcomeSection({ viewer, orders }: WelcomeSectionProps) {
         >
           <div className="flex items-center justify-between">
             <h3 className="text-2xl font-bold text-white">Pedidos Recentes</h3>
-            <button className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors">
+            <button
+              onClick={() => {
+                handleMenuClick("orders");
+              }}
+              className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors"
+            >
               Ver todos
               <ArrowRight size={16} />
             </button>
@@ -122,8 +145,12 @@ export function WelcomeSection({ viewer, orders }: WelcomeSectionProps) {
                     <Package className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h4 className="text-white font-medium">Pedido #{order.number}</h4>
-                    <p className="text-gray-400 text-sm">{new Date(order.date_created).toLocaleDateString("pt-BR")}</p>
+                    <h4 className="text-white font-medium">
+                      Pedido #{order.number}
+                    </h4>
+                    <p className="text-gray-400 text-sm">
+                      {new Date(order.date_created).toLocaleDateString("pt-BR")}
+                    </p>
                   </div>
                 </div>
                 <div className="text-right">
@@ -133,8 +160,8 @@ export function WelcomeSection({ viewer, orders }: WelcomeSectionProps) {
                       order.status === "completed"
                         ? "bg-green-500/20 text-green-400"
                         : order.status === "processing"
-                          ? "bg-yellow-500/20 text-yellow-400"
-                          : "bg-gray-500/20 text-gray-400"
+                        ? "bg-yellow-500/20 text-yellow-400"
+                        : "bg-gray-500/20 text-gray-400"
                     }`}
                   >
                     {order.status}
@@ -153,10 +180,15 @@ export function WelcomeSection({ viewer, orders }: WelcomeSectionProps) {
         transition={{ duration: 0.5, delay: 0.6 }}
         className="grid grid-cols-1 md:grid-cols-3 gap-6"
       >
-        <button className="p-6 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-400/30 rounded-2xl text-left hover:border-cyan-400/50 transition-all duration-300 group">
+        <button
+          onClick={() => handleMenuClick("orders")}
+          className="p-6 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-400/30 rounded-2xl text-left hover:border-cyan-400/50 transition-all duration-300 group"
+        >
           <Package className="w-8 h-8 text-cyan-400 mb-4 group-hover:scale-110 transition-transform" />
           <h4 className="text-white font-bold mb-2">Ver Pedidos</h4>
-          <p className="text-gray-400 text-sm">Acompanhe seus pedidos e histórico</p>
+          <p className="text-gray-400 text-sm">
+            Acompanhe seus pedidos e histórico
+          </p>
         </button>
 
         <button className="p-6 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-400/30 rounded-2xl text-left hover:border-purple-400/50 transition-all duration-300 group">
@@ -172,5 +204,5 @@ export function WelcomeSection({ viewer, orders }: WelcomeSectionProps) {
         </button>
       </motion.div>
     </div>
-  )
+  );
 }

@@ -1,21 +1,26 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { X, MapPin, Loader2 } from "lucide-react"
-import { updateCustomerAddress } from "../../server-actions/address.action"
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, MapPin, Loader2 } from "lucide-react";
+import { updateCustomerAddress } from "@/app/server-actions/address.action";
 
 interface AddressModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onAddressAdded: (address: any) => void
-  userId: string
+  isOpen: boolean;
+  onClose: () => void;
+  onAddressAdded: (address: any) => void;
+  userId: string;
 }
 
-export function AddressModal({ isOpen, onClose, onAddressAdded, userId }: AddressModalProps) {
-  const [isLoading, setIsLoading] = useState(false)
+export function AddressModal({
+  isOpen,
+  onClose,
+  onAddressAdded,
+  userId,
+}: AddressModalProps) {
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -26,32 +31,122 @@ export function AddressModal({ isOpen, onClose, onAddressAdded, userId }: Addres
     state: "",
     postcode: "",
     country: "BR",
-  })
+    phone: "",
+    email: "",
+  });
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+
+    // Validation for specific fields
+    if (name === "phone") {
+      // Remove non-numeric characters
+      const phoneValue = value.replace(/\D/g, "");
+
+      // Format phone number as (XX) XXXXX-XXXX
+      let formattedPhone = "";
+      if (phoneValue.length <= 11) {
+        if (phoneValue.length > 2) {
+          formattedPhone += `(${phoneValue.substring(0, 2)}) `;
+          if (phoneValue.length > 7) {
+            formattedPhone += `${phoneValue.substring(
+              2,
+              7
+            )}-${phoneValue.substring(7)}`;
+          } else {
+            formattedPhone += phoneValue.substring(2);
+          }
+        } else {
+          formattedPhone = phoneValue;
+        }
+
+        setFormData((prev) => ({
+          ...prev,
+          [name]: formattedPhone,
+        }));
+        return;
+      }
+    } else if (name === "postcode") {
+      // Format CEP as XXXXX-XXX
+      const cepValue = value.replace(/\D/g, "");
+      if (cepValue.length <= 8) {
+        const formattedCep =
+          cepValue.length > 5
+            ? `${cepValue.substring(0, 5)}-${cepValue.substring(5)}`
+            : cepValue;
+
+        setFormData((prev) => ({
+          ...prev,
+          [name]: formattedCep,
+        }));
+        return;
+      }
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    // Check if any field is empty
+    for (const key in formData) {
+      if (formData[key as keyof typeof formData] === "") {
+        alert("Por favor, preencha todos os campos obrigatórios");
+        return false;
+      }
+    }
+
+    // Email validation regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      alert("Por favor, insira um email válido");
+      return false;
+    }
+
+    // Phone validation - should have at least 10 digits (including area code)
+    const phoneDigits = formData.phone.replace(/\D/g, "");
+    if (phoneDigits.length < 10) {
+      alert("Por favor, insira um número de telefone válido com DDD");
+      return false;
+    }
+
+    // CEP validation - should have 8 digits
+    const cepDigits = formData.postcode.replace(/\D/g, "");
+    if (cepDigits.length !== 8) {
+      alert("Por favor, insira um CEP válido com 8 dígitos");
+      return false;
+    }
+
+    return true;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+
+    // Validate form before submission
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
 
     try {
-      const result = await updateCustomerAddress(userId, formData)
+      const result = await updateCustomerAddress(userId, formData);
 
       if (result.success) {
-        onAddressAdded(formData)
-        onClose()
+        onAddressAdded(formData);
+        onClose();
       }
     } catch (error) {
-      console.error("Erro ao salvar endereço:", error)
+      console.error("Erro ao salvar endereço:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }))
-  }
+  };
 
   return (
     <AnimatePresence>
@@ -79,7 +174,9 @@ export function AddressModal({ isOpen, onClose, onAddressAdded, userId }: Addres
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
                   <MapPin className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-xl font-bold text-white">Adicionar Endereço</h2>
+                <h2 className="text-xl font-bold text-white">
+                  Adicionar Endereço
+                </h2>
               </div>
               <button
                 onClick={onClose}
@@ -89,11 +186,19 @@ export function AddressModal({ isOpen, onClose, onAddressAdded, userId }: Addres
               </button>
             </div>
 
+            {/* Required fields notice */}
+            <div className="mb-4 text-sm text-pink-400 flex items-center">
+              <span className="mr-1">*</span>
+              <span>Todos os campos são obrigatórios</span>
+            </div>
+
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Nome</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Nome <span className="text-pink-400">*</span>
+                  </label>
                   <input
                     type="text"
                     name="first_name"
@@ -104,7 +209,9 @@ export function AddressModal({ isOpen, onClose, onAddressAdded, userId }: Addres
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Sobrenome</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Sobrenome <span className="text-pink-400">*</span>
+                  </label>
                   <input
                     type="text"
                     name="last_name"
@@ -118,7 +225,9 @@ export function AddressModal({ isOpen, onClose, onAddressAdded, userId }: Addres
 
               <div className="grid grid-cols-3 gap-4">
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Endereço</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Endereço <span className="text-pink-400">*</span>
+                  </label>
                   <input
                     type="text"
                     name="address_1"
@@ -129,7 +238,9 @@ export function AddressModal({ isOpen, onClose, onAddressAdded, userId }: Addres
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Número</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Número <span className="text-pink-400">*</span>
+                  </label>
                   <input
                     type="text"
                     name="number"
@@ -142,7 +253,9 @@ export function AddressModal({ isOpen, onClose, onAddressAdded, userId }: Addres
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Bairro</label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Bairro <span className="text-pink-400">*</span>
+                </label>
                 <input
                   type="text"
                   name="neighborhood"
@@ -155,7 +268,9 @@ export function AddressModal({ isOpen, onClose, onAddressAdded, userId }: Addres
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Cidade</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Cidade <span className="text-pink-400">*</span>
+                  </label>
                   <input
                     type="text"
                     name="city"
@@ -166,7 +281,9 @@ export function AddressModal({ isOpen, onClose, onAddressAdded, userId }: Addres
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Estado</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Estado <span className="text-pink-400">*</span>
+                  </label>
                   <select
                     name="state"
                     value={formData.state}
@@ -187,7 +304,9 @@ export function AddressModal({ isOpen, onClose, onAddressAdded, userId }: Addres
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">CEP</label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  CEP <span className="text-pink-400">*</span>
+                </label>
                 <input
                   type="text"
                   name="postcode"
@@ -197,6 +316,37 @@ export function AddressModal({ isOpen, onClose, onAddressAdded, userId }: Addres
                   placeholder="00000-000"
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Telefone <span className="text-pink-400">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    required
+                    placeholder="(00) 00000-0000"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Email <span className="text-pink-400">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    placeholder="seu@email.com"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  />
+                </div>
               </div>
 
               {/* Buttons */}
@@ -222,5 +372,5 @@ export function AddressModal({ isOpen, onClose, onAddressAdded, userId }: Addres
         </div>
       )}
     </AnimatePresence>
-  )
+  );
 }

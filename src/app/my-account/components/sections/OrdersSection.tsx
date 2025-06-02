@@ -1,38 +1,46 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { Package, Calendar, CreditCard, Truck, CheckCircle, Clock, AlertCircle } from "lucide-react"
+import { motion } from "framer-motion";
+import {
+  Package,
+  Calendar,
+  CreditCard,
+  Truck,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+} from "lucide-react";
 
 interface OrdersSectionProps {
-  orders: any[]
+  orders: any[];
 }
 
 export function OrdersSection({ orders }: OrdersSectionProps) {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "completed":
-        return <CheckCircle className="w-5 h-5 text-green-400" />
+        return <CheckCircle className="w-5 h-5 text-green-400" />;
       case "processing":
-        return <Clock className="w-5 h-5 text-yellow-400" />
+        return <Clock className="w-5 h-5 text-yellow-400" />;
       case "shipped":
-        return <Truck className="w-5 h-5 text-blue-400" />
+        return <Truck className="w-5 h-5 text-blue-400" />;
       default:
-        return <AlertCircle className="w-5 h-5 text-gray-400" />
+        return <AlertCircle className="w-5 h-5 text-gray-400" />;
     }
-  }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
-        return "bg-green-500/20 text-green-400 border-green-400/30"
+        return "bg-green-500/20 text-green-400 border-green-400/30";
       case "processing":
-        return "bg-yellow-500/20 text-yellow-400 border-yellow-400/30"
+        return "bg-yellow-500/20 text-yellow-400 border-yellow-400/30";
       case "shipped":
-        return "bg-blue-500/20 text-blue-400 border-blue-400/30"
+        return "bg-blue-500/20 text-blue-400 border-blue-400/30";
       default:
-        return "bg-gray-500/20 text-gray-400 border-gray-400/30"
+        return "bg-gray-500/20 text-gray-400 border-gray-400/30";
     }
-  }
+  };
 
   return (
     <div className="space-y-8">
@@ -48,7 +56,9 @@ export function OrdersSection({ orders }: OrdersSectionProps) {
             Meus Pedidos
           </span>
         </h2>
-        <p className="text-gray-300 text-lg">Acompanhe o status e histórico dos seus pedidos</p>
+        <p className="text-gray-300 text-lg">
+          Acompanhe o status e histórico dos seus pedidos
+        </p>
       </motion.div>
 
       {/* Orders List */}
@@ -80,28 +90,42 @@ export function OrdersSection({ orders }: OrdersSectionProps) {
 
                     <div className="space-y-2">
                       <div className="flex items-center gap-3">
-                        <h3 className="text-xl font-bold text-white">Pedido #{order.number}</h3>
+                        <h3 className="text-xl font-bold text-white">
+                          Pedido #{order.number}
+                        </h3>
                         <span
-                          className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(order.status)}`}
+                          className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(
+                            order.status
+                          )}`}
                         >
                           {getStatusIcon(order.status)}
-                          <span className="ml-2 capitalize">{order.status}</span>
+                          <span className="ml-2 capitalize">
+                            {order.status}
+                          </span>
                         </span>
                       </div>
 
                       <div className="flex items-center gap-4 text-gray-400">
                         <div className="flex items-center gap-2">
                           <Calendar className="w-4 h-4" />
-                          <span className="text-sm">{new Date(order.date_created).toLocaleDateString("pt-BR")}</span>
+                          <span className="text-sm">
+                            {new Date(order.date_created).toLocaleDateString(
+                              "pt-BR"
+                            )}
+                          </span>
                         </div>
                         <div className="flex items-center gap-2">
                           <CreditCard className="w-4 h-4" />
-                          <span className="text-sm">{order.payment_method_title || "Cartão"}</span>
+                          <span className="text-sm">
+                            {order.payment_method_title || "Cartão"}
+                          </span>
                         </div>
                       </div>
 
                       <div className="text-gray-300">
-                        <span className="text-sm">{order.line_items?.length || 0} item(s)</span>
+                        <span className="text-sm">
+                          {order.line_items?.length || 0} item(s)
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -111,7 +135,12 @@ export function OrdersSection({ orders }: OrdersSectionProps) {
                     <div className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
                       R$ {order.total}
                     </div>
-                    <button className="mt-2 px-4 py-2 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-400/30 rounded-lg text-cyan-400 hover:border-cyan-400/50 transition-all duration-300 text-sm">
+                    <button
+                      onClick={() => {
+                        window.location.href = `/order-confirmation/${order.id}`;
+                      }}
+                      className="mt-2 px-4 py-2 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-400/30 rounded-lg text-cyan-400 hover:border-cyan-400/50 transition-all duration-300 text-sm"
+                    >
                       Ver Detalhes
                     </button>
                   </div>
@@ -121,22 +150,31 @@ export function OrdersSection({ orders }: OrdersSectionProps) {
                 {order.line_items && order.line_items.length > 0 && (
                   <div className="mt-6 pt-6 border-t border-gray-700/50">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {order.line_items.slice(0, 3).map((item: any, itemIndex: number) => (
-                        <div key={itemIndex} className="flex items-center gap-3 p-3 bg-gray-800/30 rounded-xl">
-                          <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center">
-                            <Package className="w-6 h-6 text-gray-400" />
+                      {order.line_items
+                        .slice(0, 3)
+                        .map((item: any, itemIndex: number) => (
+                          <div
+                            key={itemIndex}
+                            className="flex items-center gap-3 p-3 bg-gray-800/30 rounded-xl"
+                          >
+                            <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center">
+                              <Package className="w-6 h-6 text-gray-400" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-white font-medium text-sm truncate">
+                                {item.name}
+                              </h4>
+                              <p className="text-gray-400 text-xs">
+                                Qtd: {item.quantity} • R$ {item.total}
+                              </p>
+                            </div>
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="text-white font-medium text-sm truncate">{item.name}</h4>
-                            <p className="text-gray-400 text-xs">
-                              Qtd: {item.quantity} • R$ {item.total}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
+                        ))}
                       {order.line_items.length > 3 && (
                         <div className="flex items-center justify-center p-3 bg-gray-800/30 rounded-xl border-2 border-dashed border-gray-600">
-                          <span className="text-gray-400 text-sm">+{order.line_items.length - 3} mais</span>
+                          <span className="text-gray-400 text-sm">
+                            +{order.line_items.length - 3} mais
+                          </span>
                         </div>
                       )}
                     </div>
@@ -156,7 +194,9 @@ export function OrdersSection({ orders }: OrdersSectionProps) {
           <div className="w-24 h-24 bg-gradient-to-r from-gray-600 to-gray-700 rounded-full flex items-center justify-center mx-auto mb-6">
             <Package className="w-12 h-12 text-gray-400" />
           </div>
-          <h3 className="text-2xl font-bold text-white mb-4">Nenhum pedido encontrado</h3>
+          <h3 className="text-2xl font-bold text-white mb-4">
+            Nenhum pedido encontrado
+          </h3>
           <p className="text-gray-400 mb-8 max-w-md mx-auto">
             Você ainda não fez nenhum pedido. Que tal explorar nossos produtos?
           </p>
@@ -166,5 +206,5 @@ export function OrdersSection({ orders }: OrdersSectionProps) {
         </motion.div>
       )}
     </div>
-  )
+  );
 }

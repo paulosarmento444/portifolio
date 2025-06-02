@@ -127,11 +127,7 @@ export function CheckoutSection({
           </div>
 
           {/* Payment Method Selection */}
-          <PaymentMethodSelector
-            paymentMethods={paymentMethods}
-            selectedMethod={selectedPaymentMethod}
-            onMethodChange={setSelectedPaymentMethod}
-          />
+          <PaymentMethodSelector />
 
           {/* Order Summary */}
           <div className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-2">

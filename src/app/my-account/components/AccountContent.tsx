@@ -1,47 +1,61 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { WelcomeSection } from "./sections/WelcomeSection"
-import { OrdersSection } from "./sections/OrdersSection"
-import { PostsSection } from "./sections/PostsSection"
-import { AccountSection } from "./sections/AccountSection"
-import { AddressesSection } from "./sections/AddressesSection"
-import { EventsSection } from "./sections/EventsSection"
-import { ProductsSection } from "./sections/ProductsSection"
-import { LogoutSection } from "./sections/LogoutSection"
+import { motion } from "framer-motion";
+import { WelcomeSection } from "./sections/WelcomeSection";
+import { OrdersSection } from "./sections/OrdersSection";
+import { PostsSection } from "./sections/PostsSection";
+import { AccountSection } from "./sections/AccountSection";
+import { AddressesSection } from "./sections/AddressesSection";
+import { LogoutSection } from "./sections/LogoutSection";
 
 interface AccountContentProps {
-  selectedMenu: string
-  viewer: any
-  orders: any[]
-  posts: any[]
-  customer: any
-  router: any
+  selectedMenu: string;
+  viewer: any;
+  orders: any[];
+  posts: any[];
+  customer: any;
+  router: any;
 }
 
-export function AccountContent({ selectedMenu, viewer, orders, posts, customer, router }: AccountContentProps) {
+export function AccountContent({
+  selectedMenu,
+  viewer,
+  orders,
+  posts,
+  customer,
+  router,
+}: AccountContentProps) {
   const renderContent = () => {
     switch (selectedMenu) {
       case "welcome":
-        return <WelcomeSection viewer={viewer} orders={orders} />
+        return <WelcomeSection viewer={viewer} orders={orders} />;
       case "orders":
-        return <OrdersSection orders={orders} />
+        return <OrdersSection orders={orders} />;
       case "posts":
-        return <PostsSection posts={posts} />
+        return <PostsSection posts={posts} />;
       case "account":
-        return <AccountSection username={viewer.name} billing={customer.billing} role={customer.role} />
+        return (
+          <AccountSection
+            username={viewer.name}
+            billing={customer.billing}
+            role={customer.role}
+          />
+        );
       case "addresses":
-        return <AddressesSection viewer={viewer} billing={customer.billing} shipping={customer.shipping} />
-      case "events":
-        return <EventsSection />
-      case "products":
-        return <ProductsSection />
+        return (
+          <AddressesSection
+            viewer={viewer}
+            billing={customer.billing}
+            shipping={customer.shipping}
+          />
+        );
+
       case "logout":
-        return <LogoutSection router={router} />
+        return <LogoutSection router={router} />;
       default:
-        return <WelcomeSection viewer={viewer} orders={orders} />
+        return <WelcomeSection viewer={viewer} orders={orders} />;
     }
-  }
+  };
 
   return (
     <motion.div
@@ -57,5 +71,5 @@ export function AccountContent({ selectedMenu, viewer, orders, posts, customer, 
 
       <div className="relative p-8 md:p-12">{renderContent()}</div>
     </motion.div>
-  )
+  );
 }
