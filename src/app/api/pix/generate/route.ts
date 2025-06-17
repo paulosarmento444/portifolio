@@ -12,24 +12,30 @@ export async function POST(request: Request) {
       );
     }
 
-    // Endpoint da API do Asaas para QR Code estático
-    const endpoint = "https://api.asaas.com/v3/pix/qrCodes/static";
+    // Endpoint da API do Mercado Pago
+    const endpoint = "https://api.mercadopago.com/v1/orders";
 
-    // Configuração do payload para o QR Code
+    // Configuração do payload seguindo o formato que funcionou no curl
     const payload = {
-      addressKey: "paulo.cesar.sarmento@hotmail.com", // Substitua pela sua chave PIX
-      description: description || `Pagamento do pedido #${orderId}`,
-      value: value,
-      expirationDate: expirationDate,
-      additionalInfo: [
-        {
-          key: "Pedido",
-          value: orderId,
-        },
-      ],
+      type: "online",
+      external_reference: `ext_ref_${orderId}`,
+      total_amount: value.toString(),
+      payer: {
+        email: "paulo.cesar.sarmento@hotmail.com",
+        first_name: "Paulo",
+      },
+      transactions: {
+        payments: [
+          {
+            amount: value.toString(),
+            payment_method: {
+              id: "pix",
+              type: "bank_transfer",
+            },
+          },
+        ],
+      },
     };
-
-    console.log("DESCRICAO:", body.description);
 
     console.log("Enviando requisição para:", endpoint);
     console.log("Payload:", JSON.stringify(payload, null, 2));
@@ -39,9 +45,9 @@ export async function POST(request: Request) {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-        access_token:
-          process.env.ASAAS_API_KEY ||
-          "$aact_prod_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OjZmNjJjOWQ0LWU4N2ItNGNjZi04ZWI3LTFlMmFjMWFiZmMyMDo6JGFhY2hfZjI4NWU1MjYtOTdhOC00MDVkLTljOTItZjg4OTZmMTAyNjNh",
+        Authorization:
+          "Bearer APP_USR-4592896543217568-052118-d2bc930d8d03e4d1f51a3a607c8e0ba9-179353811",
+        "X-Idempotency-Key": `idempotency_${orderId}_${Date.now()}`,
       },
       body: JSON.stringify(payload),
     });
@@ -51,13 +57,13 @@ export async function POST(request: Request) {
     if (!response.ok) {
       const errorText = await response.text();
       console.error(
-        "Erro na resposta da API do Asaas:",
+        "Erro na resposta da API do Mercado Pago:",
         response.status,
         errorText
       );
       return NextResponse.json(
         {
-          error: `API do Asaas retornou erro: ${response.status}`,
+          error: `API do Mercado Pago retornou erro: ${response.status}`,
           details: errorText,
         },
         { status: response.status }
@@ -65,9 +71,24 @@ export async function POST(request: Request) {
     }
 
     const data = await response.json();
-    console.log("Resposta da API do Asaas:", JSON.stringify(data, null, 2));
+    console.log(
+      "Resposta da API do Mercado Pago:",
+      JSON.stringify(data, null, 2)
+    );
 
-    return NextResponse.json(data);
+    // Extrair dados do QR Code da resposta
+    const payment = data.transactions?.payments?.[0];
+    const qrCodeData = {
+      orderId: data.id,
+      qr_code: payment?.payment_method?.qr_code,
+      qr_code_base64: payment?.payment_method?.qr_code_base64,
+      ticket_url: payment?.payment_method?.ticket_url,
+      expiration_date: payment?.date_of_expiration,
+      status: data.status,
+      total_amount: data.total_amount,
+    };
+
+    return NextResponse.json(qrCodeData);
   } catch (error) {
     console.error("Erro ao gerar QR Code PIX:", error);
     return NextResponse.json(

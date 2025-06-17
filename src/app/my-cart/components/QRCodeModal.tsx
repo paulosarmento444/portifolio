@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-
 import { useState, useEffect } from "react";
 import { X, Package, Loader2, Check } from "lucide-react";
 import {
@@ -36,10 +35,17 @@ export function QRCodeModal({
   const [isGenerating, setIsGenerating] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [paymentConfirmed, setPaymentConfirmed] = useState(false);
 
   useEffect(() => {
     if (isOpen && !orderId) {
       generateOrder();
+    }
+
+    // Reset states quando modal abre/fecha
+    if (!isOpen) {
+      // Não resetar orderId para manter histórico, mas resetar outros estados se necessário
+      setPaymentConfirmed(false);
     }
   }, [isOpen]);
 
@@ -97,36 +103,53 @@ export function QRCodeModal({
     }
   };
 
+  const handlePaymentSuccess = () => {
+    console.log("Pagamento confirmado com sucesso!");
+    setPaymentConfirmed(true);
+    // Opcional: atualizar status do pedido no banco de dados
+    // updateOrderStatus(orderId, 'paid')
+  };
+
   const handleClose = () => {
-    // Cliente pode fechar a qualquer momento
+    console.log("Fechando modal - polling será interrompido");
     onClose();
   };
 
   const handleBackdropClick = (e: React.MouseEvent) => {
-    // Não fechar ao clicar no backdrop - só pelo botão X
     e.stopPropagation();
   };
 
-  // Renderizar o conteúdo do modal diretamente
   return (
     <>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center">
-            <Package className="w-5 h-5 text-white" />
+          <div
+            className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+              paymentConfirmed
+                ? "bg-gradient-to-r from-green-500 to-emerald-500"
+                : "bg-gradient-to-r from-purple-500 to-pink-500"
+            }`}
+          >
+            {paymentConfirmed ? (
+              <Check className="w-5 h-5 text-white" />
+            ) : (
+              <Package className="w-5 h-5 text-white" />
+            )}
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white">Pedido Criado!</h2>
+            <h2 className="text-xl font-bold text-white">
+              {paymentConfirmed ? "Pagamento Confirmado!" : "Pedido Criado!"}
+            </h2>
             {orderId && (
               <p className="text-sm text-gray-400">Pedido #{orderId}</p>
             )}
           </div>
         </div>
-        {/* Botão de fechar sempre visível */}
         <button
           onClick={handleClose}
           className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+          title="Fechar (interrompe verificação de pagamento)"
         >
           <X className="w-4 h-4 text-white" />
         </button>
@@ -156,7 +179,13 @@ export function QRCodeModal({
           <p className="text-gray-400 text-sm">Aguarde um momento</p>
         </div>
       ) : orderId && paymentMethod === "pix" ? (
-        <PixQRCode orderId={orderId} total={total} onClose={handleClose} />
+        <PixQRCode
+          orderId={orderId}
+          total={total}
+          onClose={handleClose}
+          onPaymentSuccess={handlePaymentSuccess}
+          isModalOpen={isOpen} // Passa o estado da modal para controlar o polling
+        />
       ) : orderId ? (
         <div className="text-center py-8">
           <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -207,28 +236,34 @@ export function QRCodeModal({
           <div className="border-t border-white/10 pt-2">
             <div className="flex justify-between font-bold">
               <span className="text-white">Total:</span>
-              <span className="text-white text-lg">R$ {total.toFixed(2)}</span>
+              <span
+                className={`text-lg ${
+                  paymentConfirmed ? "text-green-400" : "text-white"
+                }`}
+              >
+                R$ {total.toFixed(2)}
+              </span>
             </div>
           </div>
         </div>
       )}
 
-      {/* Action Buttons */}
-      {orderId && !error && (
+      {/* Action Buttons - só mostrar se pagamento foi confirmado */}
+      {orderId && !error && paymentConfirmed && (
         <div className="mt-6 flex flex-col sm:flex-row gap-3">
           <button
             onClick={() =>
               (window.location.href = `/order-confirmation/${orderId}`)
             }
-            className="flex-1 px-4 py-3 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-400/30 rounded-xl text-cyan-400 hover:border-cyan-400/50 transition-all duration-300 text-sm font-medium"
+            className="flex-1 px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-xl transition-all duration-300 text-sm font-medium"
           >
-            Ver Pedido
+            Ver Confirmação
           </button>
           <button
             onClick={() => (window.location.href = "/store")}
             className="flex-1 px-4 py-3 bg-white/10 hover:bg-white/20 border border-white/10 text-white rounded-xl transition-all duration-200 text-sm font-medium"
           >
-            Continuar Comprando
+            Nova Compra
           </button>
         </div>
       )}
