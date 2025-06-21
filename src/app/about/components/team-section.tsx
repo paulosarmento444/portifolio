@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { Linkedin, Instagram, Mail } from "lucide-react"
+import { motion } from "framer-motion";
+import { Linkedin, Instagram, Mail } from "lucide-react";
 
 export default function TeamSection() {
   const team = [
     {
-      name: "Carlos Silva",
-      role: "Fundador & CEO",
-      description: "Ex-atleta profissional com 15 anos de experiência no mercado esportivo.",
-      image: "/placeholder.svg?height=300&width=300",
+      name: "Paulo César Sarmento",
+      role: "Representante Comercial Senior",
+      description: "Vendedor e especialista em atendimento personalizado.",
+      image: "/representante.jpg?height=300&width=300",
       social: {
         linkedin: "#",
         instagram: "#",
@@ -17,10 +17,11 @@ export default function TeamSection() {
       },
     },
     {
-      name: "Ana Santos",
-      role: "Diretora de Produtos",
-      description: "Especialista em equipamentos esportivos e tendências do mercado fitness.",
-      image: "/placeholder.svg?height=300&width=300",
+      name: "Maria Helena da Silva",
+      role: "Diretora Comercial",
+      description:
+        "Especialista em equipamentos esportivos e tendências do mercado fitness.",
+      image: "/ceo.png?height=300&width=300",
       social: {
         linkedin: "#",
         instagram: "#",
@@ -28,17 +29,18 @@ export default function TeamSection() {
       },
     },
     {
-      name: "Roberto Lima",
-      role: "Gerente de Vendas",
-      description: "Apaixonado por esportes e especialista em atendimento personalizado.",
-      image: "/placeholder.svg?height=300&width=300",
+      name: "Paulo César Sarmento Júnior",
+      role: "Gerente de Tecnologia",
+      description:
+        "Apaixonado por tecnologia e especialista em atendimento personalizado.",
+      image: "/tecnico.jpeg?height=300&width=300",
       social: {
         linkedin: "#",
         instagram: "#",
         email: "roberto@loja.com",
       },
     },
-  ]
+  ];
 
   return (
     <section className="relative py-20 px-6 bg-black overflow-hidden">
@@ -64,7 +66,8 @@ export default function TeamSection() {
             </span>
           </h2>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Profissionais apaixonados por esporte, dedicados a oferecer a melhor experiência para nossos clientes
+            Profissionais apaixonados por esporte, dedicados a oferecer a melhor
+            experiência para nossos clientes
           </p>
         </motion.div>
 
@@ -101,9 +104,15 @@ export default function TeamSection() {
                 </div>
 
                 {/* Info */}
-                <h3 className="text-2xl font-bold text-white mb-2">{member.name}</h3>
-                <p className="text-cyan-400 font-semibold mb-4">{member.role}</p>
-                <p className="text-gray-400 text-sm leading-relaxed mb-6">{member.description}</p>
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  {member.name}
+                </h3>
+                <p className="text-cyan-400 font-semibold mb-4">
+                  {member.role}
+                </p>
+                <p className="text-gray-400 text-sm leading-relaxed mb-6">
+                  {member.description}
+                </p>
 
                 {/* Social Links */}
                 <div className="flex justify-center gap-4">
@@ -132,5 +141,5 @@ export default function TeamSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }

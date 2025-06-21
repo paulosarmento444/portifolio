@@ -102,7 +102,7 @@ export default function BlogHero() {
               {/* Image Container */}
               <div className="relative bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl rounded-3xl p-8 border border-gray-700/50 group-hover:border-cyan-400/50 transition-all duration-500">
                 <img
-                  src="/placeholder.svg?height=500&width=400"
+                  src="/blog.png?height=500&width=400"
                   alt="Blog de Tecnologia"
                   className="w-full h-auto rounded-2xl shadow-2xl group-hover:scale-105 transition-transform duration-500"
                 />

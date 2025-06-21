@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { Trophy, Target, Zap, Users, Award, Star } from "lucide-react"
+import { motion } from "framer-motion";
+import { Trophy, Target, Zap, Users, Award, Star } from "lucide-react";
 
 export default function AboutHero() {
   return (
@@ -58,8 +58,10 @@ export default function AboutHero() {
             </h1>
 
             <p className="text-xl text-gray-300 leading-relaxed">
-              Há mais de <span className="text-cyan-400 font-semibold">10 anos</span> transformando sonhos em
-              conquistas. Somos mais que uma loja de esportes - somos parceiros na sua jornada rumo à{" "}
+              Há mais de{" "}
+              <span className="text-cyan-400 font-semibold">10 anos</span>{" "}
+              transformando sonhos em conquistas. Somos mais que uma loja de
+              esportes - somos parceiros na sua jornada rumo à{" "}
               <span className="text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text font-semibold">
                 excelência
               </span>
@@ -97,7 +99,7 @@ export default function AboutHero() {
               {/* Image Container */}
               <div className="relative bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl rounded-3xl p-8 border border-gray-700/50 group-hover:border-cyan-400/50 transition-all duration-500">
                 <img
-                  src="/placeholder.svg?height=500&width=400"
+                  src="/loja.webp?height=500&width=400"
                   alt="Nossa Loja de Esportes"
                   className="w-full h-auto rounded-2xl shadow-2xl group-hover:scale-105 transition-transform duration-500"
                 />
@@ -118,13 +120,18 @@ export default function AboutHero() {
 
       <style jsx>{`
         @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-15px) rotate(5deg); }
+          0%,
+          100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          50% {
+            transform: translateY(-15px) rotate(5deg);
+          }
         }
         .animate-float {
           animation: float 4s ease-in-out infinite;
         }
       `}</style>
     </section>
-  )
+  );
 }
