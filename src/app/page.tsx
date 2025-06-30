@@ -2,14 +2,17 @@ import Header from "@/app/components/Header";
 import { ContactForm } from "./contact/components";
 import { Toaster } from "./components/toaster";
 import SportsBanner from "./components/Banner";
+import TeamSection from "./about/components/team-section";
+import CategoriesShowcase from "./components/categories-showcase";
 
 export default async function Home() {
   return (
     <>
       <Header />
-      <div className="mt-20">
-        <SportsBanner />
-      </div>
+
+      <CategoriesShowcase />
+
+      <TeamSection />
       <ContactForm />
       <Toaster />
     </>

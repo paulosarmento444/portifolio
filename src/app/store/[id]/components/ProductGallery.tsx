@@ -126,7 +126,7 @@ export function ProductGallery({
               }`}
             >
               <Image
-                src={image.src || "/placeholder.svg?height=150&width=150"}
+                src={image.src || "/blog.png?height=150&width=150"}
                 alt={image.alt || `${product.name} ${index + 1}`}
                 fill
                 className="object-cover"

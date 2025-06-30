@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Header from "../components/Header";
-import StoreHero from "./components/store-hero";
 import StoreFilters from "./components/store-filters";
 import StoreGrid from "./components/store-grid";
 import { getProducts, getCategories } from "../service/ProductService";

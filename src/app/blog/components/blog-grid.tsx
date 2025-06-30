@@ -1,41 +1,47 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import Link from "next/link"
-import Image from "next/image"
-import { CalendarIcon, ArrowUpRight, RefreshCw } from "lucide-react"
-import { format } from "date-fns"
-import { ptBR } from "date-fns/locale"
+import { motion } from "framer-motion";
+import Link from "next/link";
+import Image from "next/image";
+import { CalendarIcon, ArrowUpRight, RefreshCw } from "lucide-react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 interface Post {
-  title: string
-  content: string
-  uri: string
-  date: string
-  excerpt?: string
+  title: string;
+  content: string;
+  uri: string;
+  date: string;
+  excerpt?: string;
   featuredImage?: {
     node: {
-      sourceUrl: string
-      altText?: string
-    }
-  }
+      sourceUrl: string;
+      altText?: string;
+    };
+  };
   categories?: {
     nodes: {
-      name: string
-      slug: string
-    }[]
-  }
+      name: string;
+      slug: string;
+    }[];
+  };
 }
 
 interface BlogGridProps {
-  posts: Post[]
-  loading: boolean
-  error: string | null
-  cleanExcerpt: (excerpt?: string) => string
-  onClearFilters: () => void
+  posts: Post[];
+  loading: boolean;
+  error: string | null;
+  cleanExcerpt: (excerpt?: string) => string;
+  onClearFilters: () => void;
 }
 
-export default function BlogGrid({ posts, loading, error, cleanExcerpt, onClearFilters }: BlogGridProps) {
+export default function BlogGrid({
+  posts,
+  loading,
+  error,
+  cleanExcerpt,
+  onClearFilters,
+}: BlogGridProps) {
   return (
     <section className="relative py-20 px-6 bg-black overflow-hidden">
       {/* Background Effects */}
@@ -74,7 +80,7 @@ export default function BlogGrid({ posts, loading, error, cleanExcerpt, onClearF
         )}
       </div>
     </section>
-  )
+  );
 }
 
 const PostCard = ({ post, excerpt }: { post: Post; excerpt: string }) => {
@@ -93,8 +99,11 @@ const PostCard = ({ post, excerpt }: { post: Post; excerpt: string }) => {
             width={380}
             height={200}
             className="w-full h-full object-cover group-hover:scale-110 duration-500 transition-all"
-            alt={post.featuredImage?.node?.altText || `Thumbnail para ${post.title}`}
-            src={post.featuredImage?.node?.sourceUrl || "/placeholder.svg"}
+            alt={
+              post.featuredImage?.node?.altText ||
+              `Thumbnail para ${post.title}`
+            }
+            src={post.featuredImage?.node?.sourceUrl || "/blog1.png"}
             unoptimized
           />
 
@@ -117,12 +126,18 @@ const PostCard = ({ post, excerpt }: { post: Post; excerpt: string }) => {
             {post.title}
           </h2>
 
-          {excerpt && <p className="text-gray-400 text-sm mb-4 line-clamp-3 flex-1">{excerpt}</p>}
+          {excerpt && (
+            <p className="text-gray-400 text-sm mb-4 line-clamp-3 flex-1">
+              {excerpt}
+            </p>
+          )}
 
           <div className="flex items-center justify-between mt-auto">
             <div className="flex items-center text-gray-500 text-xs bg-gray-800/50 px-3 py-1.5 rounded-full">
               <CalendarIcon size={14} className="mr-1.5" />
-              <time dateTime={post.date}>{format(new Date(post.date), "d MMM, yyyy", { locale: ptBR })}</time>
+              <time dateTime={post.date}>
+                {format(new Date(post.date), "d MMM, yyyy", { locale: ptBR })}
+              </time>
             </div>
 
             <span className="text-cyan-400 text-sm font-medium flex items-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
@@ -132,8 +147,8 @@ const PostCard = ({ post, excerpt }: { post: Post; excerpt: string }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 const PostCardSkeleton = () => (
   <div className="relative h-full">
@@ -152,7 +167,7 @@ const PostCardSkeleton = () => (
       </div>
     </div>
   </div>
-)
+);
 
 const ErrorMessage = ({ message }: { message: string }) => (
   <motion.div
@@ -174,7 +189,7 @@ const ErrorMessage = ({ message }: { message: string }) => (
       </button>
     </div>
   </motion.div>
-)
+);
 
 const NoPostsMessage = ({ onClearFilters }: { onClearFilters: () => void }) => (
   <motion.div
@@ -185,7 +200,9 @@ const NoPostsMessage = ({ onClearFilters }: { onClearFilters: () => void }) => (
   >
     <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 via-purple-500/20 to-pink-500/20 rounded-3xl blur-xl"></div>
     <div className="relative bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl rounded-3xl border border-gray-700/50 p-8 text-center">
-      <p className="text-gray-400 text-xl mb-6">Nenhum post encontrado para sua pesquisa</p>
+      <p className="text-gray-400 text-xl mb-6">
+        Nenhum post encontrado para sua pesquisa
+      </p>
       <button
         onClick={onClearFilters}
         className="px-6 py-3 bg-gradient-to-r from-cyan-400 to-purple-500 text-white rounded-full hover:from-cyan-500 hover:to-purple-600 transition-all duration-300 font-medium shadow-lg shadow-cyan-500/25"
@@ -194,4 +211,4 @@ const NoPostsMessage = ({ onClearFilters }: { onClearFilters: () => void }) => (
       </button>
     </div>
   </motion.div>
-)
+);

@@ -168,7 +168,7 @@ export default function ProductCard({ product, viewMode }: ProductCardProps) {
                 )}
               </div>
 
-              {product.categories && product.categories.length > 0 && (
+              {/* {product.categories && product.categories.length > 0 && (
                 <div className="flex flex-wrap gap-2 pointer-events-none">
                   {product.categories
                     .slice(0, 2)
@@ -181,7 +181,7 @@ export default function ProductCard({ product, viewMode }: ProductCardProps) {
                       </span>
                     ))}
                 </div>
-              )}
+              )} */}
             </div>
           </div>
         </div>
@@ -265,26 +265,26 @@ export default function ProductCard({ product, viewMode }: ProductCardProps) {
               {product.on_sale ? (
                 <div className="flex flex-col">
                   <span className="text-lg font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                    R$ {product.sale_price}
+                    R$ {(product.price * 1).toFixed(2)}
                   </span>
                   <span className="text-sm text-gray-500 line-through">
-                    R$ {product.regular_price}
+                    R$ {(product.price * 1.4).toFixed(2)}
                   </span>
                 </div>
               ) : (
                 <div className="text-lg font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                  R$ {product.price}
+                  R$ {(product.price * 1).toFixed(2)}
                 </div>
               )}
             </div>
 
-            {product.categories && product.categories.length > 0 && (
+            {/* {product.categories && product.categories.length > 0 && (
               <div className="text-right pointer-events-none">
                 <span className="bg-gray-800/50 text-gray-300 px-3 py-1.5 rounded-full text-xs border border-gray-600/50">
                   {product.categories[0].name}
                 </span>
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </div>

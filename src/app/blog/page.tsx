@@ -85,6 +85,8 @@ export default function Blog() {
             };
           }) || [];
 
+        console.log("Resposta da API:", postsData);
+
         setPosts(postsData);
       } catch (error) {
         console.error("Error fetching posts:", error);

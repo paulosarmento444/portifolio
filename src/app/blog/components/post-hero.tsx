@@ -1,43 +1,43 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
-import { ChevronLeft, CalendarIcon, UserIcon, Tag } from "lucide-react"
-import { format } from "date-fns"
-import { ptBR } from "date-fns/locale"
+import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { ChevronLeft, CalendarIcon, UserIcon, Tag } from "lucide-react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 interface Post {
-  title: string
-  date: string
+  title: string;
+  date: string;
   author?: {
     node: {
-      name: string
+      name: string;
       avatar?: {
-        url: string
-      }
-    }
-  }
+        url: string;
+      };
+    };
+  };
   featuredImage?: {
     node: {
-      sourceUrl: string
-      altText?: string
-    }
-  }
+      sourceUrl: string;
+      altText?: string;
+    };
+  };
   categories?: {
     nodes: {
-      name: string
-      slug: string
-    }[]
-  }
+      name: string;
+      slug: string;
+    }[];
+  };
 }
 
 interface PostHeroProps {
-  post: Post
+  post: Post;
 }
 
 export default function PostHero({ post }: PostHeroProps) {
-  const router = useRouter()
+  const router = useRouter();
 
   return (
     <section className="relative w-full h-[70vh] min-h-[600px] bg-black overflow-hidden">
@@ -150,5 +150,5 @@ export default function PostHero({ post }: PostHeroProps) {
         </motion.div>
       </div>
     </section>
-  )
+  );
 }

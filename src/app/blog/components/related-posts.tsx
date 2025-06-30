@@ -1,22 +1,22 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import Link from "next/link"
-import Image from "next/image"
-import { ArrowUpRight } from "lucide-react"
+import { motion } from "framer-motion";
+import Link from "next/link";
+import Image from "next/image";
+import { ArrowUpRight } from "lucide-react";
 
 interface RelatedPost {
-  title: string
-  uri: string
+  title: string;
+  uri: string;
   featuredImage?: {
     node: {
-      sourceUrl: string
-    }
-  }
+      sourceUrl: string;
+    };
+  };
 }
 
 interface RelatedPostsProps {
-  posts: RelatedPost[]
+  posts: RelatedPost[];
 }
 
 export default function RelatedPosts({ posts }: RelatedPostsProps) {
@@ -70,7 +70,10 @@ export default function RelatedPosts({ posts }: RelatedPostsProps) {
                   {/* Image */}
                   <div className="h-48 relative overflow-hidden">
                     <Image
-                      src={post.featuredImage?.node?.sourceUrl || "/placeholder.svg"}
+                      src={
+                        post.featuredImage?.node?.sourceUrl ||
+                        "/placeholder.svg"
+                      }
                       alt={post.title}
                       fill
                       className="object-cover group-hover:scale-110 transition-transform duration-500"
@@ -102,5 +105,5 @@ export default function RelatedPosts({ posts }: RelatedPostsProps) {
         </div>
       </div>
     </section>
-  )
+  );
 }

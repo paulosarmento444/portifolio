@@ -2,7 +2,7 @@ import axios from "axios";
 
 const consumerKey = process.env.NEXT_PUBLIC_WC_CONSUMER_KEY;
 const consumerSecret = process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET;
-const baseURL = process.env.NEXT_PUBLIC_WP_BASE_URL;
+const baseURL = process.env.NEXT_PUBLIC_WORDPRESS_URL;
 
 if (!consumerKey || !consumerSecret || !baseURL) {
   throw new Error(
