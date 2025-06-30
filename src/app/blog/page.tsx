@@ -7,6 +7,7 @@ import Header from "../components/Header";
 import BlogHero from "./components/blog-hero";
 import BlogFilters from "./components/blog-filters";
 import BlogGrid from "./components/blog-grid";
+import BlogPagination from "./components/blog-pagination";
 import { Toaster } from "react-hot-toast";
 
 interface Post {
@@ -29,9 +30,16 @@ interface Post {
   };
 }
 
+interface PageInfo {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  startCursor: string;
+  endCursor: string;
+}
+
 const GET_POSTS = gql`
-  query GetAllPosts {
-    posts {
+  query GetAllPosts($first: Int, $after: String) {
+    posts(first: $first, after: $after) {
       nodes {
         title
         uri
@@ -50,9 +58,17 @@ const GET_POSTS = gql`
           }
         }
       }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
     }
   }
 `;
+
+const POSTS_PER_PAGE = 9;
 
 export default function Blog() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -60,44 +76,61 @@ export default function Blog() {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [pageInfo, setPageInfo] = useState<PageInfo | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPosts, setTotalPosts] = useState(0);
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        setLoading(true);
-        const { data } = await apolloClient.query({
-          query: GET_POSTS,
-          fetchPolicy: "network-only",
-        });
-
-        const postsData =
-          data?.posts?.nodes.map((post: any) => {
-            let formattedUri = post.uri;
-            if (formattedUri.startsWith("/")) {
-              formattedUri = formattedUri.substring(1);
-            }
-            if (formattedUri.startsWith("blog/")) {
-              formattedUri = formattedUri.substring(5);
-            }
-            return {
-              ...post,
-              uri: formattedUri,
-            };
-          }) || [];
-
-        console.log("Resposta da API:", postsData);
-
-        setPosts(postsData);
-      } catch (error) {
-        console.error("Error fetching posts:", error);
-        setError("Falha ao carregar os posts. Por favor, tente novamente.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchPosts();
-  }, []);
+  }, [currentPage]);
+
+  const fetchPosts = async (after?: string) => {
+    try {
+      setLoading(true);
+      const { data } = await apolloClient.query({
+        query: GET_POSTS,
+        variables: {
+          first: POSTS_PER_PAGE,
+          after: after || null,
+        },
+        fetchPolicy: "network-only",
+      });
+
+      const postsData =
+        data?.posts?.nodes.map((post: any) => {
+          let formattedUri = post.uri;
+          if (formattedUri.startsWith("/")) {
+            formattedUri = formattedUri.substring(1);
+          }
+          if (formattedUri.startsWith("blog/")) {
+            formattedUri = formattedUri.substring(5);
+          }
+          return {
+            ...post,
+            uri: formattedUri,
+          };
+        }) || [];
+
+      setPosts(postsData);
+      setPageInfo(data?.posts?.pageInfo || null);
+
+      // Estimate total posts (this is a rough calculation)
+      setTotalPosts(
+        currentPage * POSTS_PER_PAGE +
+          (data?.posts?.pageInfo?.hasNextPage ? POSTS_PER_PAGE : 0)
+      );
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+      setError("Falha ao carregar os posts. Por favor, tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const cleanExcerpt = (excerpt?: string) => {
     if (!excerpt) return "";
@@ -130,6 +163,8 @@ export default function Blog() {
     return matchesSearch && matchesCategory;
   });
 
+  const totalPages = Math.ceil(totalPosts / POSTS_PER_PAGE);
+
   return (
     <>
       <Header />
@@ -152,6 +187,15 @@ export default function Blog() {
             setSelectedCategory(null);
           }}
         />
+        {!loading && !error && totalPages > 1 && (
+          <BlogPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            hasNextPage={pageInfo?.hasNextPage || false}
+            hasPreviousPage={pageInfo?.hasPreviousPage || false}
+          />
+        )}
       </main>
       <Toaster />
     </>
