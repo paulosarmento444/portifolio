@@ -1,5 +1,7 @@
 import type React from "react";
 import { BackToTop } from "./components/back-to-top";
+import { ChatbotWidget } from "./components/chatbot/ChatbotWidget";
+import { defaultChatbotConfig } from "./components/chatbot/config";
 import Script from "next/script";
 import "./globals.css";
 
@@ -29,7 +31,10 @@ export default function RootLayout({
 
         <BackToTop />
 
-        <Script
+        {/* Chatbot Widget */}
+        <ChatbotWidget config={defaultChatbotConfig} />
+
+        {/* <Script
           id="tawk-chat"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
@@ -41,11 +46,11 @@ export default function RootLayout({
               s1.src='https://embed.tawk.to/686122730fa35a190e03dfde/1iutmt4qe';
               s1.charset='UTF-8';
               s1.setAttribute('crossorigin','*');
-              s0.parentNode.insertBefore(s1,s0);
+              s0.parentNode.insertBefore(s1,s0);`
             })();
           `,
           }}
-        />
+        /> */}
 
         {children}
       </body>

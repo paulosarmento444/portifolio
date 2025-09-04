@@ -40,6 +40,7 @@
     "json-server": "^1.0.0-alpha.23",
     "libphonenumber-js": "^1.10.38",
     "lucide-react": "^0.426.0",
+    "marked": "^16.2.1",
     "next": "14.1.0",
     "qrcode.react": "^4.2.0",
     "react": "^18",
