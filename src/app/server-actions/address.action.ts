@@ -49,3 +49,33 @@ export async function updateCustomerAddress(
     };
   }
 }
+
+export async function updateBillingAddress(customerId: string, billing: any) {
+  try {
+    const response = await woocommerceClient.put(`/customers/${customerId}`, {
+      billing,
+    });
+    return { success: true, customer: response.data };
+  } catch (error: any) {
+    console.error("Erro ao atualizar billing:", error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Erro ao salvar billing",
+    };
+  }
+}
+
+export async function updateShippingAddress(customerId: string, shipping: any) {
+  try {
+    const response = await woocommerceClient.put(`/customers/${customerId}`, {
+      shipping,
+    });
+    return { success: true, customer: response.data };
+  } catch (error: any) {
+    console.error("Erro ao atualizar shipping:", error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Erro ao salvar shipping",
+    };
+  }
+}

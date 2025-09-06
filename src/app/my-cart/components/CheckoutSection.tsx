@@ -31,7 +31,9 @@ export function CheckoutSection({
 }: CheckoutSectionProps) {
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [currentAddress, setCurrentAddress] = useState(billing);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("pix");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
+    "pix" | "card"
+  >("pix");
 
   const hasAddress =
     currentAddress?.address_1 &&
@@ -127,7 +129,10 @@ export function CheckoutSection({
           </div>
 
           {/* Payment Method Selection */}
-          <PaymentMethodSelector />
+          <PaymentMethodSelector
+            selected={selectedPaymentMethod}
+            onChange={(m) => setSelectedPaymentMethod(m)}
+          />
 
           {/* Order Summary */}
           <div className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-2">
@@ -168,7 +173,11 @@ export function CheckoutSection({
                   : "bg-gray-600 text-gray-400 cursor-not-allowed"
               }`}
             >
-              <span>Finalizar Compra</span>
+              <span>
+                {selectedPaymentMethod === "pix"
+                  ? "Finalizar com PIX"
+                  : "Pagar com Cartão"}
+              </span>
               <ArrowRight className="w-5 h-5" />
             </motion.button>
 

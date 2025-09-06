@@ -5,7 +5,15 @@ import { motion } from "framer-motion";
 
 const MotionCard = motion(Card);
 const MotionBox = motion(Box);
-export function PaymentMethodSelector() {
+interface PaymentMethodSelectorProps {
+  selected: "pix" | "card";
+  onChange: (method: "pix" | "card") => void;
+}
+
+export function PaymentMethodSelector({
+  selected,
+  onChange,
+}: PaymentMethodSelectorProps) {
   const pixBenefits = [
     {
       icon: <Speed sx={{ fontSize: 20 }} />,
@@ -35,7 +43,7 @@ export function PaymentMethodSelector() {
           Método de Pagamento
         </Typography>
         <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.7)" }}>
-          Aceitamos apenas PIX para maior segurança e agilidade
+          Selecione o método de pagamento desejado
         </Typography>
       </Box>
 
@@ -46,11 +54,15 @@ export function PaymentMethodSelector() {
           border: "2px solid rgba(16,185,129,0.3)",
           position: "relative",
           overflow: "hidden",
+          outline:
+            selected === "pix" ? "3px solid rgba(16,185,129,0.6)" : "none",
+          cursor: "pointer",
         }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         whileHover={{ scale: 1.02 }}
+        onClick={() => onChange("pix")}
       >
         {/* Background Pattern */}
         <Box
@@ -112,7 +124,7 @@ export function PaymentMethodSelector() {
             </Box>
 
             <Chip
-              label="SELECIONADO"
+              label={selected === "pix" ? "SELECIONADO" : "PIX"}
               size="small"
               sx={{
                 bgcolor: "rgba(255,255,255,0.2)",
@@ -164,6 +176,88 @@ export function PaymentMethodSelector() {
         </CardContent>
       </MotionCard>
 
+      {/* CARD (Credito) */}
+      <MotionCard
+        sx={{
+          mt: 2,
+          background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+          border: "2px solid rgba(59,130,246,0.3)",
+          position: "relative",
+          overflow: "hidden",
+          outline:
+            selected === "card" ? "3px solid rgba(59,130,246,0.6)" : "none",
+          cursor: "pointer",
+        }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        whileHover={{ scale: 1.02 }}
+        onClick={() => onChange("card")}
+      >
+        <CardContent sx={{ p: 3, position: "relative" }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              mb: 2,
+            }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <MotionBox
+                sx={{
+                  width: 48,
+                  height: 48,
+                  bgcolor: "rgba(255,255,255,0.2)",
+                  borderRadius: 2,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {/* Using QrCode icon for consistency; in real UI, use a Card icon */}
+                <QrCode sx={{ fontSize: 28, color: "white" }} />
+              </MotionBox>
+
+              <Box>
+                <Typography
+                  variant="h5"
+                  sx={{ color: "white", fontWeight: "bold", mb: 0.5 }}
+                >
+                  Cartão de Crédito
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ color: "rgba(255,255,255,0.9)" }}
+                >
+                  Mercado Pago Checkout Pro
+                </Typography>
+              </Box>
+            </Box>
+
+            <Chip
+              label={selected === "card" ? "SELECIONADO" : "CARTÃO"}
+              size="small"
+              sx={{
+                bgcolor: "rgba(255,255,255,0.2)",
+                color: "white",
+                fontWeight: 600,
+                fontSize: "0.75rem",
+              }}
+            />
+          </Box>
+
+          <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
+            <Typography
+              variant="caption"
+              sx={{ color: "rgba(255,255,255,0.9)" }}
+            >
+              Pague em cartão, com segurança do Mercado Pago
+            </Typography>
+          </Stack>
+        </CardContent>
+      </MotionCard>
+
       {/* Info Box */}
       <MotionBox
         sx={{
@@ -199,14 +293,15 @@ export function PaymentMethodSelector() {
             variant="body2"
             sx={{ color: "white", fontWeight: 500, mb: 0.5 }}
           >
-            Por que apenas PIX?
+            Sobre os métodos de pagamento
           </Typography>
           <Typography
             variant="caption"
             sx={{ color: "rgba(255,255,255,0.7)", lineHeight: 1.4 }}
           >
-            Oferecemos apenas PIX para garantir pagamentos instantâneos, seguros
-            e sem taxas adicionais para você.
+            PIX: aprovação rápida e sem taxas adicionais. Cartão:
+            redirecionamento para Checkout Pro do Mercado Pago, com segurança e
+            parcelamento conforme disponível.
           </Typography>
         </Box>
       </MotionBox>

@@ -8,6 +8,7 @@ import {
   confirmOrderPayment,
 } from "../../server-actions/order.action";
 import { PixQRCode } from "./PixQRCode";
+import { WalletButton } from "./WalletButton";
 
 interface QRCodeModalProps {
   userId: string;
@@ -36,6 +37,7 @@ export function QRCodeModal({
   const [orderId, setOrderId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
 
   useEffect(() => {
     if (isOpen && !orderId) {
@@ -92,6 +94,45 @@ export function QRCodeModal({
 
       if (result.success && result.order) {
         setOrderId(result.order.id.toString());
+        // Nenhum item adicional necessário para o PIX
+        if (paymentMethod === "card") {
+          // Criar preferência no Mercado Pago e redirecionar
+          try {
+            setRedirecting(true);
+            const prefRes = await fetch("/api/mercadopago/preference", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                orderId: result.order.id,
+                total: total,
+                items: cart.items.map((it: any) => {
+                  const p = products.find((pp: any) => pp.id === it.product_id);
+                  return {
+                    title: p?.name || `Produto ${it.product_id}`,
+                    quantity: it.quantity,
+                    unit_price: Number(it.total) / Number(it.quantity || 1),
+                    picture_url: p?.images?.[0]?.src || p?.image || undefined,
+                  };
+                }),
+              }),
+            });
+            const prefData = await prefRes.json();
+            if (prefRes.ok && prefData.init_point) {
+              window.location.href = prefData.init_point;
+            } else if (prefData.sandbox_init_point) {
+              window.location.href = prefData.sandbox_init_point;
+            } else {
+              setError(
+                prefData.error || "Erro ao iniciar pagamento com cartão"
+              );
+              setRedirecting(false);
+            }
+          } catch (e) {
+            console.error(e);
+            setError("Falha ao criar preferência de pagamento");
+            setRedirecting(false);
+          }
+        }
       } else {
         setError(result.error || "Erro ao criar pedido");
       }
@@ -185,6 +226,20 @@ export function QRCodeModal({
           onClose={handleClose}
           onPaymentSuccess={handlePaymentSuccess}
           isModalOpen={isOpen} // Passa o estado da modal para controlar o polling
+        />
+      ) : orderId && paymentMethod === "card" ? (
+        <WalletButton
+          orderId={orderId}
+          total={total}
+          items={cart.items?.map((it: any) => {
+            const p = products.find((pp: any) => pp.id === it.product_id);
+            return {
+              title: p?.name || `Produto ${it.product_id}`,
+              quantity: it.quantity,
+              unit_price: Number(it.total) / Number(it.quantity || 1),
+              picture_url: p?.images?.[0]?.src || p?.image,
+            };
+          })}
         />
       ) : orderId ? (
         <div className="text-center py-8">
