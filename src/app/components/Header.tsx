@@ -14,14 +14,11 @@ import {
   User,
   Home,
   Store,
-  Zap,
-  Crown,
-  Sparkles,
   Newspaper,
 } from "lucide-react";
 
 export default function Header() {
-  const [userName, setUserName] = useState<string>("Kids");
+  const [userName, setUserName] = useState<string>("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isScrolled = useScroll();
 
@@ -37,7 +34,7 @@ export default function Header() {
           localStorage.setItem("userName", name);
         } catch (error) {
           console.error("Error fetching user name:", error);
-          setUserName("Kids");
+          setUserName("");
         }
       };
       fetchUserName();

@@ -102,7 +102,7 @@ export default function ProductCard({ product, viewMode }: ProductCardProps) {
               loading="lazy"
             />
 
-            <div className="absolute top-4 left-4 flex flex-col gap-2 pointer-events-none">
+            {/* <div className="absolute top-4 left-4 flex flex-col gap-2 pointer-events-none">
               {product.featured && (
                 <span className="bg-gradient-to-r from-cyan-400 to-purple-500 text-white px-3 py-1.5 rounded-full text-xs font-medium shadow-lg">
                   Destaque
@@ -113,7 +113,7 @@ export default function ProductCard({ product, viewMode }: ProductCardProps) {
                   -{discountPercentage}%
                 </span>
               )}
-            </div>
+            </div> */}
 
             {product.type === "variable" && (
               <div className="absolute bottom-4 left-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-3 py-1.5 rounded-full text-xs font-medium pointer-events-none shadow-lg">
@@ -131,8 +131,8 @@ export default function ProductCard({ product, viewMode }: ProductCardProps) {
                 }`}
               >
                 {product.stock_status === "instock"
-                  ? "Em estoque"
-                  : "Fora de estoque"}
+                  ? "Disponível"
+                  : "Indisponível"}
               </span>
             </div>
           </div>
@@ -155,15 +155,15 @@ export default function ProductCard({ product, viewMode }: ProductCardProps) {
                 {product.on_sale ? (
                   <div className="flex items-center gap-3">
                     <span className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                      R$ {product.sale_price}
+                      R$ {(product.price * 1).toFixed(2)}
                     </span>
                     <span className="text-lg text-gray-500 line-through">
-                      R$ {product.regular_price}
+                      R$ {(product.price * 1.2).toFixed(2)}
                     </span>
                   </div>
                 ) : (
                   <div className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                    R$ {product.price}
+                    R$ {(product.price * 1).toFixed(2)}
                   </div>
                 )}
               </div>
@@ -213,7 +213,7 @@ export default function ProductCard({ product, viewMode }: ProductCardProps) {
             loading="lazy"
           />
 
-          <div className="absolute top-4 left-4 flex flex-col gap-2 pointer-events-none">
+          {/* <div className="absolute top-4 left-4 flex flex-col gap-2 pointer-events-none">
             {product.featured && (
               <span className="bg-gradient-to-r from-cyan-400 to-purple-500 text-white px-3 py-1.5 rounded-full text-xs font-medium shadow-lg">
                 Destaque
@@ -224,7 +224,7 @@ export default function ProductCard({ product, viewMode }: ProductCardProps) {
                 -{discountPercentage}%
               </span>
             )}
-          </div>
+          </div> */}
 
           {product.type === "variable" && (
             <div className="absolute bottom-4 left-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-3 py-1.5 rounded-full text-xs font-medium pointer-events-none shadow-lg">

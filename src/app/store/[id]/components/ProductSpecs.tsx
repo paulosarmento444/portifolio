@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { Settings, Award, Truck, Shield, Star, Zap } from "lucide-react"
-import type { Product } from "@/models"
+import { motion } from "framer-motion";
+import { Settings, Award, Truck, Shield, Star, Zap } from "lucide-react";
+import type { Product } from "@/models";
 
 interface ProductSpecsProps {
-  product: Product
+  product: Product;
 }
 
 export function ProductSpecs({ product }: ProductSpecsProps) {
@@ -16,25 +16,28 @@ export function ProductSpecs({ product }: ProductSpecsProps) {
       description: "Materiais de alta qualidade e durabilidade",
       color: "from-yellow-500 to-orange-600",
     },
+
+    {
+      icon: Star,
+      title: "Desconto Exclusivo",
+      description: "Aproveite nossos descontos exclusivos",
+      color: "from-pink-500 to-red-600",
+    },
+
     {
       icon: Shield,
       title: "Garantia Estendida",
       description: "30 dias de garantia total",
       color: "from-green-500 to-emerald-600",
     },
+
     {
       icon: Truck,
       title: "Entrega Rápida",
       description: "Receba em até 7 dias úteis",
       color: "from-blue-500 to-cyan-600",
     },
-    {
-      icon: Star,
-      title: "Avaliação 5 Estrelas",
-      description: "Produto altamente recomendado",
-      color: "from-purple-500 to-pink-600",
-    },
-  ]
+  ];
 
   return (
     <section className="relative py-16 px-4">
@@ -119,7 +122,9 @@ export function ProductSpecs({ product }: ProductSpecsProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {product.attributes.map((attr, index) => (
                   <div key={index} className="space-y-2">
-                    <h4 className="text-lg font-semibold text-cyan-400">{attr.name}:</h4>
+                    <h4 className="text-lg font-semibold text-cyan-400">
+                      {attr.name}:
+                    </h4>
                     <div className="flex flex-wrap gap-2">
                       {attr.options.map((option, optionIndex) => (
                         <span
@@ -138,5 +143,5 @@ export function ProductSpecs({ product }: ProductSpecsProps) {
         )}
       </div>
     </section>
-  )
+  );
 }

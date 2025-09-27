@@ -1,66 +1,68 @@
-"use client"
+"use client";
 
-import { useEffect, useState, useCallback } from "react"
-import DOMPurify from "dompurify"
-import { getProduct, getProductVariation } from "@/app/service/ProductService"
-import type { Product } from "@/models"
-import { ProductHero } from "./ProductHero"
-import { ProductDescription } from "./ProductDescription"
-import { ProductSpecs } from "./ProductSpecs"
-import { LoadingState } from "./LoadingState"
-import { ErrorState } from "./ErrorState"
-import { NotFoundState } from "./NotFoundState"
+import { useEffect, useState, useCallback } from "react";
+import DOMPurify from "dompurify";
+import { getProduct, getProductVariation } from "@/app/service/ProductService";
+import type { Product } from "@/models";
+import { ProductHero } from "./ProductHero";
+import { ProductDescription } from "./ProductDescription";
+import { ProductSpecs } from "./ProductSpecs";
+import { LoadingState } from "./LoadingState";
+import { ErrorState } from "./ErrorState";
+import { NotFoundState } from "./NotFoundState";
 
 interface ProductDetailContainerProps {
-  productId: string
+  productId: string;
 }
 
-export function ProductDetailContainer({ productId }: ProductDetailContainerProps) {
-  const [product, setProduct] = useState<Product | null>(null)
-  const [variations, setVariations] = useState<Product[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
+export function ProductDetailContainer({
+  productId,
+}: ProductDetailContainerProps) {
+  const [product, setProduct] = useState<Product | null>(null);
+  const [variations, setVariations] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchProductData = useCallback(async () => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
-      const productData = await getProduct(Number(productId))
-      setProduct(productData)
+      const productData = await getProduct(Number(productId));
+      setProduct(productData);
 
       if (productData.type === "variable") {
-        const variationsData = await getProductVariation(Number(productId))
-        setVariations(variationsData)
+        const variationsData = await getProductVariation(Number(productId));
+        setVariations(variationsData);
       }
     } catch (error) {
-      console.error("Error fetching product:", error)
-      setError("Erro ao carregar produto. Tente novamente.")
+      console.error("Error fetching product:", error);
+      setError("Erro ao carregar produto. Tente novamente.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [productId])
+  }, [productId]);
 
   useEffect(() => {
-    fetchProductData()
-  }, [fetchProductData])
+    fetchProductData();
+  }, [fetchProductData]);
 
   if (loading) {
-    return <LoadingState />
+    return <LoadingState />;
   }
 
   if (error) {
-    return <ErrorState error={error} onRetry={fetchProductData} />
+    return <ErrorState error={error} onRetry={fetchProductData} />;
   }
 
   if (!product) {
-    return <NotFoundState />
+    return <NotFoundState />;
   }
 
   const cleanDescription = DOMPurify.sanitize(product.description, {
     FORBID_TAGS: ["style"],
     FORBID_ATTR: ["style", "class"],
-  })
+  });
 
   return (
     <div className="relative overflow-hidden bg-black min-h-screen">
@@ -90,17 +92,23 @@ export function ProductDetailContainer({ productId }: ProductDetailContainerProp
       <div className="relative z-10">
         <ProductHero product={product} variations={variations} />
 
-        {product.description && <ProductDescription description={cleanDescription} />}
+        {product.description && (
+          <ProductDescription description={cleanDescription} />
+        )}
 
         <ProductSpecs product={product} />
       </div>
 
       <style jsx>{`
         @keyframes grid-move {
-          0% { transform: translate(0, 0); }
-          100% { transform: translate(50px, 50px); }
+          0% {
+            transform: translate(0, 0);
+          }
+          100% {
+            transform: translate(50px, 50px);
+          }
         }
       `}</style>
     </div>
-  )
+  );
 }

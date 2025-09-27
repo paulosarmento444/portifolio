@@ -151,7 +151,7 @@ export function ProductInfo({
 
           {/* Action Buttons */}
           <div className="flex items-center gap-3">
-            <motion.button
+            {/* <motion.button
               onClick={() => setIsFavorite(!isFavorite)}
               className={`p-3 rounded-xl transition-all duration-300 ${
                 isFavorite
@@ -162,7 +162,7 @@ export function ProductInfo({
               whileTap={{ scale: 0.95 }}
             >
               <Heart size={20} className={isFavorite ? "fill-current" : ""} />
-            </motion.button>
+            </motion.button> */}
             <motion.button
               onClick={handleShare}
               className="p-3 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-gray-400 hover:text-white hover:border-cyan-400/50 rounded-xl transition-all duration-300"

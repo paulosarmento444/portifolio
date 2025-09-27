@@ -10,12 +10,20 @@ import {
   Clock,
   AlertCircle,
 } from "lucide-react";
+import { useState } from "react";
 
 interface OrdersSectionProps {
   orders: any[];
 }
 
 export function OrdersSection({ orders }: OrdersSectionProps) {
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const pageSize = 10;
+  const totalPages = Math.max(1, Math.ceil((orders?.length || 0) / pageSize));
+  const pagedOrders = (orders || []).slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "completed":
@@ -69,7 +77,7 @@ export function OrdersSection({ orders }: OrdersSectionProps) {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="space-y-6"
         >
-          {orders.map((order, index) => (
+          {pagedOrders.map((order, index) => (
             <motion.div
               key={order.id}
               initial={{ opacity: 0, y: 20 }}
@@ -204,6 +212,27 @@ export function OrdersSection({ orders }: OrdersSectionProps) {
             Explorar Produtos
           </button>
         </motion.div>
+      )}
+      {orders.length > pageSize && (
+        <div className="flex items-center justify-center gap-2 mt-6">
+          <button
+            className="px-3 py-2 rounded-lg bg-white/10 text-white disabled:opacity-40"
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+          >
+            Anterior
+          </button>
+          <span className="text-gray-300 text-sm">
+            Página {currentPage} de {totalPages}
+          </span>
+          <button
+            className="px-3 py-2 rounded-lg bg-white/10 text-white disabled:opacity-40"
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+          >
+            Próxima
+          </button>
+        </div>
       )}
     </div>
   );

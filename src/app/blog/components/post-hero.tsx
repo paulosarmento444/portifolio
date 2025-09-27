@@ -34,15 +34,16 @@ interface Post {
 
 interface PostHeroProps {
   post: Post;
+  isWebStory?: boolean;
 }
 
-export default function PostHero({ post }: PostHeroProps) {
+export default function PostHero({ post, isWebStory = false }: PostHeroProps) {
   const router = useRouter();
 
   return (
     <section className="relative w-full h-[70vh] min-h-[600px] bg-black overflow-hidden">
       {/* Background Image */}
-      {post.featuredImage?.node?.sourceUrl ? (
+      {!isWebStory && post.featuredImage?.node?.sourceUrl ? (
         <Image
           src={post.featuredImage.node.sourceUrl || "/placeholder.svg"}
           alt={post.featuredImage.node.altText || post.title}
@@ -51,9 +52,16 @@ export default function PostHero({ post }: PostHeroProps) {
           priority
           unoptimized
         />
-      ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 via-purple-500/20 to-pink-500/20" />
-      )}
+      ) : !isWebStory ? (
+        <Image
+          src={"/blog.png"}
+          alt={post.title}
+          fill
+          className="object-cover opacity-40"
+          priority
+          unoptimized
+        />
+      ) : null}
 
       {/* Gradient Overlays */}
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent" />

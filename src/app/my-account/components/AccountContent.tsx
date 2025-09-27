@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { WelcomeSection } from "./sections/WelcomeSection";
 import { OrdersSection } from "./sections/OrdersSection";
-import { PostsSection } from "./sections/PostsSection";
 import { AccountSection } from "./sections/AccountSection";
 import { AddressesSection } from "./sections/AddressesSection";
 import { LogoutSection } from "./sections/LogoutSection";
@@ -31,14 +30,15 @@ export function AccountContent({
         return <WelcomeSection viewer={viewer} orders={orders} />;
       case "orders":
         return <OrdersSection orders={orders} />;
-      case "posts":
-        return <PostsSection posts={posts} />;
+      // case "posts":
+      //   return <PostsSection posts={posts} />;
       case "account":
         return (
           <AccountSection
             username={viewer.name}
             billing={customer.billing}
             role={customer.role}
+            customerId={customer?.id || viewer.databaseId}
           />
         );
       case "addresses":

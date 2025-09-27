@@ -190,18 +190,6 @@ export function WelcomeSection({ viewer, orders }: WelcomeSectionProps) {
             Acompanhe seus pedidos e histórico
           </p>
         </button>
-
-        <button className="p-6 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-400/30 rounded-2xl text-left hover:border-purple-400/50 transition-all duration-300 group">
-          <Star className="w-8 h-8 text-purple-400 mb-4 group-hover:scale-110 transition-transform" />
-          <h4 className="text-white font-bold mb-2">Avaliar Produtos</h4>
-          <p className="text-gray-400 text-sm">Compartilhe sua experiência</p>
-        </button>
-
-        <button className="p-6 bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-400/30 rounded-2xl text-left hover:border-orange-400/50 transition-all duration-300 group">
-          <TrendingUp className="w-8 h-8 text-orange-400 mb-4 group-hover:scale-110 transition-transform" />
-          <h4 className="text-white font-bold mb-2">Ofertas Especiais</h4>
-          <p className="text-gray-400 text-sm">Descubra promoções exclusivas</p>
-        </button>
       </motion.div>
     </div>
   );

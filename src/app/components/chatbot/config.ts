@@ -2,7 +2,7 @@ import { ChatbotConfig } from "./types";
 
 export const defaultChatbotConfig: ChatbotConfig = {
   primaryColor: "#23A267",
-  chatbotName: "EW Academy AI Assistant",
+  chatbotName: "Solar AI Assistant",
   buttonColor: "#1D7A4B",
   backgroundColor: "#111e16",
   headerColor: "#172a21",
@@ -13,6 +13,6 @@ export const defaultChatbotConfig: ChatbotConfig = {
   iconUrl: "/chatbot/botData/avatar.svg",
   botAvatar: "/chatbot/botData/avatar.webp",
   welcomeBubble: "Olá! como podemos te ajudar hoje?",
-  firstBotMessage: "Me conta, o que você quer saber sobre a EW Academy?",
+  firstBotMessage: "Me conta, o que você quer saber sobre a Solar Esportes?",
   typingDelay: 0.5,
 };

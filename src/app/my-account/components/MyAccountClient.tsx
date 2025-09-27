@@ -1,42 +1,78 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { motion } from "framer-motion"
-import { User } from "lucide-react"
-import { AccountSidebar } from "./AccountSidebar"
-import { AccountContent } from "./AccountContent"
-import { MobileMenuButton } from "./MobileMenuButton"
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
+import { User } from "lucide-react";
+import { AccountSidebar } from "./AccountSidebar";
+import { AccountContent } from "./AccountContent";
+import { MobileMenuButton } from "./MobileMenuButton";
 
 interface MyAccountClientProps {
-  viewer: any
-  orders: any[]
-  posts: any[]
-  customer: any
+  viewer: any;
+  orders: any[];
+  posts: any[];
+  customer: any;
 }
 
-export function MyAccountClient({ viewer, orders, posts, customer }: MyAccountClientProps) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const [selectedMenu, setSelectedMenu] = useState<string>("welcome")
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false)
+export function MyAccountClient({
+  viewer,
+  orders,
+  posts,
+  customer,
+}: MyAccountClientProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [selectedMenu, setSelectedMenu] = useState<string>("welcome");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+  const [displayName, setDisplayName] = useState<string>(viewer?.name || "");
 
   useEffect(() => {
-    const menu = searchParams.get("menu")
+    const menu = searchParams.get("menu");
     if (menu) {
-      setSelectedMenu(menu)
+      setSelectedMenu(menu);
     }
-  }, [searchParams])
+  }, [searchParams]);
+
+  // Hydrate name from localStorage profile_{customerId} and listen for profile updates
+  useEffect(() => {
+    const loadName = () => {
+      try {
+        const key = `profile_${customer?.id || viewer?.databaseId}`;
+        const stored = localStorage.getItem(key);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          const composed = `${parsed.first_name || ""}${
+            parsed.first_name || parsed.last_name ? " " : ""
+          }${parsed.last_name || ""}`.trim();
+          if (composed) setDisplayName(composed);
+          else if (parsed.first_name) setDisplayName(parsed.first_name);
+        }
+      } catch {}
+    };
+
+    loadName();
+    const onProfileUpdated = () => loadName();
+    window.addEventListener(
+      "profile-updated",
+      onProfileUpdated as EventListener
+    );
+    return () =>
+      window.removeEventListener(
+        "profile-updated",
+        onProfileUpdated as EventListener
+      );
+  }, [customer?.id, viewer?.databaseId]);
 
   const handleMenuClick = (menu: string) => {
-    setSelectedMenu(menu)
-    setIsMobileMenuOpen(false)
+    setSelectedMenu(menu);
+    setIsMobileMenuOpen(false);
 
     // Update URL without page reload
-    const newUrl = new URL(window.location.href)
-    newUrl.searchParams.set("menu", menu)
-    window.history.pushState({}, "", newUrl.toString())
-  }
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.set("menu", menu);
+    window.history.pushState({}, "", newUrl.toString());
+  };
 
   return (
     <div className="relative overflow-hidden bg-black min-h-screen">
@@ -80,12 +116,13 @@ export function MyAccountClient({ viewer, orders, posts, customer }: MyAccountCl
 
               <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
                 <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                  Olá, {viewer.name}!
+                  Olá, {displayName}!
                 </span>
               </h1>
 
               <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-                Gerencie sua conta, pedidos e informações pessoais em um só lugar
+                Gerencie sua conta, pedidos e informações pessoais em um só
+                lugar
               </p>
             </motion.div>
           </div>
@@ -97,12 +134,23 @@ export function MyAccountClient({ viewer, orders, posts, customer }: MyAccountCl
             <div className="flex flex-col lg:flex-row gap-8">
               {/* Mobile Menu Button */}
               <div className="lg:hidden">
-                <MobileMenuButton isOpen={isMobileMenuOpen} onToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)} />
+                <MobileMenuButton
+                  isOpen={isMobileMenuOpen}
+                  onToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                />
               </div>
 
               {/* Sidebar */}
-              <div className={`lg:w-80 ${isMobileMenuOpen ? "block" : "hidden lg:block"}`}>
-                <AccountSidebar selectedMenu={selectedMenu} onMenuClick={handleMenuClick} userName={viewer.name} />
+              <div
+                className={`lg:w-80 ${
+                  isMobileMenuOpen ? "block" : "hidden lg:block"
+                }`}
+              >
+                <AccountSidebar
+                  selectedMenu={selectedMenu}
+                  onMenuClick={handleMenuClick}
+                  userName={displayName}
+                />
               </div>
 
               {/* Content */}
@@ -123,10 +171,14 @@ export function MyAccountClient({ viewer, orders, posts, customer }: MyAccountCl
 
       <style jsx>{`
         @keyframes grid-move {
-          0% { transform: translate(0, 0); }
-          100% { transform: translate(50px, 50px); }
+          0% {
+            transform: translate(0, 0);
+          }
+          100% {
+            transform: translate(50px, 50px);
+          }
         }
       `}</style>
     </div>
-  )
+  );
 }

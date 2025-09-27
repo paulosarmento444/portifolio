@@ -50,6 +50,7 @@ interface RelatedPost {
 const GET_POST = gql`
   query GetPost($id: ID!) {
     post(id: $id, idType: SLUG) {
+      id
       title
       content
       uri
@@ -97,6 +98,7 @@ const GET_RELATED_POSTS = gql`
 export default function PostPage() {
   const params = useParams();
   const uri = params?.uri as string;
+  console.log("URI:", uri);
 
   const [post, setPost] = useState<Post | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<RelatedPost[]>([]);
@@ -185,9 +187,20 @@ export default function PostPage() {
           </div>
         ) : post ? (
           <>
-            <PostHero post={post} />
-            <PostContent post={post} />
-            {relatedPosts.length > 0 && <RelatedPosts posts={relatedPosts} />}
+            {/(<amp-story|class=["']web-stories|<iframe[^>]+stories)/i.test(
+              post.content || ""
+            ) ? (
+              // Apenas o Web Stories embutido
+              <PostContent post={post} />
+            ) : (
+              <>
+                <PostHero post={post} />
+                <PostContent post={post} />
+                {relatedPosts.length > 0 && (
+                  <RelatedPosts posts={relatedPosts} />
+                )}
+              </>
+            )}
           </>
         ) : (
           <div className="pt-20">

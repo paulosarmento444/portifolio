@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { Package, RefreshCw } from "lucide-react"
-import ProductCard from "./product-card"
+import { motion } from "framer-motion";
+import { Package, RefreshCw } from "lucide-react";
+import ProductCard from "./product-card";
 
 interface StoreGridProps {
-  products: any[]
-  loading: boolean
-  error: string | null
-  viewMode: "grid" | "list"
-  filteredProducts: any[]
-  searchTerm: string
-  clearFilters: () => void
-  currentPage: number
-  totalPages: number
-  handlePageChange: (page: number) => void
+  products: any[];
+  loading: boolean;
+  error: string | null;
+  viewMode: "grid" | "list";
+  filteredProducts: any[];
+  searchTerm: string;
+  clearFilters: () => void;
+  currentPage: number;
+  totalPages: number;
+  handlePageChange: (page: number) => void;
 }
 
 export default function StoreGrid({
@@ -41,7 +41,8 @@ export default function StoreGrid({
         {/* Results Info */}
         <div className="mb-8 flex justify-between items-center">
           <p className="text-gray-400 text-lg">
-            {filteredProducts.length} produto{filteredProducts.length !== 1 ? "s" : ""} encontrado
+            {filteredProducts.length} produto
+            {filteredProducts.length !== 1 ? "s" : ""} encontrado
             {filteredProducts.length !== 1 ? "s" : ""}
             {searchTerm && ` para "${searchTerm}"`}
           </p>
@@ -56,7 +57,9 @@ export default function StoreGrid({
         {loading && (
           <div
             className={
-              viewMode === "grid" ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8" : "space-y-8"
+              viewMode === "grid"
+                ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
+                : "space-y-8"
             }
           >
             {Array.from({ length: 8 }).map((_, index) => (
@@ -114,24 +117,27 @@ export default function StoreGrid({
                     </button>
                   )}
 
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, index) => {
-                    const pageNumber = Math.max(1, currentPage - 2) + index
-                    if (pageNumber > totalPages) return null
+                  {Array.from(
+                    { length: Math.min(5, totalPages) },
+                    (_, index) => {
+                      const pageNumber = Math.max(1, currentPage - 2) + index;
+                      if (pageNumber > totalPages) return null;
 
-                    return (
-                      <button
-                        key={pageNumber}
-                        className={`px-4 py-3 rounded-full transition-all duration-300 ${
-                          currentPage === pageNumber
-                            ? "bg-gradient-to-r from-cyan-400 to-purple-500 text-white shadow-lg shadow-cyan-500/25"
-                            : "bg-gray-900/50 text-white hover:bg-gray-800/50 border border-gray-700/50 hover:border-gray-600/50"
-                        }`}
-                        onClick={() => handlePageChange(pageNumber)}
-                      >
-                        {pageNumber}
-                      </button>
-                    )
-                  })}
+                      return (
+                        <button
+                          key={pageNumber}
+                          className={`px-4 py-3 rounded-full transition-all duration-300 ${
+                            currentPage === pageNumber
+                              ? "bg-gradient-to-r from-cyan-400 to-purple-500 text-white shadow-lg shadow-cyan-500/25"
+                              : "bg-gray-900/50 text-white hover:bg-gray-800/50 border border-gray-700/50 hover:border-gray-600/50"
+                          }`}
+                          onClick={() => handlePageChange(pageNumber)}
+                        >
+                          {pageNumber}
+                        </button>
+                      );
+                    }
+                  )}
 
                   {currentPage < totalPages && (
                     <button
@@ -148,7 +154,7 @@ export default function StoreGrid({
         )}
       </div>
     </section>
-  )
+  );
 }
 
 const ProductSkeleton = ({ viewMode }: { viewMode: "grid" | "list" }) => {
@@ -170,7 +176,7 @@ const ProductSkeleton = ({ viewMode }: { viewMode: "grid" | "list" }) => {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -189,8 +195,8 @@ const ProductSkeleton = ({ viewMode }: { viewMode: "grid" | "list" }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 const ErrorMessage = ({ message }: { message: string }) => (
   <motion.div
@@ -212,9 +218,13 @@ const ErrorMessage = ({ message }: { message: string }) => (
       </button>
     </div>
   </motion.div>
-)
+);
 
-const NoProductsMessage = ({ onClearFilters }: { onClearFilters: () => void }) => (
+const NoProductsMessage = ({
+  onClearFilters,
+}: {
+  onClearFilters: () => void;
+}) => (
   <motion.div
     className="relative max-w-md mx-auto"
     initial={{ opacity: 0, scale: 0.9 }}
@@ -225,7 +235,9 @@ const NoProductsMessage = ({ onClearFilters }: { onClearFilters: () => void }) =
     <div className="relative bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl rounded-3xl border border-gray-700/50 p-8 text-center">
       <Package size={64} className="text-gray-600 mx-auto mb-6" />
       <p className="text-gray-400 text-xl mb-4">Nenhum produto encontrado</p>
-      <p className="text-gray-500 mb-6">Tente ajustar seus filtros ou buscar por outros termos</p>
+      <p className="text-gray-500 mb-6">
+        Tente ajustar seus filtros ou buscar por outros termos
+      </p>
       <button
         onClick={onClearFilters}
         className="px-6 py-3 bg-gradient-to-r from-cyan-400 to-purple-500 text-white rounded-full hover:from-cyan-500 hover:to-purple-600 transition-all duration-300 font-medium shadow-lg shadow-cyan-500/25"
@@ -234,4 +246,4 @@ const NoProductsMessage = ({ onClearFilters }: { onClearFilters: () => void }) =
       </button>
     </div>
   </motion.div>
-)
+);

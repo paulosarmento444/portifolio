@@ -47,6 +47,9 @@ export const getOrders = async (viewerId: number) => {
     const response = await woocommerceClient.get("/orders", {
       params: {
         customer: viewerId,
+        per_page: 100,
+        orderby: "date",
+        order: "desc",
       },
     });
     return response.data;

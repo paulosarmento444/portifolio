@@ -10,47 +10,155 @@ import {
   Shield,
   Edit,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { woocommerceClient } from "@/app/lib/wooCommerce";
+import {
+  updateCustomerProfile,
+  changeCustomerPassword,
+} from "@/app/server-actions/profile.action";
 
 interface AccountSectionProps {
   username: string;
   billing: any;
   role: string;
+  customerId: number | string;
 }
 
 export function AccountSection({
   username,
   billing,
   role,
+  customerId,
 }: AccountSectionProps) {
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isPasswordOpen, setIsPasswordOpen] = useState(false);
+  const [pending, setPending] = useState(false);
+  const [displayUsername, setDisplayUsername] = useState<string>(username);
+  const [displayBilling, setDisplayBilling] = useState<any>(billing || {});
+  const [form, setForm] = useState({
+    first_name: billing?.first_name || "",
+    last_name: billing?.last_name || "",
+    email: billing?.email || "",
+    phone: billing?.phone || "",
+    city: billing?.city || "",
+    cpf: billing?.cpf || "",
+  });
+  const [passwordForm, setPasswordForm] = useState({
+    current_password: "",
+    new_password: "",
+    confirm_password: "",
+  });
+
+  // Reidrata dados de perfil ao montar (persistência similar a endereços)
+  useEffect(() => {
+    try {
+      const key = `profile_${customerId}`;
+      const stored = localStorage.getItem(key);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        setDisplayBilling((prev: any) => ({ ...prev, ...parsed }));
+        setForm((prev) => ({ ...prev, ...parsed }));
+        const composedName = `${parsed.first_name || ""}${
+          parsed.first_name || parsed.last_name ? " " : ""
+        }${parsed.last_name || ""}`.trim();
+        if (composedName) setDisplayUsername(composedName);
+      }
+    } catch {}
+  }, [customerId]);
+
+  async function handleSaveProfile() {
+    try {
+      setPending(true);
+      const res = await updateCustomerProfile(customerId, form);
+      if (!res?.success) {
+        throw new Error(res?.error || "Erro ao atualizar perfil");
+      }
+      // Atualiza estado local para refletir imediatamente na UI
+      setDisplayBilling((prev: any) => ({ ...prev, ...form }));
+      const composedName = `${form.first_name || ""}${
+        form.first_name || form.last_name ? " " : ""
+      }${form.last_name || ""}`.trim();
+      if (composedName.length > 0) {
+        setDisplayUsername(composedName);
+      }
+      try {
+        localStorage.setItem(
+          `profile_${customerId}`,
+          JSON.stringify({ ...form })
+        );
+        // dispara evento global para o header atualizar
+        window.dispatchEvent(new Event("profile-updated"));
+      } catch {}
+      setIsEditOpen(false);
+    } catch (e) {
+      alert("Falha ao salvar. Tente novamente.");
+      console.error(e);
+    } finally {
+      setPending(false);
+    }
+  }
+
+  async function handleChangePassword() {
+    try {
+      if (
+        !passwordForm.new_password ||
+        passwordForm.new_password !== passwordForm.confirm_password
+      ) {
+        alert("As senhas não coincidem");
+        return;
+      }
+      setPending(true);
+      const res = await changeCustomerPassword(
+        customerId,
+        passwordForm.current_password,
+        passwordForm.new_password
+      );
+      if (!res?.success) {
+        throw new Error(res?.error || "Erro ao alterar senha");
+      }
+      setIsPasswordOpen(false);
+      setPasswordForm({
+        current_password: "",
+        new_password: "",
+        confirm_password: "",
+      });
+      alert("Senha alterada com sucesso. Faça login novamente se necessário.");
+    } catch (e) {
+      alert("Falha ao alterar senha. Tente novamente.");
+      console.error(e);
+    } finally {
+      setPending(false);
+    }
+  }
   const accountInfo = [
     {
       icon: User,
       label: "Nome",
-      value: username,
+      value: displayUsername,
       color: "from-cyan-500 to-blue-600",
     },
     {
       icon: Mail,
       label: "Email",
-      value: billing?.email || "Não informado",
+      value: displayBilling?.email || "Não informado",
       color: "from-purple-500 to-pink-600",
     },
     {
       icon: Phone,
       label: "Telefone",
-      value: billing?.phone || "Não informado",
+      value: displayBilling?.phone || "Não informado",
       color: "from-green-500 to-emerald-600",
     },
     {
       icon: MapPin,
       label: "Cidade",
-      value: billing?.city || "Não informado",
+      value: displayBilling?.city || "Não informado",
       color: "from-orange-500 to-red-600",
     },
     {
       icon: Calendar,
       label: "CPF",
-      value: billing?.cpf || "Não informado",
+      value: displayBilling?.cpf || "Não informado",
       color: "from-blue-500 to-cyan-600",
     },
     {
@@ -150,7 +258,10 @@ export function AccountSection({
                   Última alteração há 30 dias
                 </p>
               </div>
-              <button className="px-4 py-2 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-400/30 rounded-lg text-cyan-400 hover:border-cyan-400/50 transition-all duration-300">
+              <button
+                onClick={() => setIsPasswordOpen(true)}
+                className="px-4 py-2 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-400/30 rounded-lg text-cyan-400 hover:border-cyan-400/50 transition-all duration-300"
+              >
                 Alterar
               </button>
             </div>
@@ -165,13 +276,150 @@ export function AccountSection({
         transition={{ duration: 0.5, delay: 0.6 }}
         className="flex flex-col sm:flex-row gap-4"
       >
-        <button className="flex-1 px-6 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white rounded-2xl font-bold transition-all duration-300">
-          Salvar Alterações
+        <button
+          onClick={() => setIsEditOpen(true)}
+          className="flex-1 px-6 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white rounded-2xl font-bold transition-all duration-300"
+        >
+          Editar Dados
         </button>
         <button className="flex-1 px-6 py-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-white hover:border-gray-600/50 rounded-2xl font-bold transition-all duration-300">
           Cancelar
         </button>
       </motion.div>
+
+      {isEditOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setIsEditOpen(false)}
+          />
+          <div className="relative w-full max-w-lg bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6">
+            <h3 className="text-white font-bold mb-4">Editar Dados da Conta</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <input
+                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white"
+                placeholder="Nome"
+                value={form.first_name}
+                onChange={(e) =>
+                  setForm({ ...form, first_name: e.target.value })
+                }
+              />
+              <input
+                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white"
+                placeholder="Sobrenome"
+                value={form.last_name}
+                onChange={(e) =>
+                  setForm({ ...form, last_name: e.target.value })
+                }
+              />
+              <input
+                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white md:col-span-2"
+                placeholder="Email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+              />
+              <input
+                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white"
+                placeholder="Telefone"
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              />
+              <input
+                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white"
+                placeholder="Cidade"
+                value={form.city}
+                onChange={(e) => setForm({ ...form, city: e.target.value })}
+              />
+              <input
+                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white md:col-span-2"
+                placeholder="CPF"
+                value={form.cpf}
+                onChange={(e) => setForm({ ...form, cpf: e.target.value })}
+              />
+            </div>
+            <div className="flex justify-end gap-3 mt-5">
+              <button
+                onClick={() => setIsEditOpen(false)}
+                className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/10 text-white rounded-xl"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSaveProfile}
+                disabled={pending}
+                className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white rounded-xl"
+              >
+                Salvar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isPasswordOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setIsPasswordOpen(false)}
+          />
+          <div className="relative w-full max-w-md bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6">
+            <h3 className="text-white font-bold mb-4">Alterar Senha</h3>
+            <div className="grid grid-cols-1 gap-3">
+              <input
+                type="password"
+                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white"
+                placeholder="Senha atual"
+                value={passwordForm.current_password}
+                onChange={(e) =>
+                  setPasswordForm({
+                    ...passwordForm,
+                    current_password: e.target.value,
+                  })
+                }
+              />
+              <input
+                type="password"
+                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white"
+                placeholder="Nova senha"
+                value={passwordForm.new_password}
+                onChange={(e) =>
+                  setPasswordForm({
+                    ...passwordForm,
+                    new_password: e.target.value,
+                  })
+                }
+              />
+              <input
+                type="password"
+                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white"
+                placeholder="Confirmar nova senha"
+                value={passwordForm.confirm_password}
+                onChange={(e) =>
+                  setPasswordForm({
+                    ...passwordForm,
+                    confirm_password: e.target.value,
+                  })
+                }
+              />
+            </div>
+            <div className="flex justify-end gap-3 mt-5">
+              <button
+                onClick={() => setIsPasswordOpen(false)}
+                className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/10 text-white rounded-xl"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleChangePassword}
+                disabled={pending}
+                className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white rounded-xl"
+              >
+                Alterar Senha
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

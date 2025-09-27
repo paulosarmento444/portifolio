@@ -32,12 +32,12 @@ const menuItems = [
     icon: Package,
     color: "from-purple-500 to-pink-600",
   },
-  {
-    id: "posts",
-    label: "Posts",
-    icon: FileText,
-    color: "from-green-500 to-emerald-600",
-  },
+  // {
+  //   id: "posts",
+  //   label: "Posts",
+  //   icon: FileText,
+  //   color: "from-green-500 to-emerald-600",
+  // },
   {
     id: "account",
     label: "Conta",
