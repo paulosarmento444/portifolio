@@ -108,7 +108,9 @@ export function EditorialIntro({
     <div
       className={cn(
         "grid gap-6 lg:gap-8",
-        aside && align === "left" && "lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.42fr)] lg:items-end",
+        Boolean(aside) &&
+          align === "left" &&
+          "lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.42fr)] lg:items-end",
         className,
       )}
       {...props}

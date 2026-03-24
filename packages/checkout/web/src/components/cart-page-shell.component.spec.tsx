@@ -152,6 +152,51 @@ jest.mock("./empty-cart.component", () => ({
 const { CheckoutPageShell } = require("./cart-page-shell.component") as typeof import("./cart-page-shell.component");
 
 describe("CheckoutPageShell", () => {
+  it("resets the page scroll to the top when the checkout shell mounts", () => {
+    const scrollSpy = jest.fn();
+    Object.defineProperty(window, "scrollTo", {
+      configurable: true,
+      value: scrollSpy,
+    });
+    document.documentElement.scrollTop = 120;
+    document.body.scrollTop = 80;
+
+    render(
+      <CheckoutPageShell
+        data={{
+          userId: "12",
+          customer: {
+            id: "12",
+            email: "maria@example.com",
+            displayName: "Maria",
+            billingAddress: null,
+            shippingAddress: null,
+          },
+          cart: cartWithNormalShipping,
+          cartState: {
+            items: [
+              {
+                itemKey: "line_1",
+                productId: "7",
+                quantity: 1,
+                unitPrice: 49.9,
+                total: 49.9,
+                name: "Produto",
+                image: null,
+              },
+            ],
+          },
+          paymentMethods: [],
+          appliedCoupon: null,
+        }}
+      />,
+    );
+
+    expect(scrollSpy).toHaveBeenCalledWith({ top: 0, left: 0, behavior: "auto" });
+    expect(document.documentElement.scrollTop).toBe(0);
+    expect(document.body.scrollTop).toBe(0);
+  });
+
   it("renders items, checkout flow on the left, and finalization sidebar on the right", () => {
     render(
       <CheckoutPageShell

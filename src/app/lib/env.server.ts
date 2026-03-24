@@ -42,6 +42,33 @@ const readEnv = (key: string, options?: EnvReadOptions): string => {
   throw new Error(`[env] Missing required environment variable: ${key}${legacyHint}`);
 };
 
+const readOptionalEnv = (key: string, options?: EnvReadOptions): string | null => {
+  const value = process.env[key];
+
+  if (value) {
+    return value;
+  }
+
+  if (options?.legacy) {
+    for (const legacyKey of options.legacy) {
+      const legacyValue = process.env[legacyKey];
+
+      if (legacyValue) {
+        if (!warnedKeys.has(key)) {
+          warnedKeys.add(key);
+          console.warn(
+            `[env] ${legacyKey} is deprecated. Use ${key} instead.`,
+          );
+        }
+
+        return legacyValue;
+      }
+    }
+  }
+
+  return null;
+};
+
 export const serverEnv = {
   app: {
     get publicUrl() {
@@ -84,6 +111,21 @@ export const serverEnv = {
   hooks: {
     get webhookUrl() {
       return readEnv("WEBHOOK_URL");
+    },
+  },
+  payments: {
+    mercadoPago: {
+      get accessToken() {
+        return readOptionalEnv("MERCADO_PAGO_ACCESS_TOKEN");
+      },
+      get publicKey() {
+        return readOptionalEnv("NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY", {
+          legacy: ["MERCADO_PAGO_PUBLIC_KEY"],
+        });
+      },
+      get siteId() {
+        return readOptionalEnv("MERCADO_PAGO_SITE_ID");
+      },
     },
   },
 };

@@ -116,7 +116,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
         aria-describedby={describedBy}
         className={cn(
           ecommerceFieldStyles.input,
-          error && ecommerceFieldStyles.invalid,
+          Boolean(error) && ecommerceFieldStyles.invalid,
           fieldClassName,
           className,
         )}
@@ -171,7 +171,7 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(funct
         aria-describedby={describedBy}
         className={cn(
           ecommerceFieldStyles.select,
-          error && ecommerceFieldStyles.invalid,
+          Boolean(error) && ecommerceFieldStyles.invalid,
           fieldClassName,
           className,
         )}
@@ -229,7 +229,7 @@ export const TextAreaField = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>
         aria-describedby={describedBy}
         className={cn(
           ecommerceFieldStyles.textarea,
-          error && ecommerceFieldStyles.invalid,
+          Boolean(error) && ecommerceFieldStyles.invalid,
           fieldClassName,
           className,
         )}

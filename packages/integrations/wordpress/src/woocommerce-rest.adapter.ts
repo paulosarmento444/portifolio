@@ -155,6 +155,18 @@ export const wordpressWooRestAdapter = {
     return data;
   },
 
+  updateOrderRaw: async (
+    orderId: string | number,
+    payload: unknown,
+  ): Promise<WooOrder> => {
+    const { data } = await woocommerceClient.put<WooOrder>(
+      `/orders/${orderId}`,
+      payload,
+    );
+
+    return data;
+  },
+
   createOrderRaw: async <TInput>(payload: TInput): Promise<WooOrder> => {
     const { data } = await woocommerceClient.post<WooOrder>("/orders", payload);
     return data;

@@ -1,9 +1,14 @@
-import { Heart, Shield, Target, Trophy, Users, Zap } from "lucide-react";
+import HeartIcon from "lucide-react/dist/esm/icons/heart.js";
+import ShieldIcon from "lucide-react/dist/esm/icons/shield.js";
+import TargetIcon from "lucide-react/dist/esm/icons/target.js";
+import TrophyIcon from "lucide-react/dist/esm/icons/trophy.js";
+import UsersIcon from "lucide-react/dist/esm/icons/users.js";
+import ZapIcon from "lucide-react/dist/esm/icons/zap.js";
 import { PageHeader, SectionShell, SurfaceCard } from "../../ui";
 
 const values = [
   {
-    icon: Target,
+    icon: TargetIcon,
     title: "Curadoria com criterio",
     description:
       "O catalogo prioriza utilidade real, marcas confiaveis e leitura clara para comparar melhor.",
@@ -11,7 +16,7 @@ const values = [
       "bg-[color:var(--site-color-primary-soft)] text-[color:var(--site-color-primary)]",
   },
   {
-    icon: Heart,
+    icon: HeartIcon,
     title: "Atendimento humano",
     description:
       "A orientacao continua depois da compra, com suporte proximo para reduzir atrito e retrabalho.",
@@ -19,7 +24,7 @@ const values = [
       "bg-[color:var(--site-color-danger-soft)] text-[color:var(--site-color-danger-text)]",
   },
   {
-    icon: Shield,
+    icon: ShieldIcon,
     title: "Confianca operacional",
     description:
       "Entrega, pagamento e comunicacao seguem a mesma expectativa de clareza da vitrine.",
@@ -27,7 +32,7 @@ const values = [
       "bg-[color:var(--site-color-info-soft)] text-[color:var(--site-color-info-text)]",
   },
   {
-    icon: Users,
+    icon: UsersIcon,
     title: "Compra com contexto",
     description:
       "Loja, blog e paginas institucionais trabalham juntas para responder perguntas antes que elas virem friccao.",
@@ -35,7 +40,7 @@ const values = [
       "bg-[color:var(--site-color-secondary-soft)] text-[color:var(--site-color-secondary)]",
   },
   {
-    icon: Zap,
+    icon: ZapIcon,
     title: "Selecao atualizada",
     description:
       "Novidades entram quando fazem sentido para o cliente, nao apenas para encher prateleira.",
@@ -43,7 +48,7 @@ const values = [
       "bg-[color:var(--site-color-success-soft)] text-[color:var(--site-color-success-text)]",
   },
   {
-    icon: Trophy,
+    icon: TrophyIcon,
     title: "Experiencia completa",
     description:
       "Performance comercial e suporte pos-venda sao tratados como partes da mesma jornada.",

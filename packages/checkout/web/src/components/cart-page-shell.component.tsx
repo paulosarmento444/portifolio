@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   PageHeader,
   ProgressStepper,
@@ -41,6 +41,12 @@ export function CheckoutPageShell({ data }: CheckoutPageShellProps) {
   const hasAddress = Boolean(
     currentAddress?.addressLine1 && currentAddress.city && currentAddress.postcode,
   );
+
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, []);
 
   useEffect(() => {
     const expectedCouponCode = pendingCouponSyncRef.current;
