@@ -1,4 +1,18 @@
 export interface ChatbotConfig {
+  storeName: string;
+  storeDescription: string;
+  assistantRole: string;
+  locale: string;
+  catalogPath: string;
+  cartPath?: string;
+  supportPath?: string;
+  supportEmail?: string;
+  whatsappUrl?: string;
+  whatsappLabel?: string;
+  featuredCategories?: Array<{
+    label: string;
+    href: string;
+  }>;
   primaryColor: string;
   chatbotName: string;
   buttonColor: string;

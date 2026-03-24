@@ -10,11 +10,11 @@ const parseMarkdown = (text: string): string => {
     .replace(/\*(.*?)\*/g, "<em>$1</em>")
     .replace(
       /`(.*?)`/g,
-      '<code class="bg-gray-700 px-1 py-0.5 rounded text-sm">$1</code>'
+      '<code class="rounded-md border border-[color:var(--site-color-border)] bg-[color:var(--site-color-surface-inset)] px-1.5 py-0.5 text-sm text-[color:var(--site-color-foreground-strong)]">$1</code>'
     )
     .replace(
       /\[([^\]]+)\]\(([^)]+)\)/g,
-      '<a href="$2" class="text-yellow-400 hover:text-yellow-300 underline" target="_blank" rel="noopener noreferrer">$1</a>'
+      '<a href="$2" class="text-[color:var(--site-color-primary)] underline underline-offset-2 hover:text-[color:var(--site-color-primary-strong)]" target="_blank" rel="noopener noreferrer">$1</a>'
     )
     .replace(/\n/g, "<br>");
 };
@@ -28,6 +28,7 @@ interface ChatbotWidgetProps {
 export function ChatbotWidget({ config }: ChatbotWidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [showWelcomeBubble, setShowWelcomeBubble] = useState(true);
+  const [draft, setDraft] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -37,6 +38,7 @@ export function ChatbotWidget({ config }: ChatbotWidgetProps) {
     stopGeneration,
     isGenerating,
     error,
+    clearError,
   } = useChatbot(config);
 
   const scrollToBottom = () => {
@@ -45,7 +47,7 @@ export function ChatbotWidget({ config }: ChatbotWidgetProps) {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isGenerating, error]);
 
   const handleOpenChat = () => {
     setIsOpen(true);
@@ -57,16 +59,20 @@ export function ChatbotWidget({ config }: ChatbotWidgetProps) {
   };
 
   const handleSendMessage = async (message: string) => {
-    if (!message.trim() || isLoading) return;
-    await sendMessage(message);
+    const normalizedMessage = message.trim();
+
+    if (!normalizedMessage || isLoading) {
+      return;
+    }
+
+    await sendMessage(normalizedMessage);
+    setDraft("");
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      const input = e.target as HTMLInputElement;
-      handleSendMessage(input.value);
-      input.value = "";
+      void handleSendMessage(draft);
     }
   };
 
@@ -79,11 +85,8 @@ export function ChatbotWidget({ config }: ChatbotWidgetProps) {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={handleOpenChat}
-        className="fixed bottom-8 left-4 z-50 w-16 h-16 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full shadow-2xl border-2 border-white/20 backdrop-blur-sm flex items-center justify-center group sm:left-8"
-        style={{
-          boxShadow:
-            "0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1)",
-        }}
+        data-testid="chatbot-open"
+        className="fixed bottom-8 left-4 z-50 flex h-16 w-16 items-center justify-center rounded-full border border-[color:var(--site-color-border-strong)] bg-[color:var(--site-color-surface-strong)] shadow-[var(--site-shadow-lg)] backdrop-blur-sm sm:left-8"
       >
         <img
           src={config.botAvatar}
@@ -91,7 +94,7 @@ export function ChatbotWidget({ config }: ChatbotWidgetProps) {
           className="w-12 h-12 rounded-full object-cover"
         />
         {showWelcomeBubble && (
-          <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold animate-pulse">
+          <div className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-[color:var(--site-color-danger)] text-xs font-bold text-white animate-pulse">
             1
           </div>
         )}
@@ -105,15 +108,12 @@ export function ChatbotWidget({ config }: ChatbotWidgetProps) {
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: -50, scale: 0.8 }}
             onClick={handleOpenChat}
-            className="fixed bottom-24 left-4 z-40 max-w-xs bg-gradient-to-r from-yellow-400 to-amber-500 text-white p-4 rounded-2xl rounded-bl-md shadow-2xl cursor-pointer border border-white/20 backdrop-blur-sm sm:left-8"
-            style={{
-              background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
-            }}
+            className="fixed bottom-24 left-4 z-40 max-w-xs cursor-pointer rounded-2xl rounded-bl-md border border-[color:var(--site-color-border-strong)] bg-[color:var(--site-color-surface-strong)] p-4 text-[color:var(--site-color-foreground)] shadow-[var(--site-shadow-lg)] backdrop-blur-sm sm:left-8"
           >
             <p className="text-sm font-medium leading-relaxed">
               {config.welcomeBubble}
             </p>
-            <div className="absolute bottom-0 left-0 w-0 h-0 border-r-8 border-r-transparent border-t-8 border-t-yellow-400"></div>
+            <div className="absolute bottom-0 left-0 h-0 w-0 border-r-8 border-r-transparent border-t-8 border-t-[color:var(--site-color-surface-strong)]"></div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -128,7 +128,7 @@ export function ChatbotWidget({ config }: ChatbotWidgetProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={handleCloseChat}
-              className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
+              className="fixed inset-0 z-40 bg-[color:var(--site-color-overlay-scrim)] backdrop-blur-sm"
             />
 
             {/* Chat Container */}
@@ -136,17 +136,11 @@ export function ChatbotWidget({ config }: ChatbotWidgetProps) {
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
-              className="fixed bottom-24 left-0 right-0 z-50 w-full h-[600px] max-w-[calc(100vw-2rem)] max-h-[calc(100vh-8rem)] bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl shadow-2xl border border-white/10 backdrop-blur-xl flex flex-col overflow-hidden sm:left-8 sm:right-auto sm:w-96 sm:max-w-[calc(100vw-2rem)] sm:rounded-2xl"
-              style={{
-                background:
-                  config.backgroundColor ||
-                  "linear-gradient(135deg, #1f2937 0%, #111827 100%)",
-              }}
+              className="fixed bottom-24 left-0 right-0 z-50 flex h-[600px] max-h-[calc(100vh-8rem)] w-full max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-[color:var(--site-color-border-strong)] bg-[color:var(--site-color-surface-strong)] shadow-[var(--site-shadow-lg)] backdrop-blur-xl sm:left-8 sm:right-auto sm:w-96 sm:max-w-[calc(100vw-2rem)] sm:rounded-2xl"
             >
               {/* Header */}
               <div
-                className="flex items-center justify-between p-4 border-b border-white/10"
-                style={{ backgroundColor: config.headerColor || "#1f2937" }}
+                className="flex items-center justify-between border-b border-[color:var(--site-color-border)] bg-[color:var(--site-color-surface-inset)] p-4"
               >
                 <div className="flex items-center space-x-3">
                   <img
@@ -154,23 +148,27 @@ export function ChatbotWidget({ config }: ChatbotWidgetProps) {
                     alt="Bot"
                     className="w-8 h-8 rounded-full object-cover"
                   />
-                  <h3 className="text-white font-semibold text-lg">
+                  <h3 className="text-lg font-semibold text-[color:var(--site-color-foreground-strong)]">
                     {config.chatbotName}
                   </h3>
                 </div>
                 <button
                   onClick={handleCloseChat}
-                  className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                  className="rounded-full p-2 text-[color:var(--site-color-foreground-muted)] transition-colors hover:bg-[color:var(--site-color-interactive-muted-hover)] hover:text-[color:var(--site-color-foreground-strong)]"
                 >
-                  <X className="w-5 h-5 text-white" />
+                  <X className="h-5 w-5" />
                 </button>
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              <div
+                className="flex-1 overflow-y-auto p-4 space-y-4"
+                data-testid="chatbot-messages"
+              >
                 {messages.map((message, index) => (
                   <div
                     key={index}
+                    data-testid={`chatbot-message-${message.role}`}
                     className={`flex ${
                       message.role === "user" ? "justify-end" : "justify-start"
                     }`}
@@ -178,8 +176,8 @@ export function ChatbotWidget({ config }: ChatbotWidgetProps) {
                     <div
                       className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                         message.role === "user"
-                          ? "bg-gradient-to-r from-yellow-400 to-amber-500 text-white rounded-br-md"
-                          : "bg-white/10 text-white rounded-bl-md border border-white/20"
+                          ? "rounded-br-md bg-[color:var(--site-color-primary)] text-[color:var(--site-color-primary-contrast)]"
+                          : "rounded-bl-md border border-[color:var(--site-color-border)] bg-[color:var(--site-color-surface-inset)] text-[color:var(--site-color-foreground)]"
                       }`}
                     >
                       {message.role === "bot" && (
@@ -190,7 +188,7 @@ export function ChatbotWidget({ config }: ChatbotWidgetProps) {
                             className="w-6 h-6 rounded-full object-cover mt-1 flex-shrink-0"
                           />
                           <div
-                            className="prose prose-invert prose-sm max-w-none"
+                            className="prose prose-sm max-w-none text-[color:var(--site-color-foreground)]"
                             dangerouslySetInnerHTML={{
                               __html: parseMarkdown(message.content),
                             }}
@@ -207,7 +205,12 @@ export function ChatbotWidget({ config }: ChatbotWidgetProps) {
                 {/* Typing Indicator */}
                 {isGenerating && (
                   <div className="flex justify-start">
-                    <div className="bg-white/10 text-white rounded-2xl rounded-bl-md px-4 py-3 border border-white/20">
+                    <div
+                      className="rounded-2xl rounded-bl-md border border-[color:var(--site-color-border)] bg-[color:var(--site-color-surface-inset)] px-4 py-3 text-[color:var(--site-color-foreground)]"
+                      role="status"
+                      aria-live="polite"
+                      data-testid="chatbot-typing"
+                    >
                       <div className="flex items-center space-x-2">
                         <img
                           src={config.botAvatar}
@@ -215,16 +218,19 @@ export function ChatbotWidget({ config }: ChatbotWidgetProps) {
                           className="w-6 h-6 rounded-full object-cover"
                         />
                         <div className="flex space-x-1">
-                          <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce"></div>
+                          <div className="h-2 w-2 rounded-full bg-[color:var(--site-color-foreground-soft)] animate-bounce"></div>
                           <div
-                            className="w-2 h-2 bg-white/60 rounded-full animate-bounce"
+                            className="h-2 w-2 rounded-full bg-[color:var(--site-color-foreground-soft)] animate-bounce"
                             style={{ animationDelay: "0.1s" }}
                           ></div>
                           <div
-                            className="w-2 h-2 bg-white/60 rounded-full animate-bounce"
+                            className="h-2 w-2 rounded-full bg-[color:var(--site-color-foreground-soft)] animate-bounce"
                             style={{ animationDelay: "0.2s" }}
                           ></div>
                         </div>
+                        <span className="text-sm text-[color:var(--site-color-foreground-muted)]">
+                          Digitando...
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -233,7 +239,10 @@ export function ChatbotWidget({ config }: ChatbotWidgetProps) {
                 {/* Error Message */}
                 {error && (
                   <div className="flex justify-start">
-                    <div className="bg-red-500/20 text-red-200 rounded-2xl rounded-bl-md px-4 py-3 border border-red-500/30">
+                    <div
+                      className="rounded-2xl rounded-bl-md border border-[color:var(--site-color-danger-soft)] bg-[color:var(--site-color-danger-soft)] px-4 py-3 text-[color:var(--site-color-danger-text)]"
+                      data-testid="chatbot-error"
+                    >
                       <p className="text-sm">{error}</p>
                     </div>
                   </div>
@@ -243,34 +252,38 @@ export function ChatbotWidget({ config }: ChatbotWidgetProps) {
               </div>
 
               {/* Input */}
-              <div className="p-4 border-t border-white/10">
+              <div className="border-t border-[color:var(--site-color-border)] p-4">
                 <div className="flex space-x-2">
                   <input
                     type="text"
                     placeholder="Digite sua mensagem..."
                     disabled={isLoading}
-                    onKeyPress={handleKeyPress}
-                    className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-transparent disabled:opacity-50"
-                  />
-                  <button
-                    onClick={() => {
-                      const input = document.querySelector(
-                        'input[type="text"]'
-                      ) as HTMLInputElement;
-                      if (input?.value) {
-                        handleSendMessage(input.value);
-                        input.value = "";
+                    value={draft}
+                    onChange={(event) => {
+                      setDraft(event.target.value);
+                      if (error) {
+                        clearError();
                       }
                     }}
-                    disabled={isLoading}
-                    className="p-3 bg-gradient-to-r from-yellow-400 to-amber-500 text-white rounded-xl hover:from-yellow-500 hover:to-amber-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    onKeyDown={handleKeyDown}
+                    aria-label="Mensagem para o assistente"
+                    data-testid="chatbot-input"
+                    className="flex-1 rounded-xl border border-[color:var(--site-color-border)] bg-[color:var(--site-color-surface-inset)] px-4 py-3 text-[color:var(--site-color-foreground)] placeholder-[color:var(--site-color-foreground-soft)] focus:outline-none focus:ring-2 focus:ring-[color:var(--site-color-primary-soft)] focus:border-transparent disabled:opacity-50"
+                  />
+                  <button
+                    onClick={() => void handleSendMessage(draft)}
+                    disabled={isLoading || !draft.trim()}
+                    aria-label="Enviar mensagem"
+                    data-testid="chatbot-send"
+                    className="rounded-xl bg-[color:var(--site-color-primary)] p-3 text-[color:var(--site-color-primary-contrast)] transition-all hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <Send className="w-5 h-5" />
                   </button>
                   {isGenerating && (
                     <button
                       onClick={stopGeneration}
-                      className="p-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors"
+                      aria-label="Parar resposta"
+                      className="rounded-xl bg-[color:var(--site-color-danger)] p-3 text-white transition-colors hover:brightness-95"
                     >
                       <Square className="w-5 h-5" />
                     </button>

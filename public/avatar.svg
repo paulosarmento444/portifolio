@@ -1,0 +1,22 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Avatar</title>
+  <desc id="desc">Imagem ilustrativa de perfil.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.25"/>
+      <stop offset="50%" stop-color="#a855f7" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#ec4899" stop-opacity="0.25"/>
+    </linearGradient>
+    <linearGradient id="stroke" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="50%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#fb7185"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="48" fill="rgba(15,23,42,0.9)" />
+  <rect x="8" y="8" width="240" height="240" rx="48" fill="url(#bg)" />
+  <rect x="8" y="8" width="240" height="240" rx="48" fill="none" stroke="url(#stroke)" stroke-width="2" opacity="0.9"/>
+  <circle cx="128" cy="106" r="34" fill="rgba(226,232,240,0.9)"/>
+  <path d="M58 208c10-36 38-56 70-56s60 20 70 56" fill="rgba(226,232,240,0.9)"/>
+</svg>
+

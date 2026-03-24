@@ -1,11 +1,5 @@
-import Header from "@/app/components/Header";
-import { RegisterContainer } from "./components/RegisterContainer";
+import { AuthRegisterPage } from "@site/auth";
 
 export default function RegisterPage() {
-  return (
-    <>
-      <Header />
-      <RegisterContainer />
-    </>
-  );
+  return <AuthRegisterPage />;
 }

@@ -1,7 +1,11 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { ChatbotConfig, ChatbotState } from "../types";
+import {
+  ChatbotService,
+  normalizeChatbotError,
+} from "@/app/services/chatbot.service";
 
 export function useChatbot(config: ChatbotConfig) {
   const [state, setState] = useState<ChatbotState>({
@@ -14,6 +18,11 @@ export function useChatbot(config: ChatbotConfig) {
 
   const [abortController, setAbortController] =
     useState<AbortController | null>(null);
+  const serviceRef = useRef<ChatbotService | null>(null);
+
+  if (serviceRef.current === null) {
+    serviceRef.current = new ChatbotService();
+  }
 
   // Initialize chatbot with first message
   useEffect(() => {
@@ -32,44 +41,24 @@ export function useChatbot(config: ChatbotConfig) {
     }
   }, [config.firstBotMessage, state.isInitialized]);
 
-  const checkRequirements = useCallback(() => {
-    const errors: string[] = [];
-
-    // Check if Chrome
-    // @ts-ignore
-    if (!window.chrome) {
-      errors.push(
-        "⚠️ Este recurso só funciona no Google Chrome ou Chrome Canary (versão recente)."
-      );
-    }
-
-    // Check if LanguageModel API is available
-    if (!("LanguageModel" in window)) {
-      errors.push("⚠️ As APIs nativas de IA não estão ativas.");
-      errors.push("Ative a seguinte flag em chrome://flags/:");
-      errors.push(
-        "- Prompt API for Gemini Nano (chrome://flags/#prompt-api-for-gemini-nano)"
-      );
-      errors.push("Depois reinicie o Chrome e tente novamente.");
-    }
-
-    return errors;
-  }, []);
+  useEffect(() => {
+    return () => {
+      abortController?.abort();
+      serviceRef.current?.reset();
+    };
+  }, [abortController]);
 
   const sendMessage = useCallback(
     async (userMessage: string) => {
-      if (!userMessage.trim() || state.isLoading) return;
+      const normalizedMessage = userMessage.trim();
 
-      // Check requirements first
-      const errors = checkRequirements();
-      if (errors.length > 0) {
-        setState((prev) => ({
-          ...prev,
-          error: errors.join("\n\n"),
-          isLoading: false,
-        }));
+      if (!normalizedMessage || state.isLoading) {
         return;
       }
+
+      const history = state.messages;
+      const controller = new AbortController();
+      setAbortController(controller);
 
       setState((prev) => ({
         ...prev,
@@ -80,103 +69,52 @@ export function useChatbot(config: ChatbotConfig) {
           ...prev.messages,
           {
             role: "user",
-            content: userMessage,
+            content: normalizedMessage,
             timestamp: new Date(),
           },
         ],
       }));
 
       try {
-        // Create new abort controller
-        const controller = new AbortController();
-        setAbortController(controller);
-
-        // Check if LanguageModel is available
-        if (!window.LanguageModel) {
-          throw new Error("LanguageModel API não está disponível");
-        }
-
-        // Create session if not exists
-        let session = (window as any).chatbotSession;
-        if (!session) {
-          session = await window.LanguageModel.create({
-            initialPrompts: [
-              {
-                role: "system",
-                content: await getSystemPrompt(),
-              },
-            ],
-            expectedInputLanguages: ["pt"],
-          });
-          (window as any).chatbotSession = session;
-        }
-
-        // Add user message to conversation
-        const conversationHistory = [
-          ...state.messages
-            .filter((msg) => msg.role === "user")
-            .map((msg) => ({
-              role: "user" as const,
-              content: msg.content,
-            })),
-        ];
-
-        // Get streaming response
-        const response = session.promptStreaming(conversationHistory, {
+        const response = await serviceRef.current!.sendMessage({
+          config: {
+            assistantRole: config.assistantRole,
+            catalogPath: config.catalogPath,
+            cartPath: config.cartPath,
+            chatbotName: config.chatbotName,
+            storeDescription: config.storeDescription,
+            storeName: config.storeName,
+            locale: config.locale,
+            supportPath: config.supportPath,
+            supportEmail: config.supportEmail,
+            whatsappLabel: config.whatsappLabel,
+            whatsappUrl: config.whatsappUrl,
+            featuredCategories: config.featuredCategories,
+            welcomeBubble: config.welcomeBubble,
+            firstBotMessage: config.firstBotMessage,
+          },
+          history,
+          message: normalizedMessage,
           signal: controller.signal,
         });
 
-        let fullResponse = "";
-        let lastUpdate = 0;
-
-        // Create initial bot message
         setState((prev) => ({
           ...prev,
           messages: [
             ...prev.messages,
             {
               role: "bot",
-              content: "",
+              content: response,
               timestamp: new Date(),
             },
           ],
           isLoading: false,
-        }));
-
-        // Stream the response
-        for await (const chunk of response) {
-          if (!chunk) continue;
-
-          fullResponse += chunk;
-
-          // Update UI every 200ms to avoid too many re-renders
-          const now = Date.now();
-          if (now - lastUpdate > 200) {
-            setState((prev) => ({
-              ...prev,
-              messages: prev.messages.map((msg, index) =>
-                index === prev.messages.length - 1 && msg.role === "bot"
-                  ? { ...msg, content: fullResponse }
-                  : msg
-              ),
-            }));
-            lastUpdate = now;
-          }
-        }
-
-        // Final update
-        setState((prev) => ({
-          ...prev,
-          messages: prev.messages.map((msg, index) =>
-            index === prev.messages.length - 1 && msg.role === "bot"
-              ? { ...msg, content: fullResponse }
-              : msg
-          ),
           isGenerating: false,
         }));
       } catch (error: any) {
-        if (error.name === "AbortError") {
-          console.log("Request aborted by user");
+        const normalizedError = normalizeChatbotError(error);
+
+        if (normalizedError === "abort") {
           setState((prev) => ({
             ...prev,
             isGenerating: false,
@@ -188,13 +126,34 @@ export function useChatbot(config: ChatbotConfig) {
         console.error("Chatbot error:", error);
         setState((prev) => ({
           ...prev,
-          error: "Erro ao obter resposta da IA. Tente novamente.",
+          error: normalizedError,
           isLoading: false,
           isGenerating: false,
         }));
+      } finally {
+        setAbortController((current) =>
+          current === controller ? null : current,
+        );
       }
     },
-    [state.messages, state.isLoading, checkRequirements]
+    [
+      config.chatbotName,
+      config.firstBotMessage,
+      config.locale,
+      config.assistantRole,
+      config.catalogPath,
+      config.cartPath,
+      config.storeDescription,
+      config.storeName,
+      config.supportEmail,
+      config.whatsappLabel,
+      config.whatsappUrl,
+      config.featuredCategories,
+      config.welcomeBubble,
+      config.supportPath,
+      state.messages,
+      state.isLoading,
+    ]
   );
 
   const stopGeneration = useCallback(() => {
@@ -222,47 +181,4 @@ export function useChatbot(config: ChatbotConfig) {
     stopGeneration,
     clearError,
   };
-}
-
-// Helper function to get system prompt
-async function getSystemPrompt(): Promise<string> {
-  try {
-    // Try to fetch from the original chatbot data
-    const response = await fetch("/chatbot/botData/systemPrompt.txt");
-    if (response.ok) {
-      const systemPrompt = await response.text();
-      const llmsResponse = await fetch("/chatbot/llms.txt");
-      if (llmsResponse.ok) {
-        const llmsData = await llmsResponse.text();
-        return systemPrompt + "\n" + llmsData;
-      }
-      return systemPrompt;
-    }
-  } catch (error) {
-    console.warn("Could not fetch system prompt:", error);
-  }
-
-  // Fallback system prompt
-  return `Você é um assistente virtual da Solar Esportes, loja especializada em roupas e artigos esportivos.
-Responda apenas com base nos dados do contexto fornecido (não utilize informações externas).
-Formate todas as respostas em **markdown**.
-
-**Instruções:**
-- Seja objetivo e resumido (no máximo mil caracteres), com tom amigável e profissional.
-- Foque em produtos esportivos, roupas de academia, equipamentos de treino e acessórios.
-- Sempre inclua links para produtos e categorias quando relevante.
-- Sugira produtos complementares e acessórios relacionados.
-- O idioma padrão é Português do Brasil.
-- Apresente primeiro os produtos mais relevantes, depois categorias relacionadas.
-- Ao final de cada resposta, pergunte o que o usuário deseja fazer em seguida (ex: "Deseja ver mais detalhes do produto, acessar a categoria ou fazer uma compra?").
-- Pergunte explicitamente se o usuário quer ver o produto, acessar a categoria ou fazer uma compra.
-- Se a pergunta não for sobre produtos esportivos, redirecione para nosso catálogo de produtos.
-- Sempre mencione promoções, descontos e ofertas especiais quando disponíveis.
-
-**Categorias principais:**
-- Roupas de Academia (leggings, tops, shorts, camisetas)
-- Equipamentos de Treino (halteres, elásticos, colchonetes)
-- Calçados Esportivos (tênis de corrida, academia, caminhada)
-- Acessórios (garrafas, mochilas, bonés, luvas)
-- Suplementos e Nutrição Esportiva`;
 }

@@ -1,19 +1,9 @@
-import Header from "@/app/components/Header";
-import { ContactForm } from "./contact/components";
-import { Toaster } from "./components/toaster";
-import TeamSection from "./about/components/team-section";
 import CategoriesShowcase from "./components/categories-showcase";
 
 export default async function Home() {
   return (
-    <>
-      <Header />
-
+    <main className="site-page-shell site-stack-page">
       <CategoriesShowcase />
-
-      <TeamSection />
-      <ContactForm />
-      <Toaster />
-    </>
+    </main>
   );
 }

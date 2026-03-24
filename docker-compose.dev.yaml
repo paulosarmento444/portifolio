@@ -1,0 +1,9 @@
+services:
+    site:
+        image: node:25.8.1-slim
+        command: npm run dev
+        ports:
+            - 3000:3000
+        working_dir: /home/node/app
+        volumes:
+            - ./:/home/node/app

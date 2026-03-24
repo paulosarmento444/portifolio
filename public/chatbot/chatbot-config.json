@@ -1,6 +1,6 @@
 {
   "primaryColor": "#FF6B35",
-  "chatbotName": "Solar Esportes Assistant",
+  "chatbotName": "Assistente da loja",
   "buttonColor": "#E55A2B",
   "backgroundColor": "#1a1a1a",
   "headerColor": "#2d2d2d",
@@ -10,7 +10,7 @@
   "botText": "#fff",
   "iconUrl": "/chatbot/botData/avatar.svg",
   "botAvatar": "/chatbot/botData/avatar.svg",
-  "welcomeBubble": "Olá! Como posso te ajudar com nossos produtos esportivos?",
-  "firstBotMessage": "Bem-vindo à Solar Esportes! Estou aqui para te ajudar a encontrar os melhores produtos esportivos. O que você está procurando hoje?",
+  "welcomeBubble": "Ola! Posso ajudar com produtos, categorias e ofertas.",
+  "firstBotMessage": "Me diga o que voce procura e eu busco no catalogo da loja para voce.",
   "typingDelay": 0.5
 }

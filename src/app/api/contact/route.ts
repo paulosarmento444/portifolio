@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
+import { serverEnv } from '@/app/lib/env.server'
 
 const bodySchema = z.object({
   name: z.string(),
@@ -9,12 +10,11 @@ const bodySchema = z.object({
   message: z.string(),
 })
 
-const WEBHOOK_URL = process.env.WEBHOOK_URL!
-
 export async function POST(request: Request) {
   try {
     const body = await request.json()
     const { name, email, message, phone } = bodySchema.parse(body)
+    const webhookUrl = serverEnv.hooks.webhookUrl
 
     const messageData = {
       embeds: [
@@ -45,13 +45,18 @@ export async function POST(request: Request) {
       ],
     }
 
-    await axios.post(WEBHOOK_URL, messageData)
+    await axios.post(webhookUrl, messageData)
 
     return NextResponse.json({
       message: 'Mensagem enviada com sucesso!',
     })
   } catch (error) {
-    console.log(error)
-    return NextResponse.error()
+    console.error(error)
+    return NextResponse.json(
+      {
+        error: error instanceof Error ? error.message : 'Unexpected error',
+      },
+      { status: 500 },
+    )
   }
 }

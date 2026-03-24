@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "lib": [
       "dom",
       "dom.iterable",
@@ -24,6 +25,48 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@site/account": [
+        "./packages/account/web/src/index.ts"
+      ],
+      "@site/auth": [
+        "./packages/auth/web/src/index.ts"
+      ],
+      "@site/blog": [
+        "./packages/blog/web/src/index.ts"
+      ],
+      "@site/checkout": [
+        "./packages/checkout/web/src/index.ts"
+      ],
+      "@site/shared": [
+        "./packages/shared/web/src/index.ts"
+      ],
+      "@site/shared/server": [
+        "./packages/shared/web/src/server.ts"
+      ],
+      "@site/store": [
+        "./packages/store/web/src/index.ts"
+      ],
+      "@site/integrations/payments": [
+        "./packages/integrations/payments/src/index.ts"
+      ],
+      "@site/integrations/payments/server": [
+        "./packages/integrations/payments/src/server.ts"
+      ],
+      "@site/integrations/cocart": [
+        "./packages/integrations/cocart/src/index.ts"
+      ],
+      "@site/integrations/cocart/server": [
+        "./packages/integrations/cocart/src/server.ts"
+      ],
+      "@site/integrations/wordpress": [
+        "./packages/integrations/wordpress/src/index.ts"
+      ],
+      "@site/integrations/wordpress/register": [
+        "./packages/integrations/wordpress/src/register.ts"
+      ],
+      "@site/integrations/wordpress/server": [
+        "./packages/integrations/wordpress/src/server.ts"
       ]
     }
   },

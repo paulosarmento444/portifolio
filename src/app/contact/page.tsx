@@ -1,13 +1,5 @@
-import { Toaster } from "react-hot-toast";
-import Header from "../components/Header";
-import { ContactForm } from "./components";
+import { PublicContactPage } from "@site/shared";
 
 export default function ContactPage() {
-  return (
-    <>
-      <Header />
-      <Toaster />
-      <ContactForm />
-    </>
-  );
+  return <PublicContactPage />;
 }

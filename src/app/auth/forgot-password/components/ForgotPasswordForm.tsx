@@ -1,137 +1,171 @@
 "use client";
-import { motion } from "framer-motion";
-import { InputField } from "@/app/auth/components/InputField";
-import { ArrowRight, Mail } from "lucide-react";
+
+import Link from "next/link";
 import type React from "react";
+import { useState } from "react";
+import { ArrowLeft, ArrowRight, Mail, ShieldCheck } from "lucide-react";
+import { forgotPasswordAction } from "@site/auth";
+import { forgotPasswordRequestSchema, PageHeader, PrimaryButton, SectionShell, StatusBadge, SurfaceCard, TextField, TrustList } from "@site/shared";
 
 export function ForgotPasswordForm() {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    alert("forgot password...");
-    e.preventDefault();
+  const [state, setState] = useState<{
+    pending: boolean;
+    error: string;
+    successMessage: string;
+  }>({
+    pending: false,
+    error: "",
+    successMessage: "",
+  });
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setState({ pending: true, error: "", successMessage: "" });
+
+    const formData = new FormData(event.currentTarget);
+    const usernameOrEmail = String(formData.get("email") ?? "").trim();
+    const parsedInput = forgotPasswordRequestSchema.safeParse({
+      usernameOrEmail,
+    });
+
+    if (!parsedInput.success) {
+      setState({
+        pending: false,
+        error:
+          parsedInput.error.issues[0]?.message ||
+          "Informe um e-mail ou usuario valido.",
+        successMessage: "",
+      });
+      return;
+    }
+
+    try {
+      const result = await forgotPasswordAction(parsedInput.data);
+
+      setState({
+        pending: false,
+        error: "",
+        successMessage: result.message,
+      });
+    } catch (error) {
+      setState({
+        pending: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : "Nao foi possivel solicitar a redefinicao de senha.",
+        successMessage: "",
+      });
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-40 left-40 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
-      </div>
+    <main className="site-page-shell site-page-shell-compact site-shell-background">
+      <SectionShell container="utility" spacing="hero" stack="page" className="pb-16">
+        <div className="grid items-start gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(26rem,32rem)]">
+          <div className="site-stack-section">
+            <PageHeader
+              container="utility"
+              className="px-0 pt-0 pb-0"
+              eyebrow={
+                <>
+                  <Mail className="h-4 w-4" />
+                  Recuperacao de acesso
+                </>
+              }
+              title="Recupere o acesso sem ruído visual e volte para a conta com contexto."
+              description="Envie o e-mail da conta para receber as instrucoes de recuperacao. O fluxo continua simples, com a mesma linguagem premium aplicada ao restante da loja."
+            />
 
-      {/* Grid Pattern */}
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwgMjU1LCAyNTUsIDAuMDUpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
-
-      {/* Floating Orbs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-1/4 w-32 h-32 bg-gradient-to-r from-cyan-400/20 to-blue-500/20 rounded-full blur-xl animate-pulse"></div>
-        <div className="absolute top-40 right-1/4 w-24 h-24 bg-gradient-to-r from-purple-400/20 to-pink-500/20 rounded-full blur-xl animate-pulse delay-1000"></div>
-        <div className="absolute bottom-32 left-1/3 w-40 h-40 bg-gradient-to-r from-orange-400/20 to-red-500/20 rounded-full blur-xl animate-pulse delay-2000"></div>
-      </div>
-
-      <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="relative"
-        >
-          {/* Background Glow */}
-          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 rounded-3xl blur-2xl opacity-60"></div>
-
-          {/* Form Container */}
-          <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 md:p-12">
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Mail className="w-8 h-8 text-white" />
-              </div>
-              <h2 className="text-3xl font-bold text-white mb-2">
-                Esqueceu a Senha?
-              </h2>
-              <p className="text-gray-300">
-                Digite seu email para receber as instruções de recuperação
-              </p>
+            <div className="flex flex-wrap gap-3">
+              <StatusBadge tone="success">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                Fluxo protegido
+              </StatusBadge>
+              <StatusBadge tone="info">Resposta enviada por e-mail</StatusBadge>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <InputField
-                id="email"
-                type="email"
-                label="Email"
-                placeholder="Digite seu email"
-              />
-
-              <motion.button
-                type="submit"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="flex w-full rounded-xl justify-center items-center gap-2 py-3 px-6 text-white font-semibold bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-all duration-200"
-              >
-                <span>Enviar Instruções</span>
-                <ArrowRight className="w-5 h-5" />
-              </motion.button>
-
-              <div className="text-center">
-                <a
-                  href="/auth/login"
-                  className="text-sm text-purple-400 hover:text-purple-300 hover:underline transition-colors"
-                >
-                  Voltar para o login
-                </a>
-              </div>
-            </form>
+            <TrustList
+              items={[
+                {
+                  label: "Recuperacao por e-mail",
+                  description: "Use o e-mail principal da conta para receber as instrucoes.",
+                  tone: "info",
+                },
+                {
+                  label: "Retorno ao checkout",
+                  description: "Depois do login, seus pedidos e dados continuam disponiveis.",
+                  tone: "accent",
+                },
+                {
+                  label: "Menos friccao",
+                  description: "Fluxo enxuto para resolver o acesso e voltar ao catalogo.",
+                  tone: "success",
+                },
+              ]}
+            />
           </div>
 
-          {/* Floating Elements */}
-          <div className="absolute -top-4 -right-4 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-2xl p-3 animate-float">
-            <div className="w-6 h-6 bg-white rounded-lg"></div>
-          </div>
-          <div className="absolute -bottom-4 -left-4 bg-gradient-to-r from-purple-400 to-pink-500 rounded-2xl p-3 animate-float delay-1000">
-            <div className="w-6 h-6 bg-white rounded-lg"></div>
-          </div>
-        </motion.div>
-      </div>
+          <div className="flex justify-center xl:justify-end">
+            <SurfaceCard tone="strong" className="w-full max-w-[32rem]">
+              <form onSubmit={handleSubmit} className="site-stack-section">
+                <div className="site-stack-panel">
+                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[color:var(--site-color-primary-soft)] text-[color:var(--site-color-primary)] shadow-[var(--site-shadow-sm)]">
+                    <Mail className="h-5 w-5" />
+                  </div>
+                  <div className="site-stack-panel gap-2">
+                    <h2 className="site-text-section-title !text-2xl">Esqueceu sua senha?</h2>
+                    <p className="site-text-body text-sm">
+                      Digite o e-mail usado na conta para receber as instrucoes de recuperacao.
+                    </p>
+                  </div>
+                </div>
 
-      <style jsx>{`
-        @keyframes blob {
-          0% {
-            transform: translate(0px, 0px) scale(1);
-          }
-          33% {
-            transform: translate(30px, -50px) scale(1.1);
-          }
-          66% {
-            transform: translate(-20px, 20px) scale(0.9);
-          }
-          100% {
-            transform: translate(0px, 0px) scale(1);
-          }
-        }
-        @keyframes float {
-          0%,
-          100% {
-            transform: translateY(0px) rotate(0deg);
-          }
-          50% {
-            transform: translateY(-10px) rotate(3deg);
-          }
-        }
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-        .animate-float {
-          animation: float 4s ease-in-out infinite;
-        }
-        .delay-1000 {
-          animation-delay: 1s;
-        }
-      `}</style>
-    </div>
+                <TextField
+                  id="email"
+                  name="email"
+                  type="email"
+                  label="E-mail"
+                  placeholder="voce@exemplo.com"
+                  required
+                  autoComplete="email"
+                  hint="Use o mesmo e-mail cadastrado na loja."
+                />
+
+                <div className="site-stack-panel">
+                  <PrimaryButton
+                    type="submit"
+                    disabled={state.pending}
+                    fullWidth
+                    trailingIcon={<ArrowRight className="h-4 w-4" />}
+                  >
+                    {state.pending ? "Enviando..." : "Enviar instrucoes"}
+                  </PrimaryButton>
+                  <Link
+                    href="/auth/login"
+                    className="site-button site-button-secondary inline-flex min-h-11 w-full items-center justify-center gap-2 px-5 py-3 text-sm"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Voltar para o login
+                  </Link>
+                </div>
+
+                {state.error ? (
+                  <div className="rounded-[var(--site-radius-lg)] border border-[color:var(--site-color-danger-soft)] bg-[color:var(--site-color-danger-soft)]/70 px-4 py-3 text-sm text-[color:var(--site-color-danger-text)]">
+                    {state.error}
+                  </div>
+                ) : null}
+
+                {state.successMessage ? (
+                  <div className="rounded-[var(--site-radius-lg)] border border-[color:var(--site-color-success-soft)] bg-[color:var(--site-color-success-soft)]/70 px-4 py-3 text-sm text-[color:var(--site-color-success-text)]">
+                    {state.successMessage}
+                  </div>
+                ) : null}
+              </form>
+            </SurfaceCard>
+          </div>
+        </div>
+      </SectionShell>
+    </main>
   );
 }

@@ -1,11 +1,5 @@
-import Header from "@/app/components/Header";
-import { LoginContainer } from "./components/LoginContainer";
+import { AuthLoginPage } from "@site/auth";
 
 export default function LoginPage() {
-  return (
-    <>
-      <Header />
-      <LoginContainer />
-    </>
-  );
+  return <AuthLoginPage />;
 }

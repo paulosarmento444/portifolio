@@ -1,0 +1,21 @@
+<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Imagem ilustrativa</title>
+  <desc id="desc">Área reservada para imagem de produto ou conteúdo.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="400" height="300" fill="url(#bg)" rx="24" ry="24"/>
+  <rect x="32" y="32" width="336" height="236" fill="none" stroke="rgba(148,163,184,0.8)" stroke-width="2" stroke-dasharray="8 6" rx="20" ry="20"/>
+  <g transform="translate(200 150)">
+    <circle cx="0" cy="-24" r="32" fill="rgba(15,23,42,0.85)" stroke="#22d3ee" stroke-width="2"/>
+    <path d="M -32 40 C -20 18 -4 6 0 6 C 4 6 20 18 32 40" fill="none" stroke="rgba(226,232,240,0.95)" stroke-width="2.2" stroke-linecap="round"/>
+  </g>
+  <text x="200" y="230" text-anchor="middle" fill="#e5e7eb" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="16">
+    Imagem será exibida aqui
+  </text>
+</svg>
+

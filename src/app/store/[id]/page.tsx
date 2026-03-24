@@ -1,6 +1,5 @@
-import Header from "@/app/components/Header";
-import { ProductDetailContainer } from "./components/ProductDetailContainer";
-import { Toaster } from "@/app/components/toaster";
+import { addToCartAndRedirectAction } from "@site/checkout";
+import { StoreProductPage } from "@site/store";
 
 export default async function ProductPage({
   params: { id },
@@ -8,12 +7,9 @@ export default async function ProductPage({
   params: { id: string };
 }) {
   return (
-    <>
-      <Header />
-      <div className="mt-20">
-        <ProductDetailContainer productId={id} />
-      </div>
-      <Toaster />
-    </>
+    <StoreProductPage
+      productId={id}
+      addToCartAction={addToCartAndRedirectAction}
+    />
   );
 }

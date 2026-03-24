@@ -1,9 +1,40 @@
+# ----------------------------------------------------------------------------
+# App public URL
+# ----------------------------------------------------------------------------
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 
-WEBHOOK_URL=
-NEXT_PUBLIC_WC_CONSUMER_KEY=
-NEXT_PUBLIC_WC_CONSUMER_SECRET=
-NEXT_PUBLIC_API_URL=
-NEXT_PUBLIC_URL=
-NEXT_PUBLIC_WORDPRESS_URL=
+# ----------------------------------------------------------------------------
+# WordPress topology
+# ----------------------------------------------------------------------------
+WORDPRESS_URL=http://localhost:8080
+NEXT_PUBLIC_WORDPRESS_PUBLIC_URL=http://localhost:8080
+NEXT_PUBLIC_WORDPRESS_GRAPHQL_URL=http://localhost:8080/graphql
+
+# ----------------------------------------------------------------------------
+# WooCommerce credentials (server-only)
+# ----------------------------------------------------------------------------
+WOOCOMMERCE_CONSUMER_KEY=
+WOOCOMMERCE_CONSUMER_SECRET=
+
+# ----------------------------------------------------------------------------
+# Faust / auth
+# ----------------------------------------------------------------------------
 FAUST_SECRET_KEY=
+
+# ----------------------------------------------------------------------------
+# Mercado Pago
+# ----------------------------------------------------------------------------
 MERCADO_PAGO_ACCESS_TOKEN=
+NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY=
+MERCADO_PAGO_PAYER_EMAIL=compras@example.com
+MERCADO_PAGO_PAYER_FIRST_NAME=Cliente
+
+# ----------------------------------------------------------------------------
+# Contact webhook
+# ----------------------------------------------------------------------------
+WEBHOOK_URL=
+
+# ----------------------------------------------------------------------------
+# Legacy API URL (used only by deprecated services)
+# ----------------------------------------------------------------------------
+API_URL=http://localhost:3333
