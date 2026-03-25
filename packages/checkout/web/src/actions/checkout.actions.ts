@@ -1,7 +1,6 @@
 "use server";
 
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import {
   cocartServerAdapter,
   isCoCartCompatibilityFallbackError,
@@ -109,6 +108,64 @@ const runCheckoutCartMutation = async (
 };
 
 const readRequestHeaders = async () => readCoCartForwardHeaders(await headers());
+
+const ADD_TO_CART_LIMIT_REACHED_MESSAGE =
+  "Este produto já está no carrinho e não é possível adicionar mais unidades.";
+const GENERIC_ADD_TO_CART_ERROR_MESSAGE =
+  "Não foi possível adicionar este produto ao carrinho. Tente novamente.";
+
+const readCartMutationErrorMessage = (error: unknown) => {
+  if (!error || typeof error !== "object") {
+    return "";
+  }
+
+  const errorWithResponse = error as {
+    message?: unknown;
+    response?: {
+      data?: {
+        message?: unknown;
+      };
+    };
+  };
+
+  return String(
+    errorWithResponse.response?.data?.message ?? errorWithResponse.message ?? "",
+  ).trim();
+};
+
+const isStockOrLimitRejection = (message: string) => {
+  const loweredMessage = message.toLowerCase();
+
+  return (
+    loweredMessage.includes("stock") ||
+    loweredMessage.includes("estoque") ||
+    loweredMessage.includes("limit") ||
+    loweredMessage.includes("purchase") ||
+    loweredMessage.includes("quantity") ||
+    loweredMessage.includes("quantidade") ||
+    loweredMessage.includes("already have") ||
+    loweredMessage.includes("already in your cart") ||
+    loweredMessage.includes("max_purchase")
+  );
+};
+
+const normalizeAddToCartFailure = (error: unknown) => {
+  const message = readCartMutationErrorMessage(error);
+
+  if (message && isStockOrLimitRejection(message)) {
+    return {
+      success: false as const,
+      reason: "limit_reached" as const,
+      message: ADD_TO_CART_LIMIT_REACHED_MESSAGE,
+    };
+  }
+
+  return {
+    success: false as const,
+    reason: "unknown" as const,
+    message: message || GENERIC_ADD_TO_CART_ERROR_MESSAGE,
+  };
+};
 
 const toCheckoutAddressFormData = (
   address:
@@ -358,13 +415,20 @@ export async function addCartItemAction(input: {
 }
 
 export async function addToCartAndRedirectAction(formData: FormData) {
-  await addCartItemAction({
-    productId: String(formData.get("product_id") ?? ""),
-    variationId: String(formData.get("variation_id") ?? "").trim() || undefined,
-    quantity: Number.parseInt(String(formData.get("quantity") ?? "1"), 10),
-  });
+  try {
+    await addCartItemAction({
+      productId: String(formData.get("product_id") ?? ""),
+      variationId: String(formData.get("variation_id") ?? "").trim() || undefined,
+      quantity: Number.parseInt(String(formData.get("quantity") ?? "1"), 10),
+    });
 
-  redirect("/my-cart");
+    return {
+      success: true as const,
+      redirectTo: "/my-cart",
+    };
+  } catch (error) {
+    return normalizeAddToCartFailure(error);
+  }
 }
 
 export async function updateCartItemQuantityAction(formData: FormData) {

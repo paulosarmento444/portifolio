@@ -118,6 +118,7 @@ const {
 
 const {
   addCartItemAction,
+  addToCartAndRedirectAction,
   applyCouponAction,
   createCheckoutOrderAction,
   calculateCheckoutShippingAction,
@@ -617,6 +618,60 @@ describe("checkout.actions", () => {
     }, undefined);
     expect(mockedWriteCoCartSessionContext).toHaveBeenCalledTimes(4);
     expect(mockedSyncPersistedCheckoutCouponForCart).toHaveBeenCalledTimes(4);
+  });
+
+  it("returns a redirect target when add to cart succeeds", async () => {
+    (mockedCoCartAdapter.addCartItem as any).mockResolvedValueOnce(baseCartState);
+
+    const formData = new FormData();
+    formData.append("product_id", "7");
+    formData.append("variation_id", "21");
+    formData.append("quantity", "1");
+
+    const result = await addToCartAndRedirectAction(formData);
+
+    expect(result).toEqual({
+      success: true,
+      redirectTo: "/my-cart",
+    });
+    expect(mockedCoCartAdapter.addCartItem).toHaveBeenCalledWith(
+      {
+        productId: "7",
+        variationId: "21",
+        quantity: 1,
+      },
+      {
+        sessionKey: "session-1",
+        cartToken: "token-1",
+      },
+      undefined,
+    );
+  });
+
+  it("returns a friendly stock-limit error when add to cart is rejected by stock availability", async () => {
+    (mockedCoCartAdapter.addCartItem as any).mockRejectedValueOnce({
+      response: {
+        data: {
+          message: "You cannot add that amount to the cart — we have 0 in stock and you already have 1 in your cart.",
+        },
+      },
+      message:
+        "You cannot add that amount to the cart — we have 0 in stock and you already have 1 in your cart.",
+    });
+
+    const formData = new FormData();
+    formData.append("product_id", "7");
+    formData.append("quantity", "1");
+
+    const result = await addToCartAndRedirectAction(formData);
+
+    expect(result).toEqual({
+      success: false,
+      reason: "limit_reached",
+      message: "Este produto já está no carrinho e não é possível adicionar mais unidades.",
+    });
+    expect(mockedWriteCoCartSessionContext).not.toHaveBeenCalled();
+    expect(mockedSyncPersistedCheckoutCouponForCart).not.toHaveBeenCalled();
   });
 
   it("returns a stock-aware error when the authoritative cart rejects a quantity update", async () => {

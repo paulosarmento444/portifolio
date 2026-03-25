@@ -2,7 +2,9 @@
 
 import type React from "react";
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Loader2, Minus, Plus, ShoppingCart } from "lucide-react";
+import { toast } from "react-hot-toast";
 import type { AddToCartAction } from "../../lib/store.types";
 
 interface ProductQuantityFormProps {
@@ -22,6 +24,7 @@ export function ProductQuantityForm({
   stockQuantity,
   addToCartAction,
 }: ProductQuantityFormProps) {
+  const router = useRouter();
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const isProcessingRef = useRef(false);
@@ -58,9 +61,19 @@ export function ProductQuantityForm({
         formData.append("variation_id", variationId);
       }
       formData.append("quantity", quantity.toString());
-      await addToCartAction(formData);
+      const result = await addToCartAction(formData);
+
+      if (result && !result.success) {
+        toast.error(result.message);
+        setIsLoading(false);
+        isProcessingRef.current = false;
+        return;
+      }
+
+      router.push(result?.redirectTo ?? "/my-cart");
     } catch (error) {
       console.error("Error adding to cart:", error);
+      toast.error("Não foi possível adicionar este produto ao carrinho. Tente novamente.");
       setIsLoading(false);
       isProcessingRef.current = false;
     }

@@ -31,7 +31,20 @@ export type StoreCatalogProduct = CatalogProductCardView;
 export type StoreProductDetail = CatalogProductDetailView;
 export type StoreProductVariation = CatalogProductDetailView;
 
-export type AddToCartAction = (formData: FormData) => Promise<void>;
+export type AddToCartActionResult =
+  | {
+      success: true;
+      redirectTo?: string;
+    }
+  | {
+      success: false;
+      reason: "limit_reached" | "unknown";
+      message: string;
+    };
+
+export type AddToCartAction = (
+  formData: FormData,
+) => Promise<AddToCartActionResult | void>;
 
 export const DEFAULT_STORE_FILTERS: StoreCatalogFilters = {
   priceRange: [0, 1000],

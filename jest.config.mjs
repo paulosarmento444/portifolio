@@ -10,6 +10,8 @@ const config = {
   testEnvironment: "jest-environment-jsdom",
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   moduleNameMapper: {
+    "^lucide-react/dist/esm/icons/.*\\.js$":
+      "<rootDir>/test/mocks/lucide-react-deep-icon.mock.tsx",
     "^@/(.*)$": "<rootDir>/src/$1",
     "^@site/account$": "<rootDir>/packages/account/web/src/index.ts",
     "^@site/auth$": "<rootDir>/packages/auth/web/src/index.ts",
