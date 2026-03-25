@@ -55,19 +55,21 @@ const buildProduct = (): StoreProductDetail => ({
   stockQuantity: null,
 });
 
-const buildVariation = (): StoreProductVariation => ({
-  ...buildProduct(),
-  id: "312",
-  type: "variation",
-  name: "Produto galeria - Azul P",
-  sku: "CMFEAPAZ",
-  gallery: [
+const buildVariation = (
+  gallery: StoreProductVariation["gallery"] = [
     {
       id: "variation-image-1",
       url: "https://example.com/variation-image-1.jpg",
       alt: "Imagem da variacao",
     },
   ],
+): StoreProductVariation => ({
+  ...buildProduct(),
+  id: "312",
+  type: "variation",
+  name: "Produto galeria - Azul P",
+  sku: "CMFEAPAZ",
+  gallery,
 });
 
 describe("ProductGallery", () => {
@@ -146,5 +148,82 @@ describe("ProductGallery", () => {
     expect(activeImage.getAttribute("data-zoom-active")).toBe("false");
     expect(activeImage.getAttribute("style")).toContain("scale(1)");
     expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  it("merges variation images with the parent gallery and keeps the variation first", () => {
+    render(
+      <ProductGallery
+        product={buildProduct()}
+        selectedVariation={buildVariation([
+          {
+            id: "variation-image-1",
+            url: "https://example.com/variation-image-1.jpg",
+            alt: "Imagem da variacao",
+          },
+        ])}
+      />,
+    );
+
+    expect(
+      screen.getByTestId("product-gallery-active-image").getAttribute("data-image-key"),
+    ).toBe("variation-image-1");
+    expect(screen.getAllByRole("button", { name: /Selecionar imagem/i })).toHaveLength(3);
+
+    fireEvent.click(screen.getByRole("button", { name: "Selecionar imagem 3 de 3" }));
+
+    expect(
+      screen.getByTestId("product-gallery-active-image").getAttribute("data-image-key"),
+    ).toBe("image-2");
+  });
+
+  it("shows all variation images and deduplicates repeated parent assets", () => {
+    render(
+      <ProductGallery
+        product={{
+          ...buildProduct(),
+          gallery: [
+            {
+              id: "shared-parent",
+              url: "https://example.com/shared.jpg",
+              alt: "Compartilhada",
+            },
+            {
+              id: "image-2",
+              url: "https://example.com/image-2.jpg",
+              alt: "Imagem alternativa",
+            },
+          ],
+        }}
+        selectedVariation={buildVariation([
+          {
+            id: "variation-image-1",
+            url: "https://example.com/variation-image-1.jpg",
+            alt: "Imagem da variacao 1",
+          },
+          {
+            id: "shared-variation",
+            url: "https://example.com/shared.jpg",
+            alt: "Compartilhada",
+          },
+          {
+            id: "variation-image-3",
+            url: "https://example.com/variation-image-3.jpg",
+            alt: "Imagem da variacao 3",
+          },
+        ])}
+      />,
+    );
+
+    expect(screen.getAllByRole("button", { name: /Selecionar imagem/i })).toHaveLength(4);
+
+    fireEvent.click(screen.getByRole("button", { name: "Selecionar imagem 2 de 4" }));
+    expect(
+      screen.getByTestId("product-gallery-active-image").getAttribute("data-image-key"),
+    ).toBe("shared-variation");
+
+    fireEvent.click(screen.getByRole("button", { name: "Selecionar imagem 4 de 4" }));
+    expect(
+      screen.getByTestId("product-gallery-active-image").getAttribute("data-image-key"),
+    ).toBe("image-2");
   });
 });

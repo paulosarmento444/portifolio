@@ -325,19 +325,35 @@ const toArray = <T>(value?: T[] | Record<string, T> | null): T[] => {
   return Array.isArray(value) ? value : Object.values(value);
 };
 
+const dedupeMediaAssets = (
+  images: Array<MediaAssetView | null | undefined>,
+): MediaAssetView[] => {
+  const seen = new Set<string>();
+
+  return images.filter((image): image is MediaAssetView => {
+    if (!image?.url) {
+      return false;
+    }
+
+    const normalizedUrl = image.url.trim().toLowerCase();
+    const normalizedId = image.id?.trim().toLowerCase();
+    const dedupeKey = normalizedUrl || normalizedId;
+
+    if (!dedupeKey || seen.has(dedupeKey)) {
+      return false;
+    }
+
+    seen.add(dedupeKey);
+    return true;
+  });
+};
+
 const collectProductImages = (product: CoCartRawProduct): MediaAssetView[] => {
-  const gallery = toArray(product.images ?? [])
-    .map((image) => toMediaAsset(image))
-    .filter((image): image is MediaAssetView => Boolean(image?.url));
-
-  if (gallery.length > 0) {
-    return gallery;
-  }
-
-  const primary =
-    toMediaAsset(product.image) ?? toMediaAsset(product.featured_image) ?? null;
-
-  return primary ? [primary] : [];
+  return dedupeMediaAssets([
+    toMediaAsset(product.image),
+    toMediaAsset(product.featured_image),
+    ...toArray(product.images ?? []).map((image) => toMediaAsset(image)),
+  ]);
 };
 
 const mapCategory = (category: CoCartRawCategory): CatalogCategoryView =>

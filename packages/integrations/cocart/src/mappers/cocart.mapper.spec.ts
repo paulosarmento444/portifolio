@@ -303,6 +303,80 @@ describe("cocart.mapper", () => {
     expect(cart.coupons[0]?.discount?.amount).toBeCloseTo(10);
   });
 
+  it("keeps the primary asset, preserves multiple gallery images, and removes duplicates", () => {
+    const product = mapCoCartProductToCatalogProductDetailView({
+      id: 404,
+      slug: "produto-com-galeria",
+      name: "Produto com galeria",
+      type: "simple",
+      short_description: "<p>Resumo</p>",
+      description: "<p>Detalhes</p>",
+      image: {
+        id: 10,
+        src: {
+          full: "http://localhost:8080/uploads/produto-principal.jpg",
+        },
+        alt: "Principal",
+      },
+      featured_image: {
+        id: 11,
+        src: {
+          full: "http://localhost:8080/uploads/produto-principal.jpg",
+        },
+        alt: "Principal repetida",
+      },
+      images: [
+        {
+          id: 12,
+          src: {
+            full: "http://localhost:8080/uploads/produto-principal.jpg",
+          },
+          alt: "Principal duplicada na galeria",
+        },
+        {
+          id: 13,
+          src: {
+            full: "http://localhost:8080/uploads/produto-galeria-2.jpg",
+          },
+          alt: "Galeria 2",
+        },
+        {
+          id: 14,
+          src: {
+            full: "http://localhost:8080/uploads/produto-galeria-3.jpg",
+          },
+          alt: "Galeria 3",
+        },
+      ],
+      categories: [],
+      prices: {
+        price: "10000",
+        regular_price: "10000",
+        sale_price: "",
+        on_sale: false,
+        currency: { currency_code: "BRL", currency_minor_unit: 2 },
+      },
+      average_rating: "0",
+      rating_count: 0,
+      featured: false,
+      stock: {
+        stock_status: "instock",
+      },
+      dates: {
+        created: "2026-03-10T10:00:00.000Z",
+      },
+    });
+
+    expect(product.gallery.map((image) => image.url)).toEqual([
+      "http://localhost:8080/uploads/produto-principal.jpg",
+      "http://localhost:8080/uploads/produto-galeria-2.jpg",
+      "http://localhost:8080/uploads/produto-galeria-3.jpg",
+    ]);
+    expect(product.image?.url).toBe(
+      "http://localhost:8080/uploads/produto-principal.jpg",
+    );
+  });
+
   it("keeps shipping packages, metadata, formatted destination, and delivery forecast", () => {
     const cart = mapCoCartCartState({
       currency: {

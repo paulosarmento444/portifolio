@@ -1,6 +1,7 @@
 import type {
   CatalogCategoryView,
   CatalogProductAttributeView,
+  MediaAssetView,
   MoneyValueView,
 } from "@site/shared";
 import type {
@@ -329,11 +330,36 @@ export const resolveGallery = (
   product: StoreProductDetail,
   variation: StoreProductVariation | null,
 ) => {
-  if (variation?.gallery?.length) {
-    return variation.gallery;
+  const dedupeImages = (images: MediaAssetView[]) => {
+    const seen = new Set<string>();
+
+    return images.filter((image) => {
+      const normalizedUrl = image.url.trim().toLowerCase();
+      const normalizedId = image.id?.trim().toLowerCase();
+      const dedupeKey = normalizedUrl || normalizedId;
+
+      if (!dedupeKey || seen.has(dedupeKey)) {
+        return false;
+      }
+
+      seen.add(dedupeKey);
+      return true;
+    });
+  };
+
+  const productGallery = dedupeImages(product.gallery);
+
+  if (!variation) {
+    return productGallery;
   }
 
-  return product.gallery;
+  const variationGallery = dedupeImages(variation.gallery);
+
+  if (!variationGallery.length) {
+    return productGallery;
+  }
+
+  return dedupeImages([...variationGallery, ...productGallery]);
 };
 
 export const resolveStockLabel = (stockStatus: string) =>
