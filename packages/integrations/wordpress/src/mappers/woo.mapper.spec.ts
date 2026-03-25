@@ -6,7 +6,9 @@ describe("mapWooOrderToCheckoutOrderConfirmationView", () => {
       id: 123,
       number: "123",
       status: "pending",
-      total: "49.90",
+      discount_total: "10.00",
+      shipping_total: "15.00",
+      total: "64.90",
       date_created: "2026-03-12T10:00:00.000Z",
       payment_method: "woo-mercado-pago-custom",
       payment_method_title: "Cartão de crédito",
@@ -27,8 +29,15 @@ describe("mapWooOrderToCheckoutOrderConfirmationView", () => {
           product_id: 42,
           name: "Produto Teste",
           quantity: 2,
+          subtotal: "59.90",
           total: "49.90",
           sku: "SKU-OLD-SHOULD-NOT-LEAK",
+        },
+      ],
+      coupon_lines: [
+        {
+          code: "PIX10",
+          discount: "10.00",
         },
       ],
     });
@@ -40,10 +49,15 @@ describe("mapWooOrderToCheckoutOrderConfirmationView", () => {
       quantity: 2,
       image: null,
     });
+    expect(parsed.items[0]?.subtotal?.amount).toBe(59.9);
     expect(parsed.items[0]?.total.amount).toBe(49.9);
     expect(parsed.items[0]?.total.currencyCode).toBe("BRL");
-    expect(parsed.items[0]?.unitPrice?.amount).toBe(24.95);
+    expect(parsed.items[0]?.unitPrice?.amount).toBe(29.95);
     expect(parsed.items[0]?.unitPrice?.currencyCode).toBe("BRL");
+    expect(parsed.subtotal?.amount).toBe(59.9);
+    expect(parsed.shippingTotal?.amount).toBe(15);
+    expect(parsed.couponCode).toBe("PIX10");
+    expect(parsed.couponDiscount?.amount).toBe(10);
     expect(parsed.paymentMethodId).toBe("woo-mercado-pago-custom");
     expect(parsed.paymentUrl).toBe(
       "http://localhost:8080/finalizar-compra/order-pay/123/?pay_for_order=true",

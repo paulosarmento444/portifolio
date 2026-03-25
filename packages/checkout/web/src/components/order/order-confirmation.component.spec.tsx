@@ -118,6 +118,78 @@ describe("OrderConfirmationView", () => {
     expect(within(sidebar).getByText("testando observacao do pedido")).toBeTruthy();
   });
 
+  it("renders item pricing, shipping, discount, and the final total in a cart-like summary", () => {
+    render(
+      <OrderConfirmationView
+        order={{
+          ...baseOrder,
+          subtotal: {
+            amount: 120,
+            currencyCode: "BRL",
+            formatted: "R$ 120,00",
+          },
+          shippingTotal: {
+            amount: 15,
+            currencyCode: "BRL",
+            formatted: "R$ 15,00",
+          },
+          total: {
+            amount: 125,
+            currencyCode: "BRL",
+            formatted: "R$ 125,00",
+          },
+          couponCode: "PIX10",
+          couponDiscount: {
+            amount: 10,
+            currencyCode: "BRL",
+            formatted: "R$ 10,00",
+          },
+          items: [
+            {
+              productId: "42",
+              name: "Produto Teste",
+              quantity: 2,
+              unitPrice: {
+                amount: 60,
+                currencyCode: "BRL",
+                formatted: "R$ 60,00",
+              },
+              subtotal: {
+                amount: 120,
+                currencyCode: "BRL",
+                formatted: "R$ 120,00",
+              },
+              total: {
+                amount: 110,
+                currencyCode: "BRL",
+                formatted: "R$ 110,00",
+              },
+              image: null,
+            },
+          ],
+        }}
+        paymentConfig={null}
+        initialPaymentState={null}
+      />,
+    );
+
+    const primaryColumn = screen.getByTestId("order-confirmation-primary-column");
+    const financialSummary = screen.getByTestId("order-confirmation-financial-summary");
+
+    expect(within(primaryColumn).getByText("Preço unitário")).toBeTruthy();
+    expect(within(primaryColumn).getAllByText("Subtotal").length).toBeGreaterThan(0);
+    expect(within(primaryColumn).getByText("Total após desconto")).toBeTruthy();
+    expect(within(primaryColumn).getByText("R$ 60,00")).toBeTruthy();
+    expect(within(primaryColumn).getAllByText("R$ 120,00").length).toBeGreaterThan(0);
+    expect(within(primaryColumn).getAllByText("R$ 110,00").length).toBeGreaterThan(0);
+
+    expect(within(financialSummary).getByText("Frete")).toBeTruthy();
+    expect(within(financialSummary).getByText("Desconto (PIX10)")).toBeTruthy();
+    expect(within(financialSummary).getByText("R$ 15,00")).toBeTruthy();
+    expect(within(financialSummary).getByText("- R$ 10,00")).toBeTruthy();
+    expect(within(financialSummary).getAllByText("R$ 125,00").length).toBeGreaterThan(0);
+  });
+
   it("renders a clear fallback state when tracking exists but the official lookup is unavailable", () => {
     render(
       <OrderConfirmationView
@@ -160,5 +232,46 @@ describe("OrderConfirmationView", () => {
     );
 
     expect(screen.queryByTestId("order-confirmation-updates-card")).toBeNull();
+  });
+
+  it("keeps the financial summary concise when freight and coupon are absent", () => {
+    render(
+      <OrderConfirmationView
+        order={{
+          ...baseOrder,
+          items: [
+            {
+              productId: "42",
+              name: "Produto Teste",
+              quantity: 1,
+              unitPrice: {
+                amount: 149.9,
+                currencyCode: "BRL",
+                formatted: "R$ 149,90",
+              },
+              subtotal: {
+                amount: 149.9,
+                currencyCode: "BRL",
+                formatted: "R$ 149,90",
+              },
+              total: {
+                amount: 149.9,
+                currencyCode: "BRL",
+                formatted: "R$ 149,90",
+              },
+              image: null,
+            },
+          ],
+        }}
+        paymentConfig={null}
+        initialPaymentState={null}
+      />,
+    );
+
+    const financialSummary = screen.getByTestId("order-confirmation-financial-summary");
+
+    expect(within(financialSummary).queryByText("Frete")).toBeNull();
+    expect(within(financialSummary).queryByText(/Desconto/)).toBeNull();
+    expect(within(financialSummary).getByText("Total final")).toBeTruthy();
   });
 });

@@ -171,38 +171,60 @@ export const mapWooOrderToCheckoutOrderConfirmationView = (
   order: WooOrder,
   notes?: WooOrderNote[] | null,
 ): CheckoutOrderConfirmationView =>
-  checkoutOrderConfirmationViewSchema.parse({
-    orderId: order.id ?? 0,
-    orderNumber: order.number ?? String(order.id ?? "0"),
-    status: {
-      code: order.status ?? "unknown",
-      label: humanizeStatus(order.status),
-    },
-    createdAt: order.date_created ?? new Date(0).toISOString(),
-    total: toMoneyValue(order.total),
-    paymentMethodId: order.payment_method ?? undefined,
-    paymentMethodTitle: order.payment_method_title ?? undefined,
-    paymentUrl: order.payment_url ?? undefined,
-    shippingAddress: toAddress(order.shipping) ?? {},
-    billingAddress: toAddress(order.billing) ?? {},
-    items: (order.line_items ?? []).map((item, index) => ({
-      productId:
-        item.product_id ??
-        item.id ??
-        `order-item-${order.id ?? "unknown"}-${index}`,
-      name: item.name ?? "Produto",
-      quantity: item.quantity ?? 1,
-      total: toMoneyValue(item.total),
-      unitPrice: toMoneyValue(
-        toMoneyAmount(item.total) / Math.max(item.quantity ?? 1, 1),
-      ),
-      image: null,
-    })),
-    couponCode: order.coupon_lines?.[0]?.code ?? undefined,
-    couponDiscount: order.coupon_lines?.[0]?.discount
-      ? toMoneyValue(order.coupon_lines[0].discount)
-      : null,
-    customerNote: resolveLatestCustomerNote(order, notes),
-    trackingCode: readMetaValue(order.meta_data, TRACKING_CODE_META_KEYS),
-    trackingUrl: readMetaValue(order.meta_data, TRACKING_URL_META_KEYS),
-  });
+  checkoutOrderConfirmationViewSchema.parse((() => {
+    const items = (order.line_items ?? []).map((item, index) => {
+      const quantity = Math.max(item.quantity ?? 1, 1);
+      const subtotalAmount = toMoneyAmount(item.subtotal ?? item.total);
+      const totalAmount = toMoneyAmount(item.total);
+
+      return {
+        productId:
+          item.product_id ??
+          item.id ??
+          `order-item-${order.id ?? "unknown"}-${index}`,
+        name: item.name ?? "Produto",
+        quantity,
+        subtotal: toMoneyValue(item.subtotal ?? item.total),
+        total: toMoneyValue(item.total),
+        unitPrice: toMoneyValue(subtotalAmount / quantity),
+        image: null,
+      };
+    });
+
+    const itemsSubtotal = items.reduce(
+      (accumulator, item) => accumulator + (item.subtotal?.amount ?? item.total.amount),
+      0,
+    );
+    const discountAmount = toMoneyAmount(
+      order.discount_total ?? order.coupon_lines?.[0]?.discount,
+    );
+
+    return {
+      orderId: order.id ?? 0,
+      orderNumber: order.number ?? String(order.id ?? "0"),
+      status: {
+        code: order.status ?? "unknown",
+        label: humanizeStatus(order.status),
+      },
+      createdAt: order.date_created ?? new Date(0).toISOString(),
+      subtotal: items.length ? toMoneyValue(itemsSubtotal) : undefined,
+      shippingTotal: order.shipping_total !== undefined && order.shipping_total !== null
+        ? toMoneyValue(order.shipping_total)
+        : undefined,
+      total: toMoneyValue(order.total),
+      paymentMethodId: order.payment_method ?? undefined,
+      paymentMethodTitle: order.payment_method_title ?? undefined,
+      paymentUrl: order.payment_url ?? undefined,
+      shippingAddress: toAddress(order.shipping) ?? {},
+      billingAddress: toAddress(order.billing) ?? {},
+      items,
+      couponCode: order.coupon_lines?.[0]?.code ?? undefined,
+      couponDiscount:
+        discountAmount > 0
+          ? toMoneyValue(discountAmount)
+          : null,
+      customerNote: resolveLatestCustomerNote(order, notes),
+      trackingCode: readMetaValue(order.meta_data, TRACKING_CODE_META_KEYS),
+      trackingUrl: readMetaValue(order.meta_data, TRACKING_URL_META_KEYS),
+    };
+  })());

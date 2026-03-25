@@ -59,6 +59,7 @@ export type WooOrderItem = {
   product_id?: number | null;
   name?: string | null;
   quantity?: number | null;
+  subtotal?: string | null;
   total?: string | null;
   sku?: string | null;
 };
@@ -95,6 +96,8 @@ export type WooOrder = {
   order_key?: string | null;
   number?: string | null;
   status?: string | null;
+  discount_total?: string | null;
+  shipping_total?: string | null;
   total?: string | null;
   date_created?: string | null;
   payment_method?: string | null;

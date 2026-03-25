@@ -14,7 +14,6 @@ import {
     MessageSquareText,
     Package,
     PackageSearch,
-    Percent,
 } from "lucide-react";
 import type {
     MercadoPagoHeadlessConfig,
@@ -26,7 +25,6 @@ import type {
 } from "@site/shared";
 import {
     MetricRow,
-    OverlaySection,
     PageHeader,
     ProgressStepper,
     SectionShell,
@@ -86,6 +84,39 @@ const formatTrackingDateTime = (value?: string) => {
     }).format(parsedDate);
 };
 
+const formatCurrency = (amount: number) =>
+    new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+    }).format(amount);
+
+const formatMoneyValue = (
+    value:
+        | CheckoutOrderConfirmationView["total"]
+        | CheckoutOrderConfirmationView["shippingTotal"]
+        | CheckoutOrderConfirmationView["couponDiscount"]
+        | CheckoutOrderConfirmationView["items"][number]["subtotal"]
+        | CheckoutOrderConfirmationView["items"][number]["unitPrice"]
+        | null
+        | undefined,
+    options?: {
+        zeroLabel?: string;
+    },
+) => {
+    if (!value) {
+        return undefined;
+    }
+
+    if (
+        options?.zeroLabel &&
+        Math.abs(value.amount) < Number.EPSILON
+    ) {
+        return options.zeroLabel;
+    }
+
+    return value.formatted || formatCurrency(value.amount);
+};
+
 const resolveTrackingTone = (
     state: CheckoutOrderTrackingState,
 ) => {
@@ -139,6 +170,76 @@ export function OrderConfirmationView({
         tracking?.lastUpdatedAt,
     );
     const hasOrderUpdates = Boolean(trackingCode || customerNote || tracking);
+    const derivedSubtotalAmount = currentOrder.items.reduce(
+        (accumulator, item) =>
+            accumulator + (item.subtotal?.amount ?? item.total.amount),
+        0,
+    );
+    const orderSubtotal =
+        currentOrder.subtotal ??
+        (currentOrder.items.length
+            ? {
+                  amount: derivedSubtotalAmount,
+                  currencyCode: currentOrder.total.currencyCode,
+                  formatted: formatCurrency(derivedSubtotalAmount),
+              }
+            : null);
+    const shippingTotal = currentOrder.shippingTotal ?? null;
+    const couponDiscount = currentOrder.couponDiscount ?? null;
+    const hasCouponBenefit = Boolean(
+        currentOrder.couponCode || (couponDiscount && couponDiscount.amount > 0),
+    );
+    const itemCountLabel =
+        currentOrder.items.length === 1
+            ? "1 item no pedido"
+            : `${currentOrder.items.length} itens no pedido`;
+    const financialMetrics = [
+        {
+            label: "Subtotal",
+            value:
+                formatMoneyValue(orderSubtotal) ||
+                formatMoneyValue(currentOrder.total) ||
+                "R$ 0,00",
+            meta: itemCountLabel,
+        },
+        ...(shippingTotal
+            ? [
+                  {
+                      label: "Frete",
+                      value:
+                          formatMoneyValue(shippingTotal, {
+                              zeroLabel: "Grátis",
+                          }) || "Grátis",
+                      meta:
+                          shippingTotal.amount > 0
+                              ? "Valor de entrega registrado no pedido."
+                              : "Entrega sem custo para o cliente.",
+                  },
+              ]
+            : []),
+        ...(hasCouponBenefit
+            ? [
+                  {
+                      label: currentOrder.couponCode
+                          ? `Desconto (${currentOrder.couponCode})`
+                          : "Desconto",
+                      value:
+                          couponDiscount && couponDiscount.amount > 0
+                              ? `- ${formatMoneyValue(couponDiscount)}`
+                              : "Aplicado",
+                      meta: currentOrder.couponCode
+                          ? "Cupom vinculado ao pedido confirmado."
+                          : "Desconto aplicado ao total final do pedido.",
+                  },
+              ]
+            : []),
+        {
+            label: "Total final",
+            value:
+                formatMoneyValue(currentOrder.total) || currentOrder.total.formatted,
+            meta: "Valor final confirmado no pedido.",
+        },
+    ];
 
     const handleCopyTracking = async () => {
         if (!trackingCode || !navigator.clipboard?.writeText) {
@@ -271,83 +372,124 @@ export function OrderConfirmationView({
 
                             <div className="site-stack-section">
                                 {currentOrder.items.map((item, index) => (
-                                    <div
+                                    <article
                                         key={`${item.productId ?? index}`}
-                                        className="flex flex-col gap-4 rounded-[var(--site-radius-lg)] border border-[color:var(--site-color-border)] bg-[color:var(--site-color-surface-inset)] p-4 sm:flex-row sm:items-center sm:justify-between"
+                                        className="site-stack-section rounded-[var(--site-radius-lg)] border border-[color:var(--site-color-border)] bg-[color:var(--site-color-surface-inset)] p-4"
                                     >
-                                        <div className="flex items-center gap-4">
-                                            <div className="h-16 w-16 overflow-hidden rounded-[var(--site-radius-lg)] bg-[color:var(--site-color-surface)]">
-                                                {item.image?.url ? (
-                                                    <div className="relative h-full w-full">
-                                                        <Image
-                                                            src={item.image.url}
-                                                            alt={item.name}
-                                                            fill
-                                                            sizes="64px"
-                                                            unoptimized
-                                                            className="object-cover"
-                                                        />
-                                                    </div>
-                                                ) : (
-                                                    <div className="flex h-full w-full items-center justify-center text-[color:var(--site-color-foreground-muted)]">
-                                                        <Package className="h-6 w-6" />
-                                                    </div>
-                                                )}
+                                        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                                            <div className="flex items-center gap-4">
+                                                <div className="h-16 w-16 overflow-hidden rounded-[var(--site-radius-lg)] bg-[color:var(--site-color-surface)]">
+                                                    {item.image?.url ? (
+                                                        <div className="relative h-full w-full">
+                                                            <Image
+                                                                src={item.image.url}
+                                                                alt={item.name}
+                                                                fill
+                                                                sizes="64px"
+                                                                unoptimized
+                                                                className="object-cover"
+                                                            />
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex h-full w-full items-center justify-center text-[color:var(--site-color-foreground-muted)]">
+                                                            <Package className="h-6 w-6" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="site-stack-panel">
+                                                    <h3 className="text-sm font-semibold text-[color:var(--site-color-foreground-strong)]">
+                                                        {item.name}
+                                                    </h3>
+                                                    <p className="site-text-meta">
+                                                        Quantidade: {item.quantity}
+                                                    </p>
+                                                </div>
                                             </div>
-                                            <div className="site-stack-panel">
-                                                <h3 className="text-sm font-semibold text-[color:var(--site-color-foreground-strong)]">
-                                                    {item.name}
-                                                </h3>
+                                            <div className="rounded-[var(--site-radius-md)] border border-[color:var(--site-color-border)] bg-[color:var(--site-color-surface)] px-4 py-3 text-left sm:min-w-[11rem] sm:text-right">
                                                 <p className="site-text-meta">
-                                                    Quantidade: {item.quantity}
+                                                    Total do item
+                                                </p>
+                                                <p className="text-lg font-semibold text-[color:var(--site-color-foreground-strong)]">
+                                                    {formatMoneyValue(item.total) ||
+                                                        item.total.formatted}
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className="text-left sm:text-right">
-                                            <p className="site-text-meta">
-                                                Total do item
-                                            </p>
-                                            <p className="text-base font-semibold text-[color:var(--site-color-foreground-strong)]">
-                                                {item.total.formatted}
-                                            </p>
+
+                                        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                                            <div className="rounded-[var(--site-radius-md)] border border-[color:var(--site-color-border)] bg-[color:var(--site-color-surface)] px-3 py-3">
+                                                <p className="site-text-meta">
+                                                    Quantidade
+                                                </p>
+                                                <p className="mt-1 text-sm font-semibold text-[color:var(--site-color-foreground-strong)]">
+                                                    {item.quantity}
+                                                </p>
+                                            </div>
+                                            <div className="rounded-[var(--site-radius-md)] border border-[color:var(--site-color-border)] bg-[color:var(--site-color-surface)] px-3 py-3">
+                                                <p className="site-text-meta">
+                                                    Preço unitário
+                                                </p>
+                                                <p className="mt-1 text-sm font-semibold text-[color:var(--site-color-foreground-strong)]">
+                                                    {formatMoneyValue(item.unitPrice) ||
+                                                        item.total.formatted}
+                                                </p>
+                                            </div>
+                                            <div className="rounded-[var(--site-radius-md)] border border-[color:var(--site-color-border)] bg-[color:var(--site-color-surface)] px-3 py-3">
+                                                <p className="site-text-meta">
+                                                    Subtotal
+                                                </p>
+                                                <p className="mt-1 text-sm font-semibold text-[color:var(--site-color-foreground-strong)]">
+                                                    {formatMoneyValue(item.subtotal) ||
+                                                        item.total.formatted}
+                                                </p>
+                                            </div>
+                                            {item.subtotal &&
+                                            Math.abs(
+                                                item.subtotal.amount - item.total.amount,
+                                            ) > Number.EPSILON ? (
+                                                <div className="rounded-[var(--site-radius-md)] border border-[color:var(--site-color-success-soft)] bg-[color:var(--site-color-success-soft)]/30 px-3 py-3">
+                                                    <p className="site-text-meta">
+                                                        Total após desconto
+                                                    </p>
+                                                    <p className="mt-1 text-sm font-semibold text-[color:var(--site-color-foreground-strong)]">
+                                                        {formatMoneyValue(item.total) ||
+                                                            item.total.formatted}
+                                                    </p>
+                                                </div>
+                                            ) : null}
                                         </div>
-                                    </div>
+                                    </article>
                                 ))}
                             </div>
 
-                            <OverlaySection
-                                title="Resumo financeiro"
-                                description="Total final do pedido e eventual cupom aplicado."
+                            <div
+                                className="site-stack-section"
+                                data-testid="order-confirmation-financial-summary"
                             >
-                                <div className="flex items-center justify-between text-sm text-[color:var(--site-color-foreground-muted)]">
-                                    <span>Subtotal</span>
-                                    <span className="font-medium text-[color:var(--site-color-foreground)]">
-                                        {currentOrder.total.formatted}
-                                    </span>
+                                <div
+                                    className="rounded-[var(--site-radius-xl)] border border-[color:var(--site-color-border-strong)] bg-[color:var(--site-color-surface-soft)] px-5 py-4 shadow-[var(--site-shadow-sm)]"
+                                    role="status"
+                                    aria-live="polite"
+                                    aria-atomic="true"
+                                >
+                                    <p className="site-text-meta">
+                                        Total final do pedido
+                                    </p>
+                                    <p className="text-2xl font-semibold tracking-tight text-[color:var(--site-color-foreground-strong)] sm:text-3xl">
+                                        {formatMoneyValue(currentOrder.total) ||
+                                            currentOrder.total.formatted}
+                                    </p>
+                                    <p className="site-text-meta">
+                                        Resumo consolidado com subtotal, frete e
+                                        desconto aplicados ao pedido.
+                                    </p>
                                 </div>
-                                {currentOrder.couponCode &&
-                                currentOrder.couponDiscount ? (
-                                    <div className="flex items-center justify-between text-sm text-[color:var(--site-color-success)]">
-                                        <span className="inline-flex items-center gap-2">
-                                            <Percent className="h-4 w-4" /> Cupom (
-                                            {currentOrder.couponCode})
-                                        </span>
-                                        <span className="font-medium">
-                                            -{" "}
-                                            {currentOrder.couponDiscount.formatted}
-                                        </span>
-                                    </div>
-                                ) : null}
-                                <div className="site-divider" />
-                                <div className="flex items-center justify-between">
-                                    <span className="text-base font-semibold text-[color:var(--site-color-foreground-strong)]">
-                                        Total do pedido
-                                    </span>
-                                    <span className="text-2xl font-semibold text-[color:var(--site-color-foreground-strong)]">
-                                        {currentOrder.total.formatted}
-                                    </span>
-                                </div>
-                            </OverlaySection>
+
+                                <MetricRow
+                                    items={financialMetrics}
+                                    className="sm:grid-cols-2 xl:grid-cols-2"
+                                />
+                            </div>
                         </SurfaceCard>
 
                         <SurfaceCard

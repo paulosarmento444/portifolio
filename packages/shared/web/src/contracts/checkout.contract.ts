@@ -202,6 +202,8 @@ export const checkoutOrderConfirmationViewSchema = z
     orderNumber: createRequiredTextSchema("Numero do pedido", { max: 64 }),
     status: statusViewSchema,
     createdAt: createDateTimeStringSchema("Data do pedido"),
+    subtotal: optionalMoneyValueViewSchema,
+    shippingTotal: optionalMoneyValueViewSchema,
     total: moneyValueViewSchema,
     paymentMethodId: createOptionalTextSchema({ max: 120 }),
     paymentMethodTitle: createOptionalTextSchema({ max: 120 }),
