@@ -11,8 +11,8 @@ import {
   TextField,
 } from "@site/shared";
 import type { CoCartCartStateView } from "@site/integrations/cocart";
-import { applyCouponAction, removeCouponAction } from "../actions/checkout.actions";
-import type { CheckoutAppliedCoupon } from "../lib/checkout.types";
+import { applyCouponAction, removeCouponAction } from "../data/actions/checkout.actions";
+import type { CheckoutAppliedCoupon } from "../data/checkout.types";
 
 interface CouponSectionProps {
   initialCoupon?: CheckoutAppliedCoupon | null;

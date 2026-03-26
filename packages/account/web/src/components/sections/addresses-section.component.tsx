@@ -17,8 +17,8 @@ import type {
   AccountAddressFormData,
   AccountAddressType,
   AccountCustomerChangeHandler,
-} from "../../lib/account.types";
-import { saveAccountAddressAction } from "../../actions/account.actions";
+} from "../../data/account.types";
+import { saveAccountAddressAction } from "../../data/actions/account.actions";
 
 interface AddressesSectionProps {
   viewer: AuthUserView;

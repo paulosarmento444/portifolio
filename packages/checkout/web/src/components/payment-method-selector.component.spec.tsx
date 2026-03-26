@@ -1,8 +1,8 @@
 import { describe, expect, it, jest } from "@jest/globals";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { useState } from "react";
-import type { CheckoutPaymentMethodCode } from "../lib/checkout.types";
-import type { CheckoutPaymentOption } from "../lib/payment-methods";
+import type { CheckoutPaymentMethodCode } from "../data/checkout.types";
+import type { CheckoutPaymentOption } from "../data/payment-methods";
 import { PaymentMethodSelector } from "./payment-method-selector.component";
 
 const options: CheckoutPaymentOption[] = [

@@ -3,7 +3,7 @@
 import { Lock, Package, ShieldCheck, ShoppingBag } from "lucide-react";
 import type { CoCartCartStateView } from "@site/integrations/cocart";
 import { MetricRow, StatusBadge, SurfaceCard } from "@site/shared";
-import { deriveCheckoutAppliedCouponFromCart } from "../lib/checkout-coupon";
+import { deriveCheckoutAppliedCouponFromCart } from "../data/checkout-coupon";
 
 interface CartSummaryProps {
   cart: CoCartCartStateView;

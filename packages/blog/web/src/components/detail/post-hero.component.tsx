@@ -11,7 +11,7 @@ import {
   StatusBadge,
   SurfaceCard,
 } from "@site/shared";
-import { cleanBlogExcerpt } from "../../lib/blog.utils";
+import { cleanBlogExcerpt } from "../../data/blog.utils";
 
 interface PostHeroProps {
   post: BlogPostDetailView;

@@ -16,6 +16,7 @@ const config = {
     "^@site/account$": "<rootDir>/packages/account/web/src/index.ts",
     "^@site/auth$": "<rootDir>/packages/auth/web/src/index.ts",
     "^@site/blog$": "<rootDir>/packages/blog/web/src/index.ts",
+    "^@site/chatbot$": "<rootDir>/packages/chatbot/web/src/index.ts",
     "^@site/checkout$": "<rootDir>/packages/checkout/web/src/index.ts",
     "^@site/shared$": "<rootDir>/packages/shared/web/src/index.ts",
     "^@site/shared/server$": "<rootDir>/packages/shared/web/src/server.ts",

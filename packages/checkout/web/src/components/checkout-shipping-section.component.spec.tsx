@@ -4,13 +4,13 @@ import { useState } from "react";
 import type { AccountCustomerView } from "@site/shared";
 import type { CoCartCartStateView } from "@site/integrations/cocart";
 
-jest.mock("../actions/checkout.actions", () => ({
+jest.mock("../data/actions/checkout.actions", () => ({
   calculateCheckoutShippingAction: jest.fn(),
   reloadCheckoutShippingAction: jest.fn(),
   selectCheckoutShippingRateAction: jest.fn(),
 }));
 
-const checkoutActionsModule = jest.requireMock("../actions/checkout.actions") as any;
+const checkoutActionsModule = jest.requireMock("../data/actions/checkout.actions") as any;
 
 const { CheckoutShippingSection } = require("./checkout-shipping-section.component") as typeof import("./checkout-shipping-section.component");
 

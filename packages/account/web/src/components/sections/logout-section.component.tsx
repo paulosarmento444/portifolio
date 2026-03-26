@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AlertTriangle, LogOut, Shield } from "lucide-react";
 import { PrimaryButton, SecondaryButton, SurfaceCard } from "@site/shared";
-import { logoutAccountAction } from "../../actions/account.actions";
+import { logoutAccountAction } from "../../data/actions/account.actions";
 
 interface LogoutSectionProps {
   onCancel: () => void;

@@ -1,5 +1,5 @@
 import { PageHeader, SectionShell, SurfaceCard, StatusBadge } from "@site/shared";
-import type { StoreProductDetail } from "../../lib/store.types";
+import type { StoreProductDetail } from "../../data/store.types";
 
 interface ProductSpecsProps {
   product: StoreProductDetail;

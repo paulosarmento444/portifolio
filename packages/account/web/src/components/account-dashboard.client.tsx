@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { DrawerShell, PageHeader, SectionShell, StatusBadge, SurfaceCard } from "@site/shared";
 import type { AccountOverviewView } from "@site/shared";
-import type { AccountMenu } from "../lib/account.types";
+import type { AccountMenu } from "../data/account.types";
 import { AccountSidebar } from "./account-sidebar.component";
 import { AccountContent } from "./account-content.component";
 import { MobileMenuButton } from "./mobile-menu-button.component";

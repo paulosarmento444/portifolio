@@ -13,8 +13,8 @@ import {
   StatusBadge,
   SurfaceCard,
 } from "@site/shared";
-import type { CheckoutPaymentMethodCode } from "../lib/checkout.types";
-import type { CheckoutPaymentOption } from "../lib/payment-methods";
+import type { CheckoutPaymentMethodCode } from "../data/checkout.types";
+import type { CheckoutPaymentOption } from "../data/payment-methods";
 import { AddressModal } from "./address-modal.component";
 import { CheckoutShippingSection } from "./checkout-shipping-section.component";
 import { PaymentMethodSelector } from "./payment-method-selector.component";

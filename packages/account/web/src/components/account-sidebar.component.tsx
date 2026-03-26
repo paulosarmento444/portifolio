@@ -2,7 +2,7 @@
 
 import { Home, LogOut, MapPin, Package, Shield, User } from "lucide-react";
 import { StatusBadge, SurfaceCard, cn } from "@site/shared";
-import type { AccountMenu } from "../lib/account.types";
+import type { AccountMenu } from "../data/account.types";
 
 interface AccountSidebarProps {
   selectedMenu: AccountMenu;

@@ -20,7 +20,7 @@ import type {
     StoreCategoryOption,
     StorePriceBounds,
     StoreViewMode,
-} from "../../lib/store.types";
+} from "../../data/store.types";
 import { STORE_SORT_PRESETS } from "./store-toolbar.component";
 
 interface StoreFilterSidebarContentProps {

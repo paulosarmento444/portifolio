@@ -9,7 +9,7 @@ import {
   StatusBadge,
   SurfaceCard,
 } from "@site/shared";
-import type { AccountMenu } from "../../lib/account.types";
+import type { AccountMenu } from "../../data/account.types";
 
 interface WelcomeSectionProps {
   viewer: AuthUserView;

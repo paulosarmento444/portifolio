@@ -1,5 +1,5 @@
 import { StoreCatalogClient } from "../components/catalog/store-catalog.client";
-import { loadCatalogSnapshot } from "../server/catalog-snapshot";
+import { loadCatalogSnapshot } from "../data/loaders/catalog-snapshot.loader";
 
 export async function StoreCatalogPage() {
   try {

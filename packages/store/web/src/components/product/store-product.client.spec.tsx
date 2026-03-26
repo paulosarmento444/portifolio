@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type {
   StoreProductDetail,
   StoreProductVariation,
-} from "../../lib/store.types";
+} from "../../data/store.types";
 
 jest.mock("./product-hero.component", () => ({
   ProductHero: ({

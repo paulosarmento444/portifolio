@@ -1,7 +1,0 @@
-Arquivo legado.
-
-O chatbot nao usa mais este arquivo para montar o prompt.
-O contexto atual do assistente e montado dinamicamente com:
-- configuracao da loja
-- regras locais de ecommerce
-- fallback simples via Firebase AI Logic

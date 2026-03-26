@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element, jsx-a11y/alt-text */
 import { describe, expect, it, jest } from "@jest/globals";
 import { render, screen } from "@testing-library/react";
-import type { StoreCatalogProduct } from "../../lib/store.types";
+import type { StoreCatalogProduct } from "../../data/store.types";
 
 jest.mock("next/image", () => ({
   __esModule: true,

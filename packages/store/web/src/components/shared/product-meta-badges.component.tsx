@@ -1,5 +1,5 @@
 import { StatusBadge } from "@site/shared";
-import { resolveStockLabel } from "../../lib/store.utils";
+import { resolveStockLabel } from "../../data/store.utils";
 
 interface ProductMetaBadgesProps {
   featured: boolean;

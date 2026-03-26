@@ -5,12 +5,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Star } from "lucide-react";
 import { cn, StatusBadge } from "@site/shared";
-import type { StoreCatalogProduct, StoreViewMode } from "../../lib/store.types";
+import type { StoreCatalogProduct, StoreViewMode } from "../../data/store.types";
 import {
     formatMoney,
     resolveStockLabel,
     truncatePlainText,
-} from "../../lib/store.utils";
+} from "../../data/store.utils";
 
 interface ProductCardProps {
     product: StoreCatalogProduct;

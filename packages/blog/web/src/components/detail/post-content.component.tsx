@@ -10,7 +10,7 @@ import {
   Twitter,
 } from "lucide-react";
 import { EditorialSurface, MediaFrame, SectionShell, SecondaryButton, SurfaceCard } from "@site/shared";
-import { buildStoryEmbedUrl, isBlogWebStoryContent } from "../../lib/blog.utils";
+import { buildStoryEmbedUrl, isBlogWebStoryContent } from "../../data/blog.utils";
 
 interface PostContentProps {
   post: {

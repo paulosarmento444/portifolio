@@ -1,8 +1,8 @@
 "use client";
 import { type FormEvent, useState } from "react";
 import { loginCredentialsSchema } from "@site/shared";
-import { loginUserAction } from "../../actions/auth.actions";
-import { INITIAL_AUTH_FORM_STATE } from "../../lib/auth-state";
+import { loginUserAction } from "../../data/actions/auth.actions";
+import { INITIAL_AUTH_FORM_STATE } from "../../data/auth-state";
 import { AuthForm } from "../shared/auth-form.component";
 
 export default function LoginForm() {

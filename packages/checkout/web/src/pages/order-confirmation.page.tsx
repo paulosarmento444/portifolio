@@ -1,20 +1,12 @@
 import Link from "next/link";
 import { PackageSearch } from "lucide-react";
-import { headers } from "next/headers";
-import {
-  cocartServerAdapter,
-  readCoCartAccessToken,
-  readCoCartForwardHeaders,
-  verifyCoCartAccessToken,
-} from "@site/integrations/cocart/server";
-import { mercadoPagoHeadlessServer } from "@site/integrations/payments/server";
-import { wordpressWooRestAdapter } from "@site/integrations/wordpress/server";
 import {
   EmptyState,
   SectionShell,
   cn,
   ecommerceButtonStyles,
 } from "@site/shared";
+import { loadOrderConfirmationPageData } from "../data/loaders/order-confirmation.loader";
 import { OrderConfirmationView } from "../components/order/order-confirmation.component";
 
 interface CheckoutOrderConfirmationPageProps {
@@ -49,69 +41,17 @@ function OrderNotFoundState() {
 export async function CheckoutOrderConfirmationPage({
   orderId,
 }: CheckoutOrderConfirmationPageProps) {
-  const numericOrderId = Number.parseInt(orderId, 10);
-  const headerSource = await headers();
-  const requestHeaders = await readCoCartForwardHeaders(headerSource);
+  const pageData = await loadOrderConfirmationPageData(orderId);
 
-  if (!Number.isFinite(numericOrderId) || numericOrderId <= 0) {
+  if (!pageData) {
     return <OrderNotFoundState />;
   }
 
-  let sessionState:
-    | Awaited<ReturnType<typeof cocartServerAdapter.getSessionState>>
-    | null = null;
-  const accessToken = await readCoCartAccessToken(headerSource);
-  const verifiedTokenUser = verifyCoCartAccessToken(accessToken);
-
-  if (!verifiedTokenUser?.id) {
-    try {
-      sessionState = await cocartServerAdapter.getSessionState(requestHeaders);
-    } catch {
-      sessionState = null;
-    }
-  }
-
-  const customerId = Number(verifiedTokenUser?.id || sessionState?.session.user?.id);
-
-  if (Number.isFinite(customerId) && customerId > 0) {
-    try {
-      const paymentContext =
-        await wordpressWooRestAdapter.getOrderPaymentContextForCustomer(
-          numericOrderId,
-          customerId,
-        );
-
-      if (paymentContext) {
-        const [initialPaymentState, paymentConfig] = await Promise.all([
-          paymentContext.order.paymentMethodId?.startsWith("woo-mercado-pago")
-            ? mercadoPagoHeadlessServer
-                .getOrderPaymentState({
-                  orderId: numericOrderId,
-                  orderKey: paymentContext.orderKey,
-                  sync: true,
-                })
-                .catch(() => null)
-            : Promise.resolve(null),
-          mercadoPagoHeadlessServer.getConfig().catch(() => null),
-        ]);
-
-        const order = initialPaymentState
-          ? (await wordpressWooRestAdapter
-              .getOrderByIdForCustomer(numericOrderId, customerId)
-              .catch(() => paymentContext.order)) || paymentContext.order
-          : paymentContext.order;
-
-        return (
-          <OrderConfirmationView
-            order={order}
-            initialPaymentState={initialPaymentState}
-            paymentConfig={paymentConfig}
-          />
-        );
-      }
-    } catch {
-    }
-  }
-
-  return <OrderNotFoundState />;
+  return (
+    <OrderConfirmationView
+      order={pageData.order}
+      initialPaymentState={pageData.initialPaymentState}
+      paymentConfig={pageData.paymentConfig}
+    />
+  );
 }

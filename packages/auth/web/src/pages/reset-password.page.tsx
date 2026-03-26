@@ -17,7 +17,7 @@ import {
 import {
   resetPasswordAction,
   validateResetPasswordTokenAction,
-} from "../actions/auth.actions";
+} from "../data/actions/auth.actions";
 
 type ValidationState = "validating" | "ready" | "invalid" | "success";
 

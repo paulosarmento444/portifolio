@@ -1,6 +1,6 @@
 import type { MoneyValueView } from "@site/shared";
 import { StatusBadge, cn } from "@site/shared";
-import { formatMoney } from "../../lib/store.utils";
+import { formatMoney } from "../../data/store.utils";
 
 interface ProductPriceBlockProps {
   price: MoneyValueView;

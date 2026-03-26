@@ -4,8 +4,8 @@ import { useEffect, useState, type MouseEvent as ReactMouseEvent } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { IconButton, MediaFrame, StatusBadge } from "@site/shared";
-import type { StoreProductDetail, StoreProductVariation } from "../../lib/store.types";
-import { resolveGallery } from "../../lib/store.utils";
+import type { StoreProductDetail, StoreProductVariation } from "../../data/store.types";
+import { resolveGallery } from "../../data/store.utils";
 
 interface ProductGalleryProps {
   product: StoreProductDetail;

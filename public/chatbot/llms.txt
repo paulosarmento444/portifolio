@@ -1,4 +1,0 @@
-Arquivo legado.
-
-O chatbot nao usa mais este arquivo como fonte de contexto.
-O contexto atual do assistente vem da configuracao da loja e de regras locais simples.

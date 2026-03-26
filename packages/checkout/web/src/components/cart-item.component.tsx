@@ -9,7 +9,7 @@ import { IconButton, StatusBadge, SurfaceCard } from "@site/shared";
 import {
   removeCartItemAction,
   updateCartItemQuantityAction,
-} from "../actions/checkout.actions";
+} from "../data/actions/checkout.actions";
 
 interface CartItemProps {
   item: CoCartCartItemView;

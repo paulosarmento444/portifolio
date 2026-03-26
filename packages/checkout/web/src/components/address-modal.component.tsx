@@ -12,8 +12,8 @@ import {
   SelectField,
   TextField,
 } from "@site/shared";
-import type { CheckoutAddressFormData } from "../lib/checkout.types";
-import { saveCheckoutAddressAction } from "../actions/checkout.actions";
+import type { CheckoutAddressFormData } from "../data/checkout.types";
+import { saveCheckoutAddressAction } from "../data/actions/checkout.actions";
 
 interface AddressModalProps {
   isOpen: boolean;

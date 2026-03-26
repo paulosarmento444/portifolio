@@ -3,7 +3,7 @@
 import { Package } from "lucide-react";
 import type { CoCartCartStateView } from "@site/integrations/cocart";
 import { StatusBadge, SurfaceCard } from "@site/shared";
-import type { CheckoutAppliedCoupon } from "../lib/checkout.types";
+import type { CheckoutAppliedCoupon } from "../data/checkout.types";
 import { CartItem } from "./cart-item.component";
 import { CouponSection } from "./coupon-section.component";
 

@@ -6,14 +6,14 @@ import type {
   AddToCartAction,
   StoreProductDetail,
   StoreProductVariation,
-} from "../../lib/store.types";
+} from "../../data/store.types";
 import {
   buildInitialVariationSelection,
   findMatchingVariation,
   getCompatibleVariationOptions,
   getAttributeOptions,
   reconcileVariationSelection,
-} from "../../lib/store.utils";
+} from "../../data/store.utils";
 import { ProductDescription } from "./product-description.component";
 import { ProductHero } from "./product-hero.component";
 import { ProductSpecs } from "./product-specs.component";

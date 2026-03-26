@@ -35,6 +35,9 @@
       "@site/blog": [
         "./packages/blog/web/src/index.ts"
       ],
+      "@site/chatbot": [
+        "./packages/chatbot/web/src/index.ts"
+      ],
       "@site/checkout": [
         "./packages/checkout/web/src/index.ts"
       ],

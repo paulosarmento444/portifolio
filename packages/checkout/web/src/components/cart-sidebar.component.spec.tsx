@@ -10,11 +10,11 @@ jest.mock("next/navigation", () => ({
   }),
 }));
 
-jest.mock("../actions/checkout.actions", () => ({
+jest.mock("../data/actions/checkout.actions", () => ({
   createCheckoutOrderAction: jest.fn(),
 }));
 
-const actionsModule = jest.requireMock("../actions/checkout.actions") as {
+const actionsModule = jest.requireMock("../data/actions/checkout.actions") as {
   createCheckoutOrderAction: jest.Mock;
 };
 

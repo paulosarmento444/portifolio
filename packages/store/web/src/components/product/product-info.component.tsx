@@ -12,8 +12,8 @@ import {
 import type {
   AddToCartAction,
   StoreProductDetail,
-} from "../../lib/store.types";
-import { truncatePlainText } from "../../lib/store.utils";
+} from "../../data/store.types";
+import { truncatePlainText } from "../../data/store.utils";
 import { ProductMetaBadges } from "../shared/product-meta-badges.component";
 import { ProductPriceBlock } from "../shared/product-price-block.component";
 import { ProductQuantityForm } from "./product-quantity-form.component";

@@ -10,7 +10,7 @@ import { SurfaceCard } from "@site/shared";
 import type {
   AccountCustomerChangeHandler,
   AccountMenu,
-} from "../lib/account.types";
+} from "../data/account.types";
 import { WelcomeSection } from "./sections/welcome-section.component";
 import { OrdersSection } from "./sections/orders-section.component";
 import { AccountSection } from "./sections/account-section.component";

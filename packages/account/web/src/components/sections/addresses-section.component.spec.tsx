@@ -1,12 +1,12 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 
-jest.mock("../../actions/account.actions", () => ({
+jest.mock("../../data/actions/account.actions", () => ({
   saveAccountAddressAction: jest.fn(),
 }));
 
 const { saveAccountAddressAction } = jest.requireMock(
-  "../../actions/account.actions",
+  "../../data/actions/account.actions",
 ) as {
   saveAccountAddressAction: jest.Mock;
 };

@@ -43,7 +43,7 @@ The following routes already follow the package-based architecture:
 These remain in `src/app` because they are app-specific integration seams, not reusable feature UI:
 
 1. `layout.tsx` and the Next router shell itself;
-2. `components/chatbot/*` plus the colocated chatbot service;
+2. thin Next-specific runtime glue only when a feature cannot live inside `packages/*`;
 3. `api/*` transport handlers;
 4. app env/runtime glue in `lib/*`.
 

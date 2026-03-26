@@ -7,7 +7,7 @@ jest.mock("next/navigation", () => ({
   })),
 }));
 
-jest.mock("../actions/auth.actions", () => ({
+jest.mock("../data/actions/auth.actions", () => ({
   forgotPasswordAction: jest.fn(),
   resetPasswordAction: jest.fn(),
   validateResetPasswordTokenAction: jest.fn(),

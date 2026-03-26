@@ -2,7 +2,7 @@
 
 import { Package, RefreshCw } from "lucide-react";
 import { EmptyState, PrimaryButton } from "@site/shared";
-import type { StoreCatalogProduct, StoreViewMode } from "../../lib/store.types";
+import type { StoreCatalogProduct, StoreViewMode } from "../../data/store.types";
 import { ProductCard } from "./product-card.component";
 import { StorePagination } from "./store-pagination.component";
 

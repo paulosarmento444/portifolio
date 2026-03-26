@@ -15,11 +15,11 @@ import type {
   AccountCustomerChangeHandler,
   AccountPasswordFormData,
   AccountProfileFormData,
-} from "../../lib/account.types";
+} from "../../data/account.types";
 import {
   changeAccountPasswordAction,
   updateAccountProfileAction,
-} from "../../actions/account.actions";
+} from "../../data/actions/account.actions";
 
 interface AccountSectionProps {
   viewer: AuthUserView;

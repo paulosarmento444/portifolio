@@ -14,14 +14,14 @@ import {
   cn,
   ecommerceButtonStyles,
 } from "@site/shared";
-import { createCheckoutOrderAction } from "../actions/checkout.actions";
+import { createCheckoutOrderAction } from "../data/actions/checkout.actions";
 import type {
   CheckoutCreateOrderInput,
   CheckoutPaymentMethodCode,
   CheckoutSessionCart,
-} from "../lib/checkout.types";
-import { deriveCheckoutAppliedCouponFromCart } from "../lib/checkout-coupon";
-import type { CheckoutPaymentOption } from "../lib/payment-methods";
+} from "../data/checkout.types";
+import { deriveCheckoutAppliedCouponFromCart } from "../data/checkout-coupon";
+import type { CheckoutPaymentOption } from "../data/payment-methods";
 import { CartSummary } from "./cart-summary.component";
 
 interface CartSidebarProps {

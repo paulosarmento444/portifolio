@@ -9,9 +9,9 @@ import {
 } from "@site/shared";
 import type { AccountCustomerView } from "@site/shared";
 import type { CoCartCartStateView } from "@site/integrations/cocart";
-import type { CheckoutPaymentMethodCode, CheckoutPageData } from "../lib/checkout.types";
-import { deriveCheckoutAppliedCouponFromCart } from "../lib/checkout-coupon";
-import { mapCheckoutPaymentMethodToOption } from "../lib/payment-methods";
+import type { CheckoutPaymentMethodCode, CheckoutPageData } from "../data/checkout.types";
+import { deriveCheckoutAppliedCouponFromCart } from "../data/checkout-coupon";
+import { mapCheckoutPaymentMethodToOption } from "../data/payment-methods";
 import { CartContent } from "./cart-content.component";
 import { CartSidebar } from "./cart-sidebar.component";
 import { CheckoutSection } from "./checkout-section.component";

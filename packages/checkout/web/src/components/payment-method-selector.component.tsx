@@ -3,8 +3,8 @@
 import { useRef, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { CheckCircle2, CreditCard, QrCode, Shield } from "lucide-react";
 import { OverlaySection, StatusBadge, cn } from "@site/shared";
-import type { CheckoutPaymentMethodCode } from "../lib/checkout.types";
-import type { CheckoutPaymentOption } from "../lib/payment-methods";
+import type { CheckoutPaymentMethodCode } from "../data/checkout.types";
+import type { CheckoutPaymentOption } from "../data/payment-methods";
 
 interface PaymentMethodSelectorProps {
   options: CheckoutPaymentOption[];

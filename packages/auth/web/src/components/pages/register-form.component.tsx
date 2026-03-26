@@ -4,8 +4,8 @@ import type React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { registerCredentialsSchema } from "@site/shared";
-import { registerUserAction } from "../../actions/auth.actions";
-import { INITIAL_AUTH_FORM_STATE } from "../../lib/auth-state";
+import { registerUserAction } from "../../data/actions/auth.actions";
+import { INITIAL_AUTH_FORM_STATE } from "../../data/auth-state";
 import { AuthForm } from "../shared/auth-form.component";
 
 export default function RegisterForm() {

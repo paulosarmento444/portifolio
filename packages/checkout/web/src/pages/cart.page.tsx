@@ -1,6 +1,6 @@
 import { CartLoginError } from "../components/cart-login-error.component";
 import { CheckoutPageShell } from "../components/cart-page-shell.component";
-import { loadCheckoutPageData } from "../actions/checkout.actions";
+import { loadCheckoutPageData } from "../data/actions/checkout.actions";
 
 export async function CheckoutCartPage() {
   const data = await loadCheckoutPageData();

@@ -8,8 +8,7 @@ import {
   buildThemeInitScript,
 } from "@site/shared";
 import { getAuthSession } from "@site/auth";
-import { ChatbotWidget } from "./components/chatbot/ChatbotWidget";
-import { defaultChatbotConfig } from "./components/chatbot/config";
+import { ChatbotWidget, defaultChatbotConfig } from "@site/chatbot";
 import Script from "next/script";
 import { publicEnv } from "./lib/env.public";
 import "./globals.css";

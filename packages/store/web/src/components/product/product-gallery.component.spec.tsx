@@ -4,7 +4,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import type {
   StoreProductDetail,
   StoreProductVariation,
-} from "../../lib/store.types";
+} from "../../data/store.types";
 import { ProductGallery } from "./product-gallery.component";
 
 jest.mock("next/image", () => ({

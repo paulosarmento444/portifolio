@@ -15,7 +15,7 @@ import {
   StatusBadge,
   SurfaceCard,
 } from "@site/shared";
-import { resolveCheckoutOrderFlow } from "../../lib/payment-methods";
+import { resolveCheckoutOrderFlow } from "../../data/payment-methods";
 import { MercadoPagoCardForm } from "./mercado-pago-card-form.component";
 import { MercadoPagoPixPanel } from "./mercado-pago-pix-panel.component";
 import { MercadoPagoThreeDSPanel } from "./mercado-pago-three-ds-panel.component";

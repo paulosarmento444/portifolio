@@ -9,12 +9,12 @@ import {
   filterAndSortCatalogProducts,
   paginateProducts,
   resolveStorePriceBounds,
-} from "../../lib/store.utils";
+} from "../../data/store.utils";
 import {
   DEFAULT_STORE_FILTERS,
   type StoreCatalogProduct,
   type StoreViewMode,
-} from "../../lib/store.types";
+} from "../../data/store.types";
 import { StoreBreadcrumbs } from "./store-breadcrumbs.component";
 import { StoreCatalogHeader } from "./store-catalog-header.component";
 import {

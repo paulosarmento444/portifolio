@@ -14,12 +14,12 @@ jest.mock("next/image", () => ({
   default: () => <div data-testid="mock-cart-item-image" />,
 }));
 
-jest.mock("../actions/checkout.actions", () => ({
+jest.mock("../data/actions/checkout.actions", () => ({
   removeCartItemAction: jest.fn(),
   updateCartItemQuantityAction: jest.fn(),
 }));
 
-const actionsModule = jest.requireMock("../actions/checkout.actions") as {
+const actionsModule = jest.requireMock("../data/actions/checkout.actions") as {
   removeCartItemAction: jest.Mock;
   updateCartItemQuantityAction: jest.Mock;
 };

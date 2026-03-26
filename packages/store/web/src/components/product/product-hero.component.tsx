@@ -5,7 +5,7 @@ import type {
   AddToCartAction,
   StoreProductDetail,
   StoreProductVariation,
-} from "../../lib/store.types";
+} from "../../data/store.types";
 import { ProductGallery } from "./product-gallery.component";
 import { ProductInfo } from "./product-info.component";
 

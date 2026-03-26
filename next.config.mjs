@@ -10,6 +10,7 @@ const nextConfig = {
       "packages/integrations/payments",
       "packages/store/web",
       "packages/blog/web",
+      "packages/chatbot/web",
       "packages/auth/web",
       "packages/account/web",
       "packages/checkout/web",

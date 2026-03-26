@@ -1,12 +1,12 @@
 import { describe, expect, it, jest, beforeEach } from "@jest/globals";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
-jest.mock("../actions/checkout.actions", () => ({
+jest.mock("../data/actions/checkout.actions", () => ({
   applyCouponAction: jest.fn(),
   removeCouponAction: jest.fn(),
 }));
 
-const actionsModule = jest.requireMock("../actions/checkout.actions") as {
+const actionsModule = jest.requireMock("../data/actions/checkout.actions") as {
   applyCouponAction: jest.Mock;
   removeCouponAction: jest.Mock;
 };

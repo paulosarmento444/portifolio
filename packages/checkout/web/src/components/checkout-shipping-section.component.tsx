@@ -25,8 +25,8 @@ import {
   calculateCheckoutShippingAction,
   reloadCheckoutShippingAction,
   selectCheckoutShippingRateAction,
-} from "../actions/checkout.actions";
-import type { CheckoutShippingDestinationFormData } from "../lib/checkout.types";
+} from "../data/actions/checkout.actions";
+import type { CheckoutShippingDestinationFormData } from "../data/checkout.types";
 
 interface CheckoutShippingSectionProps {
   cart: CoCartCartStateView;

@@ -14,7 +14,7 @@ import {
   TextField,
   TrustList,
 } from "@site/shared";
-import { forgotPasswordAction } from "../actions/auth.actions";
+import { forgotPasswordAction } from "../data/actions/auth.actions";
 
 export function AuthForgotPasswordPage() {
   const [state, setState] = useState<{

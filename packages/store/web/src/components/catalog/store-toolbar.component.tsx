@@ -1,6 +1,6 @@
 import { Grid3X3, List, SlidersHorizontal } from "lucide-react";
 import { IconButton, PrimaryButton, cn } from "@site/shared";
-import type { StoreViewMode } from "../../lib/store.types";
+import type { StoreViewMode } from "../../data/store.types";
 
 interface StoreToolbarProps {
   onOpenFilters: () => void;
