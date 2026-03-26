@@ -258,7 +258,7 @@ export function OrderConfirmationView({
         <div className="site-shell-background">
             <PageHeader
                 container="commerce"
-                className="pt-28 pb-4"
+                className="pb-4 pt-[calc(var(--site-shell-offset)+1rem)]"
                 eyebrow={
                     <StatusBadge tone={statusTone}>
                         Pedido #{currentOrder.orderNumber}

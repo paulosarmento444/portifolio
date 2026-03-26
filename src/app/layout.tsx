@@ -1,6 +1,7 @@
 import type React from "react";
 import type { Metadata } from "next";
 import { DEFAULT_THEME, buildThemeInitScript } from "@site/shared";
+import { getAuthSession } from "@site/auth";
 import { BackToTop } from "./components/back-to-top";
 import { ChatbotWidget } from "./components/chatbot/ChatbotWidget";
 import { defaultChatbotConfig } from "./components/chatbot/config";
@@ -35,11 +36,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getAuthSession().catch(() => ({
+    isAuthenticated: false,
+    user: null,
+  }));
+  const initialAccountName =
+    session.isAuthenticated && session.user
+      ? session.user.displayName?.trim() || ""
+      : "";
+
   return (
     <html
       lang="pt-BR"
@@ -85,7 +95,12 @@ export default function RootLayout({
           }}
         /> */}
 
-        <AppShell initialTheme={DEFAULT_THEME}>{children}</AppShell>
+        <AppShell
+          initialTheme={DEFAULT_THEME}
+          initialAccountName={initialAccountName}
+        >
+          {children}
+        </AppShell>
       </body>
     </html>
   );

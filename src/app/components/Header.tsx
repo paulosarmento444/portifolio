@@ -1,66 +1,63 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowRight, Menu, ShoppingBag, UserRound } from "lucide-react";
 import { DrawerShell, IconButton, cn } from "@site/shared";
-import { getAuthSession } from "@site/auth";
 import { useScroll } from "../hooks/useScroll";
 import { Logo } from "./Logo";
 import { NavLinks } from "./NavLinks";
 import { ShellSearchShortcut } from "./ShellSearchShortcut";
 import { ThemeToggleButton } from "./ThemeToggleButton";
 import { UserProfile } from "./UserProfile";
+import { resolveAccountFirstName } from "./header.utils";
 import { utilityNavigation } from "./shell.config";
 
-export default function Header() {
+interface HeaderProps {
+  initialAccountName?: string;
+}
+
+export default function Header({ initialAccountName = "" }: Readonly<HeaderProps>) {
   const pathname = usePathname();
   const isScrolled = useScroll();
-  const [userName, setUserName] = useState("");
-  const [isLoadingUser, setIsLoadingUser] = useState(true);
+  const headerRef = useRef<HTMLElement | null>(null);
+  const [userName, setUserName] = useState(() =>
+    resolveAccountFirstName(initialAccountName),
+  );
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    let isMounted = true;
+    setUserName(resolveAccountFirstName(initialAccountName));
+  }, [initialAccountName]);
 
-    const loadUser = async () => {
-      try {
-        const session = await getAuthSession();
-        if (isMounted) {
-          setUserName(
-            session.isAuthenticated && session.user ? session.user.displayName : "",
-          );
-        }
-      } catch {
-        if (isMounted) {
-          setUserName("");
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoadingUser(false);
-        }
+  useLayoutEffect(() => {
+    const syncShellOffset = () => {
+      const nextHeight = headerRef.current?.offsetHeight;
+
+      if (!nextHeight) {
+        return;
       }
+
+      document.documentElement.style.setProperty(
+        "--site-shell-offset",
+        `${nextHeight}px`,
+      );
     };
 
-    loadUser();
+    syncShellOffset();
+    window.addEventListener("resize", syncShellOffset);
 
     return () => {
-      isMounted = false;
+      window.removeEventListener("resize", syncShellOffset);
     };
-  }, []);
+  }, [pathname, userName]);
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [pathname]);
 
-  const accountLabel = useMemo(() => {
-    if (isLoadingUser) {
-      return "Minha conta";
-    }
-
-    return userName || "Entrar";
-  }, [isLoadingUser, userName]);
+  const accountLabel = userName || "Entrar";
 
   const drawerUtilityNavigation = useMemo(() => {
     return utilityNavigation.map((item) => {
@@ -68,7 +65,7 @@ export default function Header() {
         return item;
       }
 
-      if (isLoadingUser || userName) {
+      if (userName) {
         return item;
       }
 
@@ -79,10 +76,14 @@ export default function Header() {
         description: "Acesse sua conta e acompanhe pedidos",
       };
     });
-  }, [isLoadingUser, userName]);
+  }, [userName]);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50">
+    <header
+      ref={headerRef}
+      data-testid="site-header"
+      className="fixed inset-x-0 top-0 z-50"
+    >
       <div className="site-container site-container-marketing pt-3 sm:pt-4">
         <div
           className={cn(
@@ -117,7 +118,7 @@ export default function Header() {
 
               <div className="hidden items-center gap-2 lg:flex">
                 <ThemeToggleButton />
-                <UserProfile name={userName} />
+                <UserProfile name={initialAccountName} />
               </div>
 
               <div className="flex items-center gap-2 lg:hidden">

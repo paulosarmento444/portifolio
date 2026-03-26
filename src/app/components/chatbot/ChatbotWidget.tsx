@@ -86,7 +86,7 @@ export function ChatbotWidget({ config }: ChatbotWidgetProps) {
         whileTap={{ scale: 0.95 }}
         onClick={handleOpenChat}
         data-testid="chatbot-open"
-        className="fixed bottom-8 left-4 z-50 flex h-16 w-16 items-center justify-center rounded-full border border-[color:var(--site-color-border-strong)] bg-[color:var(--site-color-surface-strong)] shadow-[var(--site-shadow-lg)] backdrop-blur-sm sm:left-8"
+        className="fixed bottom-8 left-4 z-[70] flex h-16 w-16 items-center justify-center rounded-full border border-[color:var(--site-color-border-strong)] bg-[color:var(--site-color-surface-strong)] shadow-[var(--site-shadow-lg)] backdrop-blur-sm sm:left-8"
       >
         <img
           src={config.botAvatar}
@@ -108,7 +108,7 @@ export function ChatbotWidget({ config }: ChatbotWidgetProps) {
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: -50, scale: 0.8 }}
             onClick={handleOpenChat}
-            className="fixed bottom-24 left-4 z-40 max-w-xs cursor-pointer rounded-2xl rounded-bl-md border border-[color:var(--site-color-border-strong)] bg-[color:var(--site-color-surface-strong)] p-4 text-[color:var(--site-color-foreground)] shadow-[var(--site-shadow-lg)] backdrop-blur-sm sm:left-8"
+            className="fixed bottom-24 left-4 z-[69] max-w-xs cursor-pointer rounded-2xl rounded-bl-md border border-[color:var(--site-color-border-strong)] bg-[color:var(--site-color-surface-strong)] p-4 text-[color:var(--site-color-foreground)] shadow-[var(--site-shadow-lg)] backdrop-blur-sm sm:left-8"
           >
             <p className="text-sm font-medium leading-relaxed">
               {config.welcomeBubble}
@@ -128,7 +128,8 @@ export function ChatbotWidget({ config }: ChatbotWidgetProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={handleCloseChat}
-              className="fixed inset-0 z-40 bg-[color:var(--site-color-overlay-scrim)] backdrop-blur-sm"
+              data-testid="chatbot-backdrop"
+              className="fixed inset-0 z-[70] bg-[color:var(--site-color-overlay-scrim)] backdrop-blur-sm"
             />
 
             {/* Chat Container */}
@@ -136,7 +137,8 @@ export function ChatbotWidget({ config }: ChatbotWidgetProps) {
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
-              className="fixed bottom-24 left-0 right-0 z-50 flex h-[600px] max-h-[calc(100vh-8rem)] w-full max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-[color:var(--site-color-border-strong)] bg-[color:var(--site-color-surface-strong)] shadow-[var(--site-shadow-lg)] backdrop-blur-xl sm:left-8 sm:right-auto sm:w-96 sm:max-w-[calc(100vw-2rem)] sm:rounded-2xl"
+              data-testid="chatbot-panel"
+              className="fixed bottom-24 left-0 right-0 z-[80] flex h-[600px] max-h-[calc(100vh-8rem)] w-full max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-[color:var(--site-color-border-strong)] bg-[color:var(--site-color-surface-strong)] shadow-[var(--site-shadow-lg)] backdrop-blur-xl sm:left-8 sm:right-auto sm:w-96 sm:max-w-[calc(100vw-2rem)] sm:rounded-2xl"
             >
               {/* Header */}
               <div

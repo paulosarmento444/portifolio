@@ -83,7 +83,7 @@ export function CheckoutPageShell({ data }: CheckoutPageShellProps) {
     <div className="site-shell-background">
       <PageHeader
         container="commerce"
-        className="pt-24 pb-2 sm:pt-28 sm:pb-3"
+        className="pb-2 pt-[calc(var(--site-shell-offset)+0.75rem)] sm:pb-3"
         eyebrow="Checkout"
         title="Seu carrinho"
         description={

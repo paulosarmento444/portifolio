@@ -103,7 +103,7 @@
     --site-container-commerce: 76rem;
     --site-container-content: 48rem;
     --site-container-utility: 70rem;
-    --site-shell-offset: 5.25rem;
+    --site-shell-offset: 8.75rem;
     --site-inline-padding: 1rem;
     --site-inline-padding-sm: 1.5rem;
     --site-inline-padding-lg: 2rem;
@@ -765,6 +765,16 @@
 
   .site-card-compact {
     padding: var(--site-card-compact-padding-desktop);
+  }
+}
+
+@media (min-width: 1024px) {
+  :root,
+  :root[data-theme="dark"],
+  .theme-dark,
+  :root[data-theme="light"],
+  .theme-light {
+    --site-shell-offset: 5.25rem;
   }
 }
 
