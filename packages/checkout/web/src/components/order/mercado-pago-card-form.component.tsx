@@ -46,6 +46,9 @@ const FIXED_FORM_IDS = {
   installments: "pharmacore-mp-installments",
 } as const;
 
+const compactFieldClassName =
+  "min-h-[2.875rem] px-3.5 py-2.5 text-[15px] text-[color:var(--site-color-foreground-strong)] placeholder:text-[color:var(--site-color-foreground-soft)]";
+
 const countMeaningfulOptions = (select: HTMLSelectElement | null) => {
   if (!select) {
     return 0;
@@ -71,34 +74,48 @@ const SecureField = memo(function SecureField({
         id={id}
         className={cn(
           ecommerceFieldStyles.input,
-          "flex min-h-[52px] items-center overflow-hidden px-0 py-0 [&>iframe]:min-h-[52px] [&>iframe]:w-full",
+          "flex h-[2.875rem] min-h-[2.875rem] items-center overflow-hidden bg-[color:var(--site-color-surface-strong)] px-0 py-0 text-[color:var(--site-color-foreground-strong)] [&>iframe]:!h-[2.875rem] [&>iframe]:!min-h-[2.875rem] [&>iframe]:w-full",
         )}
       />
     </FieldShell>
   );
 });
 
-const CardFieldLayout = memo(function CardFieldLayout() {
+const CardFieldLayout = memo(function CardFieldLayout({
+  onCardholderNameChange,
+}: {
+  onCardholderNameChange: (value: string) => void;
+}) {
   return (
-    <form className="site-stack-section min-w-0" id={FIXED_FORM_IDS.form} data-testid="mercado-pago-card-layout" onSubmit={(event) => event.preventDefault()}>
+    <form
+      className="grid gap-4 min-w-0"
+      id={FIXED_FORM_IDS.form}
+      data-testid="mercado-pago-card-layout"
+      onSubmit={(event) => event.preventDefault()}
+    >
       <div className="grid gap-4">
-        <SecureField
-          id={FIXED_FORM_IDS.cardNumber}
-          label="Número do cartão"
-          hint="Os dados sensíveis são tokenizados pelo Mercado Pago."
-        />
+        <SecureField id={FIXED_FORM_IDS.cardNumber} label="Número do cartão" />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
         <TextField
           id={FIXED_FORM_IDS.cardholderName}
           label="Nome impresso no cartão"
           autoComplete="cc-name"
           placeholder="Como aparece no cartão"
+          fieldClassName={compactFieldClassName}
+          onChange={(event) => onCardholderNameChange(event.currentTarget.value)}
+        />
+        <SelectField
+          id={FIXED_FORM_IDS.installments}
+          label="Parcelamento"
+          fieldClassName={compactFieldClassName}
         />
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-4 sm:grid-cols-2">
         <SecureField id={FIXED_FORM_IDS.expirationDate} label="Validade" />
         <SecureField id={FIXED_FORM_IDS.securityCode} label="Código de segurança" />
-        <SelectField id={FIXED_FORM_IDS.installments} label="Parcelamento" />
       </div>
     </form>
   );
@@ -150,6 +167,7 @@ export function MercadoPagoCardForm({
   const [hasInstallmentOptions, setHasInstallmentOptions] = useState(false);
   const [requiresDocument, setRequiresDocument] = useState(false);
   const [requiresIssuer, setRequiresIssuer] = useState(false);
+  const [cardholderName, setCardholderName] = useState("");
   const amountLabel = useMemo(
     () =>
       new Intl.NumberFormat("pt-BR", {
@@ -196,6 +214,12 @@ export function MercadoPagoCardForm({
         : "",
     [stableConfig],
   );
+  const cardholderPreview =
+    cardholderName.trim() || "Nome do titular";
+  const showExtraFields = requiresDocument || requiresIssuer;
+  const installmentsStatusLabel = hasInstallmentOptions
+    ? "Parcelas carregadas para este cartão."
+    : "As parcelas aparecem depois dos primeiros dígitos.";
 
   useEffect(() => {
     let isCancelled = false;
@@ -407,105 +431,143 @@ export function MercadoPagoCardForm({
   };
 
   return (
-    <SurfaceCard tone="strong" className="site-stack-section min-w-0">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="site-stack-panel">
-          <StatusBadge tone="accent">
-            <CreditCard className="h-3.5 w-3.5" />
-            Checkout Transparente
-          </StatusBadge>
-          <div>
-            <h3 className="site-text-card-title text-[color:var(--site-color-foreground-strong)]">
-              Pague com cartão sem sair da loja
-            </h3>
-            <p className="site-text-body text-sm">
-              Os campos sensíveis são tokenizados pelo Mercado Pago. O pedido já existe e será atualizado automaticamente quando o pagamento for confirmado.
+    <SurfaceCard
+      tone="strong"
+      padding="compact"
+      className="min-w-0 gap-4 border-[color:var(--site-color-border-strong)] bg-[radial-gradient(circle_at_top_right,var(--site-color-glow-primary-strong),transparent_34%),linear-gradient(180deg,var(--site-color-surface-strong),var(--site-color-surface))] shadow-[var(--site-shadow-md)]"
+    >
+      <div className="site-stack-panel gap-3">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="site-stack-panel min-w-0 gap-2">
+            <div className="flex items-center gap-2 text-[color:var(--site-color-foreground-muted)]">
+              <CreditCard className="h-4 w-4 text-[color:var(--site-color-primary)]" />
+              <span className="site-text-meta uppercase tracking-[0.14em]">
+                Cartão de crédito
+              </span>
+            </div>
+            <div className="min-w-0">
+              <h3 className="site-text-card-title text-[color:var(--site-color-foreground-strong)]">
+                Pague com cartão sem sair da loja
+              </h3>
+              <p className="site-text-body text-sm text-[color:var(--site-color-foreground-muted)]">
+                Checkout transparente com tokenização oficial do Mercado Pago e confirmação do pedido nesta mesma tela.
+              </p>
+            </div>
+          </div>
+          <div className="min-w-[10rem] text-left sm:text-right">
+            <p className="site-text-meta uppercase tracking-[0.12em]">Total desta cobrança</p>
+            <p className="text-2xl font-semibold tracking-tight text-[color:var(--site-color-foreground-strong)]">
+              {amountLabel}
             </p>
           </div>
         </div>
-        <div className="rounded-[var(--site-radius-lg)] border border-[color:var(--site-color-border)] bg-[color:var(--site-color-surface-inset)] px-4 py-3 text-right">
-          <p className="site-text-meta">Valor do pedido</p>
-          <p className="text-lg font-semibold text-[color:var(--site-color-foreground-strong)]">
-            {amountLabel}
-          </p>
+
+        <div
+          className="flex flex-wrap items-center gap-2.5 rounded-[calc(var(--site-radius-xl)+2px)] border border-[color:var(--site-color-border)] bg-[color:var(--site-color-surface)]/78 px-3.5 py-3 backdrop-blur-sm"
+          data-testid="mercado-pago-card-summary-strip"
+        >
+          <StatusBadge tone="success" className="shrink-0">
+            <ShieldCheck className="h-3.5 w-3.5" />
+            Ambiente protegido
+          </StatusBadge>
+          <div className="inline-flex min-w-0 items-center gap-2 text-sm text-[color:var(--site-color-foreground-muted)]">
+            <span className="site-text-meta shrink-0">Titular</span>
+            <span
+              className="truncate font-medium text-[color:var(--site-color-foreground-strong)]"
+              data-testid="mercado-pago-cardholder-preview"
+            >
+              {cardholderPreview}
+            </span>
+          </div>
+          <span className="site-text-meta sm:ml-auto">{installmentsStatusLabel}</span>
         </div>
       </div>
 
-      <CardFieldLayout />
+      <div className="site-stack-section min-w-0 border-t border-[color:var(--site-color-border)] pt-4">
+        <CardFieldLayout onCardholderNameChange={setCardholderName} />
 
-      <div className="site-stack-section">
         <div
           className={cn(
-            "grid gap-4",
-            !requiresDocument && "hidden",
+            "grid gap-3 border-t border-dashed border-[color:var(--site-color-border)] pt-4",
+            !showExtraFields && "hidden",
           )}
         >
-          <div className="site-stack-section">
+          <div className="site-stack-panel gap-1">
+            <p className="site-text-meta uppercase tracking-[0.12em]">Validação adicional</p>
+            <p className="text-sm text-[color:var(--site-color-foreground-muted)]">
+              O emissor pediu informações extras para autorizar este cartão.
+            </p>
+          </div>
+
+          <div
+            className={cn(
+              "grid gap-3 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)]",
+              !requiresDocument && "hidden",
+            )}
+          >
             <FieldShell label="Tipo de documento" htmlFor={FIXED_FORM_IDS.identificationType}>
               <select
                 id={FIXED_FORM_IDS.identificationType}
-                className={cn(ecommerceFieldStyles.select)}
+                className={cn(ecommerceFieldStyles.select, compactFieldClassName)}
                 tabIndex={requiresDocument ? 0 : -1}
               />
             </FieldShell>
+            <TextField
+              id={FIXED_FORM_IDS.identificationNumber}
+              label="Número do documento"
+              autoComplete="off"
+              placeholder="Digite o documento do titular"
+              containerClassName={cn(!requiresDocument && "hidden")}
+              fieldClassName={compactFieldClassName}
+              tabIndex={requiresDocument ? 0 : -1}
+            />
           </div>
-          <TextField
-            id={FIXED_FORM_IDS.identificationNumber}
-            label="Número do documento"
-            autoComplete="off"
-            placeholder="Digite o documento do titular"
-            containerClassName={cn(!requiresDocument && "hidden")}
-            tabIndex={requiresDocument ? 0 : -1}
-          />
-        </div>
 
-        <FieldShell
-          label="Banco emissor"
-          htmlFor={FIXED_FORM_IDS.issuer}
-          className={cn(!requiresIssuer && "hidden")}
-        >
-          <select
-            id={FIXED_FORM_IDS.issuer}
-            className={cn(ecommerceFieldStyles.select)}
-            tabIndex={requiresIssuer ? 0 : -1}
-          />
-        </FieldShell>
-      </div>
-
-      {(initializationError || localError || externalError) ? (
-        <div className="flex items-start gap-3 rounded-[var(--site-radius-lg)] border border-[color:var(--site-color-danger-soft)] bg-[color:var(--site-color-danger-soft)]/70 px-4 py-3 text-sm text-[color:var(--site-color-danger-text)]">
-          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-          <p>{externalError || localError || initializationError}</p>
-        </div>
-      ) : null}
-
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--site-radius-lg)] border border-[color:var(--site-color-border)] bg-[color:var(--site-color-surface-inset)] px-4 py-3">
-        <div className="site-stack-panel">
-          <StatusBadge tone="neutral">
-            <ShieldCheck className="h-3.5 w-3.5" />
-            Tokenização oficial do Mercado Pago
-          </StatusBadge>
-          <p className="site-text-meta">
-            {hasInstallmentOptions
-              ? "As parcelas já foram carregadas para o cartão informado."
-              : "As parcelas aparecem assim que o Mercado Pago reconhece os primeiros dígitos do cartão."}
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <GhostButton onClick={onRefresh} disabled={isSubmitting}>
-            Atualizar status
-          </GhostButton>
-          <PrimaryButton
-            onClick={handleSubmit}
-            disabled={disabled || isInitializing || isSubmitting || Boolean(initializationError)}
+          <FieldShell
+            label="Banco emissor"
+            htmlFor={FIXED_FORM_IDS.issuer}
+            className={cn(!requiresIssuer && "hidden")}
           >
-            {isInitializing || isSubmitting ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <CreditCard className="h-4 w-4" />
-            )}
-            Pagar com cartão
-          </PrimaryButton>
+            <select
+              id={FIXED_FORM_IDS.issuer}
+              className={cn(ecommerceFieldStyles.select, compactFieldClassName)}
+              tabIndex={requiresIssuer ? 0 : -1}
+            />
+          </FieldShell>
+        </div>
+
+        {(initializationError || localError || externalError) ? (
+          <div className="flex items-start gap-3 rounded-[var(--site-radius-lg)] border border-[color:var(--site-color-danger-soft)] bg-[color:var(--site-color-danger-soft)]/70 px-4 py-3 text-sm text-[color:var(--site-color-danger-text)]">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            <p>{externalError || localError || initializationError}</p>
+          </div>
+        ) : null}
+
+        <div className="flex flex-col gap-3 border-t border-[color:var(--site-color-border)] pt-4 md:flex-row md:items-center md:justify-between">
+          <div className="site-stack-panel gap-1">
+            <p className="text-sm font-medium text-[color:var(--site-color-foreground-strong)]">
+              Dados sensíveis enviados direto para o Mercado Pago.
+            </p>
+            <p className="site-text-meta">
+              Emissor e parcelas são carregados automaticamente conforme o cartão informado.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <GhostButton onClick={onRefresh} disabled={isSubmitting}>
+              Atualizar status
+            </GhostButton>
+            <PrimaryButton
+              onClick={handleSubmit}
+              disabled={disabled || isInitializing || isSubmitting || Boolean(initializationError)}
+            >
+              {isInitializing || isSubmitting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <CreditCard className="h-4 w-4" />
+              )}
+              Pagar com cartão
+            </PrimaryButton>
+          </div>
         </div>
       </div>
     </SurfaceCard>

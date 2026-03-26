@@ -1,5 +1,5 @@
 import { describe, expect, it, jest } from "@jest/globals";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type { MercadoPagoHeadlessConfig } from "@site/integrations/payments";
 
 jest.mock("./mercado-pago-sdk", () => ({
@@ -93,15 +93,17 @@ describe("MercadoPagoCardForm", () => {
   });
 
   it("reveals document and issuer fields only when the SDK populates them and updates the installments message", async () => {
-    render(
-      <MercadoPagoCardForm
-        amount={249.9}
-        config={baseConfig}
-        isSubmitting={false}
-        onRefresh={jest.fn()}
-        onSubmit={jest.fn(async () => undefined)}
-      />,
-    );
+    await act(async () => {
+      render(
+        <MercadoPagoCardForm
+          amount={249.9}
+          config={baseConfig}
+          isSubmitting={false}
+          onRefresh={jest.fn()}
+          onSubmit={jest.fn(async () => undefined)}
+        />,
+      );
+    });
 
     const documentInput = document.getElementById(
       "pharmacore-mp-identification-number",
@@ -117,9 +119,7 @@ describe("MercadoPagoCardForm", () => {
     expect(documentInput.closest(".hidden")).not.toBeNull();
     expect(issuerSelect.closest(".hidden")).not.toBeNull();
     expect(
-      screen.getByText(
-        "As parcelas aparecem assim que o Mercado Pago reconhece os primeiros dígitos do cartão.",
-      ),
+      screen.getByText("As parcelas aparecem depois dos primeiros dígitos."),
     ).toBeTruthy();
 
     identificationTypeSelect.append(new Option("CPF", "CPF"));
@@ -135,26 +135,59 @@ describe("MercadoPagoCardForm", () => {
     await waitFor(() => {
       expect(documentInput.closest(".hidden")).toBeNull();
       expect(issuerSelect.closest(".hidden")).toBeNull();
-      expect(
-        screen.getByText("As parcelas já foram carregadas para o cartão informado."),
-      ).toBeTruthy();
+      expect(screen.getByText("Parcelas carregadas para este cartão.")).toBeTruthy();
     });
   });
-  it("keeps the transparent checkout form stacked for the narrow payment sidebar", async () => {
-    render(
-      <MercadoPagoCardForm
-        amount={199.9}
-        config={baseConfig}
-        isSubmitting={false}
-        onRefresh={jest.fn()}
-        onSubmit={jest.fn(async () => undefined)}
-      />,
-    );
+
+  it("renders the form in a single premium surface with a compact summary strip", async () => {
+    await act(async () => {
+      render(
+        <MercadoPagoCardForm
+          amount={199.9}
+          config={baseConfig}
+          isSubmitting={false}
+          onRefresh={jest.fn()}
+          onSubmit={jest.fn(async () => undefined)}
+        />,
+      );
+    });
 
     const layout = await screen.findByTestId("mercado-pago-card-layout");
+    const summaryStrip = screen.getByTestId("mercado-pago-card-summary-strip");
+    const secureCardNumberField = document.getElementById("pharmacore-mp-card-number");
+    const cardholderField = screen.getByLabelText("Nome impresso no cartão");
+    const installmentsField = screen.getByLabelText("Parcelamento");
 
     expect(layout.className).toContain("min-w-0");
     expect(layout.className).not.toContain("lg:grid-cols");
+    expect(summaryStrip.textContent).toContain("Ambiente protegido");
+    expect(summaryStrip.textContent).toContain("Nome do titular");
+    expect(secureCardNumberField?.className).toContain("min-h-[2.875rem]");
+    expect(secureCardNumberField?.className).toContain("[&>iframe]:!h-[2.875rem]");
+    expect(cardholderField.className).toContain("min-h-[2.875rem]");
+    expect(installmentsField.className).toContain("min-h-[2.875rem]");
+  });
+
+  it("updates the visible cardholder summary without affecting the secure SDK fields", async () => {
+    await act(async () => {
+      render(
+        <MercadoPagoCardForm
+          amount={199.9}
+          config={baseConfig}
+          isSubmitting={false}
+          onRefresh={jest.fn()}
+          onSubmit={jest.fn(async () => undefined)}
+        />,
+      );
+    });
+
+    fireEvent.change(screen.getByLabelText("Nome impresso no cartão"), {
+      target: { value: "Maria Silva" },
+    });
+
+    expect(
+      screen.getByTestId("mercado-pago-cardholder-preview").textContent,
+    ).toBe("Maria Silva");
   });
 
 });

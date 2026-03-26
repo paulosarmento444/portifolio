@@ -193,7 +193,35 @@ export function OrderConfirmationView({
         currentOrder.items.length === 1
             ? "1 item no pedido"
             : `${currentOrder.items.length} itens no pedido`;
-    const financialMetrics = [
+    const orderOverviewMetrics = [
+        {
+            label: "Pedido",
+            value: `#${currentOrder.orderNumber}`,
+            meta: "Referência para atendimento e suporte.",
+        },
+        {
+            label: "Criado em",
+            value: new Date(currentOrder.createdAt).toLocaleDateString(
+                "pt-BR",
+            ),
+            meta: "Data confirmada no WooCommerce.",
+        },
+        {
+            label: "Pagamento",
+            value:
+                currentOrder.paymentMethodTitle ||
+                "Pagamento pendente",
+            meta: paymentResolved
+                ? "Método confirmado no pedido."
+                : "Aguardando conclusão.",
+        },
+        {
+            label: "Status",
+            value: currentOrder.status.label,
+            meta: "Atualização mais recente do pedido.",
+        },
+    ];
+    const financialBreakdownItems = [
         {
             label: "Subtotal",
             value:
@@ -233,12 +261,6 @@ export function OrderConfirmationView({
                   },
               ]
             : []),
-        {
-            label: "Total final",
-            value:
-                formatMoneyValue(currentOrder.total) || currentOrder.total.formatted,
-            meta: "Valor final confirmado no pedido.",
-        },
     ];
 
     const handleCopyTracking = async () => {
@@ -318,43 +340,52 @@ export function OrderConfirmationView({
                     ]}
                 />
 
-                <MetricRow
-                    items={[
-                        {
-                            label: "Pedido",
-                            value: `#${currentOrder.orderNumber}`,
-                            meta: "Registrado com sucesso",
-                        },
-                        {
-                            label: "Data",
-                            value: new Date(
-                                currentOrder.createdAt,
-                            ).toLocaleDateString("pt-BR"),
-                            meta: "Criação do pedido",
-                        },
-                        {
-                            label: "Pagamento",
-                            value:
-                                currentOrder.paymentMethodTitle ||
-                                "Pagamento pendente",
-                            meta: paymentResolved
-                                ? "Confirmado pelo WooCommerce"
-                                : "Aguardando conclusão",
-                        },
-                        {
-                            label: "Status",
-                            value: currentOrder.status.label,
-                            meta: "Atualização mais recente",
-                        },
-                    ]}
-                />
+                <SurfaceCard tone="soft" className="site-stack-section">
+                    <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(16rem,0.42fr)] xl:items-end">
+                        <div className="site-stack-panel">
+                            <StatusBadge tone={statusTone}>
+                                {currentOrder.status.label}
+                            </StatusBadge>
+                            <div>
+                                <h2 className="site-text-section-title text-[color:var(--site-color-foreground-strong)]">
+                                    Visão geral do pedido
+                                </h2>
+                                <p className="site-text-body text-sm">
+                                    Uma leitura rápida do pedido, do pagamento e
+                                    do valor confirmado, no mesmo padrão visual
+                                    do restante da jornada de compra.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="rounded-[calc(var(--site-radius-xl)+2px)] border border-[color:var(--site-color-border-strong)] bg-[linear-gradient(145deg,var(--site-color-surface),var(--site-color-surface-soft))] px-5 py-4 shadow-[var(--site-shadow-sm)]">
+                            <p className="site-text-meta">Total confirmado</p>
+                            <p className="text-3xl font-semibold tracking-tight text-[color:var(--site-color-foreground-strong)]">
+                                {formatMoneyValue(currentOrder.total) ||
+                                    currentOrder.total.formatted}
+                            </p>
+                            <p className="site-text-meta">
+                                Pedido #{currentOrder.orderNumber}
+                            </p>
+                        </div>
+                    </div>
+
+                    <MetricRow
+                        items={orderOverviewMetrics}
+                        className="xl:grid-cols-4"
+                    />
+                </SurfaceCard>
 
                 <div className="grid gap-6 xl:grid-cols-[minmax(0,1.3fr)_minmax(360px,1fr)] xl:items-start">
                     <div
                         className="site-stack-section min-w-0"
                         data-testid="order-confirmation-primary-column"
                     >
-                        <SurfaceCard tone="strong" className="site-stack-section">
+                        <SurfaceCard
+                            tone="strong"
+                            padding="compact"
+                            className="site-stack-section"
+                        >
                             <div className="flex items-start justify-between gap-4">
                                 <div>
                                     <h2 className="site-text-section-title text-[color:var(--site-color-foreground-strong)]">
@@ -374,10 +405,10 @@ export function OrderConfirmationView({
                                 {currentOrder.items.map((item, index) => (
                                     <article
                                         key={`${item.productId ?? index}`}
-                                        className="site-stack-section rounded-[var(--site-radius-lg)] border border-[color:var(--site-color-border)] bg-[color:var(--site-color-surface-inset)] p-4"
+                                        className="site-stack-section rounded-[calc(var(--site-radius-xl)+2px)] border border-[color:var(--site-color-border)] bg-[linear-gradient(180deg,var(--site-color-surface),var(--site-color-surface-inset))] p-4 shadow-[var(--site-shadow-sm)]"
                                     >
-                                        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                                            <div className="flex items-center gap-4">
+                                        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(11rem,0.35fr)] lg:items-start">
+                                            <div className="flex items-start gap-4">
                                                 <div className="h-16 w-16 overflow-hidden rounded-[var(--site-radius-lg)] bg-[color:var(--site-color-surface)]">
                                                     {item.image?.url ? (
                                                         <div className="relative h-full w-full">
@@ -396,35 +427,48 @@ export function OrderConfirmationView({
                                                         </div>
                                                     )}
                                                 </div>
-                                                <div className="site-stack-panel">
-                                                    <h3 className="text-sm font-semibold text-[color:var(--site-color-foreground-strong)]">
-                                                        {item.name}
-                                                    </h3>
+                                                <div className="site-stack-panel min-w-0 gap-2">
+                                                    <div className="flex flex-wrap items-center gap-2">
+                                                        <h3 className="text-base font-semibold text-[color:var(--site-color-foreground-strong)]">
+                                                            {item.name}
+                                                        </h3>
+                                                        <StatusBadge tone="neutral">
+                                                            Qtd {item.quantity}
+                                                        </StatusBadge>
+                                                    </div>
                                                     <p className="site-text-meta">
-                                                        Quantidade: {item.quantity}
+                                                        Item confirmado no
+                                                        pedido e refletido no
+                                                        total final abaixo.
                                                     </p>
                                                 </div>
                                             </div>
-                                            <div className="rounded-[var(--site-radius-md)] border border-[color:var(--site-color-border)] bg-[color:var(--site-color-surface)] px-4 py-3 text-left sm:min-w-[11rem] sm:text-right">
+                                            <div className="rounded-[var(--site-radius-lg)] border border-[color:var(--site-color-border)] bg-[color:var(--site-color-surface)] px-4 py-3 text-left lg:text-right">
                                                 <p className="site-text-meta">
                                                     Total do item
                                                 </p>
-                                                <p className="text-lg font-semibold text-[color:var(--site-color-foreground-strong)]">
+                                                <p className="text-xl font-semibold text-[color:var(--site-color-foreground-strong)]">
                                                     {formatMoneyValue(item.total) ||
                                                         item.total.formatted}
                                                 </p>
+                                                {item.subtotal &&
+                                                Math.abs(
+                                                    item.subtotal.amount -
+                                                        item.total.amount,
+                                                ) > Number.EPSILON ? (
+                                                    <p className="mt-1 text-xs font-medium text-[color:var(--site-color-success-text)]">
+                                                        Economia de{" "}
+                                                        {formatCurrency(
+                                                            item.subtotal
+                                                                .amount -
+                                                                item.total.amount,
+                                                        )}
+                                                    </p>
+                                                ) : null}
                                             </div>
                                         </div>
 
-                                        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                                            <div className="rounded-[var(--site-radius-md)] border border-[color:var(--site-color-border)] bg-[color:var(--site-color-surface)] px-3 py-3">
-                                                <p className="site-text-meta">
-                                                    Quantidade
-                                                </p>
-                                                <p className="mt-1 text-sm font-semibold text-[color:var(--site-color-foreground-strong)]">
-                                                    {item.quantity}
-                                                </p>
-                                            </div>
+                                        <div className="grid gap-3 sm:grid-cols-2">
                                             <div className="rounded-[var(--site-radius-md)] border border-[color:var(--site-color-border)] bg-[color:var(--site-color-surface)] px-3 py-3">
                                                 <p className="site-text-meta">
                                                     Preço unitário
@@ -443,57 +487,15 @@ export function OrderConfirmationView({
                                                         item.total.formatted}
                                                 </p>
                                             </div>
-                                            {item.subtotal &&
-                                            Math.abs(
-                                                item.subtotal.amount - item.total.amount,
-                                            ) > Number.EPSILON ? (
-                                                <div className="rounded-[var(--site-radius-md)] border border-[color:var(--site-color-success-soft)] bg-[color:var(--site-color-success-soft)]/30 px-3 py-3">
-                                                    <p className="site-text-meta">
-                                                        Total após desconto
-                                                    </p>
-                                                    <p className="mt-1 text-sm font-semibold text-[color:var(--site-color-foreground-strong)]">
-                                                        {formatMoneyValue(item.total) ||
-                                                            item.total.formatted}
-                                                    </p>
-                                                </div>
-                                            ) : null}
                                         </div>
                                     </article>
                                 ))}
-                            </div>
-
-                            <div
-                                className="site-stack-section"
-                                data-testid="order-confirmation-financial-summary"
-                            >
-                                <div
-                                    className="rounded-[var(--site-radius-xl)] border border-[color:var(--site-color-border-strong)] bg-[color:var(--site-color-surface-soft)] px-5 py-4 shadow-[var(--site-shadow-sm)]"
-                                    role="status"
-                                    aria-live="polite"
-                                    aria-atomic="true"
-                                >
-                                    <p className="site-text-meta">
-                                        Total final do pedido
-                                    </p>
-                                    <p className="text-2xl font-semibold tracking-tight text-[color:var(--site-color-foreground-strong)] sm:text-3xl">
-                                        {formatMoneyValue(currentOrder.total) ||
-                                            currentOrder.total.formatted}
-                                    </p>
-                                    <p className="site-text-meta">
-                                        Resumo consolidado com subtotal, frete e
-                                        desconto aplicados ao pedido.
-                                    </p>
-                                </div>
-
-                                <MetricRow
-                                    items={financialMetrics}
-                                    className="sm:grid-cols-2 xl:grid-cols-2"
-                                />
                             </div>
                         </SurfaceCard>
 
                         <SurfaceCard
                             tone="soft"
+                            padding="compact"
                             className="site-stack-section min-w-0 overflow-hidden"
                             data-testid="order-confirmation-payment-card"
                         >
@@ -502,12 +504,9 @@ export function OrderConfirmationView({
                                     Pagamento e acompanhamento
                                 </h2>
                                 <p className="site-text-body text-sm">
-                                    O pagamento abaixo acontece 100% dentro do
-                                    storefront, usando componentes próprios
-                                    conectados ao WooCommerce/Mercado Pago como
-                                    backend e fonte de verdade. O status do
-                                    pedido é relido automaticamente enquanto a
-                                    confirmação acontece.
+                                    O pagamento continua dentro da experiência
+                                    da loja, com status sincronizado em tempo
+                                    real enquanto o pedido é confirmado.
                                 </p>
                             </div>
 
@@ -574,9 +573,104 @@ export function OrderConfirmationView({
                         className="site-stack-section min-w-0"
                         data-testid="order-confirmation-sidebar"
                     >
+                        <SurfaceCard
+                            tone="strong"
+                            padding="compact"
+                            className="site-stack-section xl:sticky xl:top-[calc(var(--site-shell-offset)+1rem)]"
+                            data-testid="order-confirmation-financial-summary"
+                        >
+                            <div className="flex items-start justify-between gap-3">
+                                <div>
+                                    <h2 className="site-text-card-title text-[color:var(--site-color-foreground-strong)]">
+                                        Resumo financeiro
+                                    </h2>
+                                    <p className="site-text-body text-sm">
+                                        O mesmo resumo consolidado do carrinho,
+                                        agora com os valores definitivos do
+                                        pedido.
+                                    </p>
+                                </div>
+                                <StatusBadge
+                                    tone={
+                                        paymentResolved
+                                            ? "success"
+                                            : "warning"
+                                    }
+                                >
+                                    {paymentResolved
+                                        ? "Confirmado"
+                                        : "Aguardando"}
+                                </StatusBadge>
+                            </div>
+
+                            <div
+                                className="rounded-[calc(var(--site-radius-xl)+2px)] border border-[color:var(--site-color-border)] bg-[color:var(--site-color-surface-inset)] p-4 shadow-[var(--site-shadow-sm)]"
+                                role="status"
+                                aria-live="polite"
+                                aria-atomic="true"
+                            >
+                                <dl className="space-y-3">
+                                    {financialBreakdownItems.map((item) => (
+                                        <div
+                                            key={item.label}
+                                            className="flex items-start justify-between gap-4"
+                                        >
+                                            <div className="site-stack-panel gap-1">
+                                                <dt className="text-sm font-medium text-[color:var(--site-color-foreground-strong)]">
+                                                    {item.label}
+                                                </dt>
+                                                {item.meta ? (
+                                                    <dd className="site-text-meta">
+                                                        {item.meta}
+                                                    </dd>
+                                                ) : null}
+                                            </div>
+                                            <dd className="text-sm font-semibold text-[color:var(--site-color-foreground-strong)]">
+                                                {item.value}
+                                            </dd>
+                                        </div>
+                                    ))}
+                                </dl>
+
+                                <div className="mt-4 border-t border-[color:var(--site-color-border)] pt-4">
+                                    <div className="flex items-end justify-between gap-4">
+                                        <div className="site-stack-panel gap-1">
+                                            <p className="site-text-meta">
+                                                Total final
+                                            </p>
+                                            <p className="text-sm font-medium text-[color:var(--site-color-foreground-strong)]">
+                                                Valor efetivamente confirmado no
+                                                pedido.
+                                            </p>
+                                        </div>
+                                        <p className="text-3xl font-semibold tracking-tight text-[color:var(--site-color-foreground-strong)]">
+                                            {formatMoneyValue(
+                                                currentOrder.total,
+                                            ) ||
+                                                currentOrder.total.formatted}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {hasCouponBenefit &&
+                            couponDiscount &&
+                            couponDiscount.amount > 0 ? (
+                                <div className="rounded-[var(--site-radius-lg)] border border-[color:var(--site-color-success-soft)] bg-[color:var(--site-color-success-soft)]/40 px-4 py-3">
+                                    <p className="site-text-meta">
+                                        Economia registrada
+                                    </p>
+                                    <p className="text-base font-semibold text-[color:var(--site-color-foreground-strong)]">
+                                        {formatMoneyValue(couponDiscount)}
+                                    </p>
+                                </div>
+                            ) : null}
+                        </SurfaceCard>
+
                         {hasOrderUpdates ? (
                             <SurfaceCard
                                 tone="strong"
+                                padding="compact"
                                 className="site-stack-section"
                                 data-testid="order-confirmation-updates-card"
                             >
@@ -821,6 +915,7 @@ export function OrderConfirmationView({
 
                         <SurfaceCard
                             tone="strong"
+                            padding="compact"
                             className="site-stack-section"
                         >
                             <div>

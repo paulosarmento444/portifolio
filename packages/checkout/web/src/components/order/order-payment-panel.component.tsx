@@ -353,11 +353,11 @@ export function OrderPaymentPanel({
   return (
     <div className="site-stack-section min-w-0" id="payment" data-testid="order-payment-panel-root">
       <OverlaySection
-        title={paymentFlow === "pix" ? "Pagamento PIX na página" : "Pagamento com cartão na página"}
+        title={paymentFlow === "pix" ? "Pagamento com PIX" : "Pagamento com cartão"}
         description={
           paymentFlow === "pix"
-            ? "O pedido continua no WooCommerce, mas o QR Code e o acompanhamento agora ficam 100% dentro da experiência do storefront."
-            : "O formulário abaixo tokeniza o cartão com a SDK oficial do Mercado Pago e processa o pagamento sem renderizar a página do WordPress."
+            ? "O QR Code e o acompanhamento do PIX acontecem dentro da mesma experiência do storefront."
+            : "O cartão é tokenizado pela SDK oficial do Mercado Pago e o pedido segue sincronizado em tempo real."
         }
         actions={
           <GhostButton onClick={() => void refreshPaymentContext()} disabled={isRefreshing}>

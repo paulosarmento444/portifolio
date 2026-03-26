@@ -69,11 +69,13 @@ describe("OrderConfirmationView", () => {
     const primaryColumn = screen.getByTestId("order-confirmation-primary-column");
     const sidebar = screen.getByTestId("order-confirmation-sidebar");
     const paymentCard = screen.getByTestId("order-confirmation-payment-card");
+    const financialSummary = screen.getByTestId("order-confirmation-financial-summary");
 
     expect(primaryColumn.contains(paymentCard)).toBe(true);
     expect(within(primaryColumn).getByText("Itens do pedido")).toBeTruthy();
     expect(within(paymentCard).getByText("Total do pedido")).toBeTruthy();
     expect(within(paymentCard).getByTestId("order-payment-panel")).toBeTruthy();
+    expect(sidebar.contains(financialSummary)).toBe(true);
     expect(within(sidebar).getByText("Endereços do pedido")).toBeTruthy();
     expect(within(sidebar).queryByTestId("order-payment-panel")).toBeNull();
   });
@@ -178,7 +180,7 @@ describe("OrderConfirmationView", () => {
 
     expect(within(primaryColumn).getByText("Preço unitário")).toBeTruthy();
     expect(within(primaryColumn).getAllByText("Subtotal").length).toBeGreaterThan(0);
-    expect(within(primaryColumn).getByText("Total após desconto")).toBeTruthy();
+    expect(within(primaryColumn).getByText("Economia de R$ 10,00")).toBeTruthy();
     expect(within(primaryColumn).getByText("R$ 60,00")).toBeTruthy();
     expect(within(primaryColumn).getAllByText("R$ 120,00").length).toBeGreaterThan(0);
     expect(within(primaryColumn).getAllByText("R$ 110,00").length).toBeGreaterThan(0);
@@ -187,6 +189,7 @@ describe("OrderConfirmationView", () => {
     expect(within(financialSummary).getByText("Desconto (PIX10)")).toBeTruthy();
     expect(within(financialSummary).getByText("R$ 15,00")).toBeTruthy();
     expect(within(financialSummary).getByText("- R$ 10,00")).toBeTruthy();
+    expect(within(financialSummary).getByText("Economia registrada")).toBeTruthy();
     expect(within(financialSummary).getAllByText("R$ 125,00").length).toBeGreaterThan(0);
   });
 

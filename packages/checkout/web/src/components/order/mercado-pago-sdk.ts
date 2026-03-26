@@ -137,15 +137,28 @@ export const readMercadoPagoDeviceSessionId = () =>
     ? window.MP_DEVICE_SESSION_ID.trim()
     : undefined;
 
+const readThemeValue = (variableName: string, fallback: string) => {
+  if (typeof window === "undefined") {
+    return fallback;
+  }
+
+  const value = window
+    .getComputedStyle(document.documentElement)
+    .getPropertyValue(variableName)
+    .trim();
+
+  return value || fallback;
+};
+
 export const buildMercadoPagoFieldStyle = () => ({
-  fontSize: "16px",
-  height: "48px",
-  padding: "14px",
+  fontSize: "15px",
+  height: "44px",
+  padding: "10px 12px",
   textAlign: "left" as const,
   fontFamily: "var(--site-font-body, system-ui)",
-  fontWeight: "400",
-  color: "#0f172a",
-  placeholderColor: "#64748b",
+  fontWeight: "500",
+  color: readThemeValue("--site-color-foreground-strong", "#fbfdff"),
+  placeholderColor: readThemeValue("--site-color-foreground-soft", "#9aaabc"),
 });
 
 export const buildSecureFieldListeners = (
