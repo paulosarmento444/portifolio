@@ -1,9 +1,9 @@
-import CategoriesShowcase from "./components/categories-showcase";
+import { PublicHomePage } from "@site/shared/server";
 
 export default async function Home() {
   return (
     <main className="site-page-shell site-stack-page">
-      <CategoriesShowcase />
+      <PublicHomePage />
     </main>
   );
 }

@@ -1,5 +1,5 @@
 import { ChatbotConfig } from "./types";
-import { footerMeta } from "../shell.config";
+import { footerMeta } from "@site/shared";
 
 export const defaultChatbotConfig: ChatbotConfig = {
   storeName: "Solar Esportes",

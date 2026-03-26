@@ -1,11 +1,15 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { DEFAULT_THEME, buildThemeInitScript } from "@site/shared";
+import {
+  BackToTopButton,
+  DEFAULT_THEME,
+  SiteAppShell,
+  SiteToaster,
+  buildThemeInitScript,
+} from "@site/shared";
 import { getAuthSession } from "@site/auth";
-import { BackToTop } from "./components/back-to-top";
 import { ChatbotWidget } from "./components/chatbot/ChatbotWidget";
 import { defaultChatbotConfig } from "./components/chatbot/config";
-import { AppShell } from "./components/AppShell";
 import Script from "next/script";
 import { publicEnv } from "./lib/env.public";
 import "./globals.css";
@@ -72,7 +76,7 @@ export default async function RootLayout({
           strategy="afterInteractive"
         />
 
-        <BackToTop />
+        <BackToTopButton />
 
         {/* Chatbot Widget */}
         <ChatbotWidget config={defaultChatbotConfig} />
@@ -95,12 +99,13 @@ export default async function RootLayout({
           }}
         /> */}
 
-        <AppShell
+        <SiteAppShell
           initialTheme={DEFAULT_THEME}
           initialAccountName={initialAccountName}
         >
           {children}
-        </AppShell>
+        </SiteAppShell>
+        <SiteToaster />
       </body>
     </html>
   );

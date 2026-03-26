@@ -5,7 +5,7 @@ import { defaultChatbotConfig } from "../config";
 const mockSendMessage: any = jest.fn();
 const mockReset: any = jest.fn();
 
-jest.mock("@/app/services/chatbot.service", () => ({
+jest.mock("../chatbot.service", () => ({
   ChatbotService: jest.fn().mockImplementation(() => ({
     sendMessage: mockSendMessage,
     reset: mockReset,

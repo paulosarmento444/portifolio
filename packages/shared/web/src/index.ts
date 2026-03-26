@@ -1,5 +1,6 @@
 export * from "./contracts";
 export * from "./design-system";
+export * from "./shell";
 export * from "./theme";
 export * from "./ui";
 export * from "./public-pages";

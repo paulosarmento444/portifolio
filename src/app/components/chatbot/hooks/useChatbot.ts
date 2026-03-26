@@ -5,7 +5,7 @@ import { ChatbotConfig, ChatbotState } from "../types";
 import {
   ChatbotService,
   normalizeChatbotError,
-} from "@/app/services/chatbot.service";
+} from "../chatbot.service";
 
 export function useChatbot(config: ChatbotConfig) {
   const [state, setState] = useState<ChatbotState>({

@@ -35,13 +35,16 @@ The following routes already follow the package-based architecture:
 7. `/my-account`
 8. `/my-cart`
 9. `/order-confirmation/[id]`
+10. `/auth/forgot-password`
+11. `/auth/reset-password`
 
 ## Intentional app-shell exceptions
 
-These remain in `src/app` as route-local composition exceptions and should not be expanded:
+These remain in `src/app` because they are app-specific integration seams, not reusable feature UI:
 
-1. home composition under `page.tsx`;
-2. `components/categories-showcase.tsx`;
-3. `auth/forgot-password/*`.
+1. `layout.tsx` and the Next router shell itself;
+2. `components/chatbot/*` plus the colocated chatbot service;
+3. `api/*` transport handlers;
+4. app env/runtime glue in `lib/*`.
 
 New feature work should live in packages and use the `@site/*` aliases documented in [`../docs/package-architecture.md`](../docs/package-architecture.md).

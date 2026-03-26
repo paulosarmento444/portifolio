@@ -15,13 +15,12 @@ O chatbot agora funciona com uma arquitetura simples:
 ```text
 src/app/components/chatbot/
 ├── ChatbotWidget.tsx
+├── chatbot.service.ts
 ├── config.ts
+├── firebase-app.ts
 ├── types.ts
 └── hooks/
    └── useChatbot.ts
-
-src/app/services/
-└── chatbot.service.ts
 ```
 
 ## Como funciona
