@@ -75,8 +75,8 @@ export function useStoreCatalogState({
   const [filters, setFilters] = useState(() => buildDefaultStoreFilters(priceBounds));
 
   useEffect(() => {
-    const queryCategory = searchParams.get("category");
-    const querySearch = searchParams.get("search");
+    const queryCategory = searchParams?.get("category") ?? null;
+    const querySearch = searchParams?.get("search") ?? null;
 
     setSelectedCategoryId(
       queryCategory && categories.some((category) => category.id === queryCategory)

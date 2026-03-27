@@ -50,7 +50,7 @@ export function useAccountDashboardState({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [selectedMenu, setSelectedMenu] = useState<AccountMenu>(
-    normalizeAccountMenu(searchParams.get("menu")),
+    normalizeAccountMenu(searchParams?.get("menu") ?? null),
   );
   const [isMobileMenuOpen, setIsMobileMenuOpenState] = useState(false);
   const [customer, setCustomerState] = useState<AccountCustomerView | null>(
@@ -65,14 +65,14 @@ export function useAccountDashboardState({
   const userEmail = customer?.email || overview.viewer.email || "";
 
   useEffect(() => {
-    setSelectedMenu(normalizeAccountMenu(searchParams.get("menu")));
+    setSelectedMenu(normalizeAccountMenu(searchParams?.get("menu") ?? null));
   }, [searchParams]);
 
   const handleMenuClick = (menu: AccountMenu) => {
     setSelectedMenu(menu);
     setIsMobileMenuOpenState(false);
 
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() ?? "");
     params.set("menu", menu);
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };

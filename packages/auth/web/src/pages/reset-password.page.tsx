@@ -23,8 +23,14 @@ type ValidationState = "validating" | "ready" | "invalid" | "success";
 
 export function AuthResetPasswordPage() {
   const searchParams = useSearchParams();
-  const login = useMemo(() => searchParams.get("login")?.trim() ?? "", [searchParams]);
-  const key = useMemo(() => searchParams.get("key")?.trim() ?? "", [searchParams]);
+  const login = useMemo(
+    () => searchParams?.get("login")?.trim() ?? "",
+    [searchParams],
+  );
+  const key = useMemo(
+    () => searchParams?.get("key")?.trim() ?? "",
+    [searchParams],
+  );
   const [state, setState] = useState<{
     status: ValidationState;
     pending: boolean;
