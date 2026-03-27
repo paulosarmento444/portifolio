@@ -29,6 +29,10 @@ export type AccountPasswordFormData = {
   confirm_password: string;
 };
 
+export type AccountPasswordFormErrors = Partial<
+  Record<keyof AccountPasswordFormData, string>
+>;
+
 export type AccountAddressFormData = {
   first_name: string;
   last_name: string;
@@ -41,6 +45,10 @@ export type AccountAddressFormData = {
   phone: string;
   email: string;
 };
+
+export type AccountAddressFormErrors = Partial<
+  Record<keyof AccountAddressFormData, string>
+>;
 
 export type AccountSectionPropsBase = {
   viewer: AuthUserView;

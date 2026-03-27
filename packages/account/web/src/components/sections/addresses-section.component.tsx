@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ChangeEvent, type FormEvent } from "react";
 import { Building, Home, MapPin } from "lucide-react";
 import type { AccountCustomerView, AuthUserView } from "@site/shared";
 import {
@@ -15,10 +15,17 @@ import {
 } from "@site/shared";
 import type {
   AccountAddressFormData,
+  AccountAddressFormErrors,
   AccountAddressType,
   AccountCustomerChangeHandler,
 } from "../../data/account.types";
 import { saveAccountAddressAction } from "../../data/actions/account.actions";
+import { normalizeBrazilianStateValue } from "../../data/brazilian-states";
+import {
+  accountAddressSchema,
+  mapAccountAddressFieldErrors,
+} from "../../data/schemas/account-address.schema";
+import { StateSelect } from "../fields/state-select.component";
 
 interface AddressesSectionProps {
   viewer: AuthUserView;
@@ -47,6 +54,7 @@ export function AddressesSection({
   const [currentType, setCurrentType] = useState<AccountAddressType | null>(null);
   const [pending, setPending] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<AccountAddressFormErrors>({});
   const [form, setForm] = useState<AccountAddressFormData>(EMPTY_ADDRESS_FORM);
 
   const billing = customer?.billingAddress ?? null;
@@ -90,13 +98,14 @@ export function AddressesSection({
   const openModal = (type: AccountAddressType) => {
     const source = type === "billing" ? billing : shipping;
     setErrorMessage(null);
+    setFieldErrors({});
     setForm({
       first_name: source?.firstName || "",
       last_name: source?.lastName || "",
       address_1: source?.addressLine1 || "",
       address_2: source?.addressLine2 || "",
       city: source?.city || "",
-      state: source?.state || "",
+      state: normalizeBrazilianStateValue(source?.state) || "",
       postcode: source?.postcode || "",
       country: source?.country || "BR",
       phone: source?.phone || "",
@@ -105,21 +114,64 @@ export function AddressesSection({
     setCurrentType(type);
   };
 
-  const handleSubmit = async () => {
+  const closeModal = () => {
+    setErrorMessage(null);
+    setFieldErrors({});
+    setCurrentType(null);
+  };
+
+  const handleFieldChange =
+    (field: keyof AccountAddressFormData) =>
+    (
+      event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>,
+    ) => {
+      const nextValue = event.target.value;
+
+      setForm((current) => ({
+        ...current,
+        [field]: nextValue,
+      }));
+      setFieldErrors((current) => ({
+        ...current,
+        [field]: undefined,
+      }));
+      setErrorMessage(null);
+    };
+
+  const handleSubmit = async (event?: FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
+
     if (!currentType || !customer?.id) {
       setErrorMessage("Não foi possível identificar a conta para salvar o endereço.");
       return;
     }
 
+    const parsedForm = accountAddressSchema.safeParse(form);
+
+    if (!parsedForm.success) {
+      setErrorMessage(null);
+      setFieldErrors(
+        mapAccountAddressFieldErrors(parsedForm.error.flatten().fieldErrors),
+      );
+      return;
+    }
+
     try {
       setErrorMessage(null);
+      setFieldErrors({});
       setPending(true);
-      const result = await saveAccountAddressAction(customer.id, currentType, form);
-      if (!result.success || !result.customer) {
-        throw new Error(result.error || "Erro ao salvar endereço");
+      const result = await saveAccountAddressAction(
+        customer.id,
+        currentType,
+        parsedForm.data,
+      );
+      if (!result.success) {
+        setFieldErrors(result.fieldErrors ?? {});
+        setErrorMessage(result.fieldErrors ? null : result.error || "Erro ao salvar endereco");
+        return;
       }
       onCustomerChange(result.customer);
-      setCurrentType(null);
+      closeModal();
     } catch (error) {
       console.error(error);
       setErrorMessage("Falha ao salvar o endereço. Tente novamente.");
@@ -233,7 +285,7 @@ export function AddressesSection({
 
       <ModalShell
         isOpen={Boolean(currentType)}
-        onClose={() => setCurrentType(null)}
+        onClose={closeModal}
         title={
           currentType === "billing"
             ? "Editar endereço de cobrança"
@@ -241,86 +293,73 @@ export function AddressesSection({
         }
         description="Mantenha seus dados de endereço prontos para o checkout."
         size="md"
+        contentClassName="pr-1"
       >
-        <div className="grid gap-4 md:grid-cols-2">
-          <TextField
-            label="Nome"
-            value={form.first_name}
-            onChange={(event) =>
-              setForm((current) => ({ ...current, first_name: event.target.value }))
-            }
-          />
-          <TextField
-            label="Sobrenome"
-            value={form.last_name}
-            onChange={(event) =>
-              setForm((current) => ({ ...current, last_name: event.target.value }))
-            }
-          />
-          <TextField
-            label="Endereço"
-            hint="Inclua rua e número neste campo."
-            containerClassName="md:col-span-2"
-            value={form.address_1}
-            onChange={(event) =>
-              setForm((current) => ({ ...current, address_1: event.target.value }))
-            }
-          />
-          <TextField
-            label="Complemento"
-            containerClassName="md:col-span-2"
-            value={form.address_2}
-            onChange={(event) =>
-              setForm((current) => ({ ...current, address_2: event.target.value }))
-            }
-          />
-          <TextField
-            label="Cidade"
-            value={form.city}
-            onChange={(event) =>
-              setForm((current) => ({ ...current, city: event.target.value }))
-            }
-          />
-          <TextField
-            label="Estado"
-            value={form.state}
-            onChange={(event) =>
-              setForm((current) => ({ ...current, state: event.target.value }))
-            }
-          />
-          <TextField
-            label="CEP"
-            value={form.postcode}
-            onChange={(event) =>
-              setForm((current) => ({ ...current, postcode: event.target.value }))
-            }
-          />
-          <TextField
-            label="Telefone"
-            value={form.phone}
-            onChange={(event) =>
-              setForm((current) => ({ ...current, phone: event.target.value }))
-            }
-          />
-          {currentType === "billing" ? (
+        <form noValidate onSubmit={handleSubmit} className="site-stack-section">
+          <div className="grid gap-4 md:grid-cols-2">
             <TextField
-              label="E-mail"
-              type="email"
-              containerClassName="md:col-span-2"
-              value={form.email}
-              onChange={(event) =>
-                setForm((current) => ({ ...current, email: event.target.value }))
-              }
+              label="Nome"
+              value={form.first_name}
+              onChange={handleFieldChange("first_name")}
             />
-          ) : null}
-        </div>
-        {errorMessage ? <p className="site-helper-text site-helper-text-danger">{errorMessage}</p> : null}
-        <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
-          <SecondaryButton onClick={() => setCurrentType(null)}>Cancelar</SecondaryButton>
-          <PrimaryButton onClick={handleSubmit} disabled={pending}>
-            {pending ? "Salvando..." : "Salvar endereço"}
-          </PrimaryButton>
-        </div>
+            <TextField
+              label="Sobrenome"
+              value={form.last_name}
+              onChange={handleFieldChange("last_name")}
+            />
+            <TextField
+              label="Endereço"
+              hint="Inclua rua e número neste campo."
+              containerClassName="md:col-span-2"
+              value={form.address_1}
+              onChange={handleFieldChange("address_1")}
+            />
+            <TextField
+              label="Complemento"
+              containerClassName="md:col-span-2"
+              value={form.address_2}
+              onChange={handleFieldChange("address_2")}
+            />
+            <TextField
+              label="Cidade"
+              value={form.city}
+              onChange={handleFieldChange("city")}
+            />
+            <StateSelect
+              label="Estado"
+              placeholder="Selecione o estado"
+              error={fieldErrors.state}
+              value={form.state}
+              onChange={handleFieldChange("state")}
+            />
+            <TextField
+              label="CEP"
+              value={form.postcode}
+              onChange={handleFieldChange("postcode")}
+            />
+            <TextField
+              label="Telefone"
+              value={form.phone}
+              onChange={handleFieldChange("phone")}
+            />
+            {currentType === "billing" ? (
+              <TextField
+                label="E-mail"
+                type="email"
+                containerClassName="md:col-span-2"
+                value={form.email}
+                onChange={handleFieldChange("email")}
+              />
+            ) : null}
+          </div>
+          {errorMessage ? <p className="site-helper-text site-helper-text-danger">{errorMessage}</p> : null}
+          <div className="sticky bottom-0 z-10 -mb-1 flex flex-col gap-3 border-t border-[color:var(--site-color-border)] bg-[color:var(--site-color-surface-strong)] pt-4 sm:flex-row sm:justify-end">
+            <SecondaryButton onClick={closeModal}>Cancelar</SecondaryButton>
+            <PrimaryButton type="submit" disabled={pending}>
+              {pending ? "Salvando..." : "Salvar endereço"}
+            </PrimaryButton>
+          </div>
+        </form>
       </ModalShell>
     </div>
   );

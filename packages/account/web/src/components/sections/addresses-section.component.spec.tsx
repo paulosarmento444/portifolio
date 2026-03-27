@@ -99,6 +99,28 @@ describe("AddressesSection", () => {
     expect(screen.getByLabelText("Complemento")).toBeTruthy();
   });
 
+  it("pre-selects the normalized UF when existing data stores the full state name", async () => {
+    render(
+      <AddressesSection
+        viewer={viewer}
+        customer={{
+          ...customer,
+          billingAddress: {
+            ...customer.billingAddress,
+            state: "Rio de Janeiro",
+          },
+        }}
+        onCustomerChange={() => undefined}
+      />,
+    );
+
+    fireEvent.click(screen.getAllByRole("button", { name: "Editar endereço" })[0]);
+
+    const stateSelect = (await screen.findByLabelText("Estado")) as HTMLSelectElement;
+
+    expect(stateSelect.value).toBe("RJ");
+  });
+
   it("saves the selected address with a default BR country payload", async () => {
     const onCustomerChange = jest.fn();
 
@@ -120,6 +142,9 @@ describe("AddressesSection", () => {
     fireEvent.change(await screen.findByLabelText("Cidade"), {
       target: { value: "Campinas" },
     });
+    fireEvent.change(screen.getByLabelText("Estado"), {
+      target: { value: "MG" },
+    });
     fireEvent.click(screen.getByRole("button", { name: "Salvar endereço" }));
 
     await waitFor(() =>
@@ -128,10 +153,64 @@ describe("AddressesSection", () => {
         "billing",
         expect.objectContaining({
           city: "Campinas",
+          state: "MG",
           country: "BR",
         }),
       ),
     );
     expect(onCustomerChange).toHaveBeenCalledWith(customer);
+  });
+
+  it("shows a field error when the state is missing", async () => {
+    render(
+      <AddressesSection
+        viewer={viewer}
+        customer={{
+          ...customer,
+          billingAddress: null,
+        }}
+        onCustomerChange={() => undefined}
+      />,
+    );
+
+    fireEvent.click(screen.getAllByRole("button", { name: "Adicionar endereço" })[0]);
+    fireEvent.click(await screen.findByRole("button", { name: "Salvar endereço" }));
+
+    expect(await screen.findByText("Selecione o estado.")).toBeTruthy();
+    expect(saveAccountAddressAction).not.toHaveBeenCalled();
+  });
+
+  it("keeps the save button reachable and disabled while the address form is submitting", async () => {
+    let resolveRequest: ((value: unknown) => void) | undefined;
+    (saveAccountAddressAction as any).mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveRequest = resolve;
+        }),
+    );
+
+    render(
+      <AddressesSection
+        viewer={viewer}
+        customer={customer}
+        onCustomerChange={() => undefined}
+      />,
+    );
+
+    fireEvent.click(screen.getAllByRole("button", { name: "Editar endereço" })[0]);
+
+    const submitButton = await screen.findByRole("button", { name: "Salvar endereço" });
+    fireEvent.click(submitButton);
+
+    const pendingButton = await screen.findByRole("button", { name: "Salvando..." });
+    expect(pendingButton.hasAttribute("disabled")).toBe(true);
+    expect(screen.getByRole("dialog")).toBeTruthy();
+
+    resolveRequest?.({
+      success: true,
+      customer,
+    });
+
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
   });
 });

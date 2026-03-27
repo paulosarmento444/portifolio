@@ -41,7 +41,12 @@ export function FieldShell({
           <label htmlFor={htmlFor} className={ecommerceFieldStyles.label}>
             <span>{label}</span>
             {required ? (
-              <span className="ml-1 text-[color:var(--site-color-danger)]">*</span>
+              <span
+                aria-hidden="true"
+                className="ml-1 text-[color:var(--site-color-danger)]"
+              >
+                *
+              </span>
             ) : null}
           </label>
           {supportingAction ? <div className="shrink-0">{supportingAction}</div> : null}

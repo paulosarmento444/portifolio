@@ -1,12 +1,18 @@
 "use client";
 
+"use client";
+
 import {
   useEffect,
   useId,
   useRef,
+  useState,
+  type MutableRefObject,
+  type RefObject,
   type HTMLAttributes,
   type ReactNode,
 } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { cn } from "./utils/cn";
 import { IconButton } from "./actions";
@@ -51,6 +57,92 @@ const getFocusableElements = (container: HTMLElement | null) => {
   );
 };
 
+const useOverlayMount = () => {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  return isMounted;
+};
+
+const useOverlayScrollLock = (
+  isOpen: boolean,
+  panelRef: RefObject<HTMLElement | null>,
+  onCloseRef: MutableRefObject<(() => void) | undefined>,
+) => {
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const previouslyFocusedElement =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalBodyPaddingRight = document.body.style.paddingRight;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+    const scrollbarCompensation = Math.max(
+      window.innerWidth - document.documentElement.clientWidth,
+      0,
+    );
+
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+
+    if (scrollbarCompensation > 0) {
+      document.body.style.paddingRight = `${scrollbarCompensation}px`;
+    }
+
+    queueMicrotask(() => {
+      const focusableElements = getFocusableElements(panelRef.current);
+      const initialFocusTarget = focusableElements[0] ?? panelRef.current;
+      initialFocusTarget?.focus();
+    });
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onCloseRef.current?.();
+        return;
+      }
+
+      if (event.key !== "Tab") {
+        return;
+      }
+
+      const focusableElements = getFocusableElements(panelRef.current);
+      if (focusableElements.length === 0) {
+        event.preventDefault();
+        panelRef.current?.focus();
+        return;
+      }
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+      const activeElement =
+        document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
+      if (event.shiftKey && activeElement === firstElement) {
+        event.preventDefault();
+        lastElement.focus();
+      } else if (!event.shiftKey && activeElement === lastElement) {
+        event.preventDefault();
+        firstElement.focus();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalBodyOverflow;
+      document.body.style.paddingRight = originalBodyPaddingRight;
+      document.documentElement.style.overflow = originalHtmlOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+      previouslyFocusedElement?.focus();
+    };
+  }, [isOpen, onCloseRef, panelRef]);
+};
+
 interface OverlayShellProps {
   isOpen: boolean;
   onClose?: () => void;
@@ -85,6 +177,7 @@ export function ModalShell({
   overlayClassName,
   panelId,
 }: Readonly<ModalShellProps>) {
+  const isMounted = useOverlayMount();
   const titleId = useId();
   const descriptionId = useId();
   const panelRef = useRef<HTMLDivElement | null>(null);
@@ -94,68 +187,14 @@ export function ModalShell({
     onCloseRef.current = onClose;
   }, [onClose]);
 
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
+  useOverlayScrollLock(isOpen, panelRef, onCloseRef);
 
-    const previouslyFocusedElement =
-      document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    queueMicrotask(() => {
-      const focusableElements = getFocusableElements(panelRef.current);
-      const initialFocusTarget = focusableElements[0] ?? panelRef.current;
-      initialFocusTarget?.focus();
-    });
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onCloseRef.current?.();
-        return;
-      }
-
-      if (event.key !== "Tab") {
-        return;
-      }
-
-      const focusableElements = getFocusableElements(panelRef.current);
-      if (focusableElements.length === 0) {
-        event.preventDefault();
-        panelRef.current?.focus();
-        return;
-      }
-
-      const firstElement = focusableElements[0];
-      const lastElement = focusableElements[focusableElements.length - 1];
-      const activeElement =
-        document.activeElement instanceof HTMLElement ? document.activeElement : null;
-
-      if (event.shiftKey && activeElement === firstElement) {
-        event.preventDefault();
-        lastElement.focus();
-      } else if (!event.shiftKey && activeElement === lastElement) {
-        event.preventDefault();
-        firstElement.focus();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.body.style.overflow = originalOverflow;
-      window.removeEventListener("keydown", handleKeyDown);
-      previouslyFocusedElement?.focus();
-    };
-  }, [isOpen]);
-
-  if (!isOpen) {
+  if (!isOpen || !isMounted) {
     return null;
   }
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto px-4 py-4 sm:items-center sm:px-6 sm:py-6">
       <div
         className={cn(overlayBaseClassName, overlayClassName)}
         onClick={closeOnBackdrop ? onClose : undefined}
@@ -170,7 +209,7 @@ export function ModalShell({
         tabIndex={-1}
         className={cn(
           panelBaseClassName,
-          "relative z-[101] flex max-h-[calc(100vh-2rem)] w-full flex-col overflow-hidden rounded-[var(--site-radius-xl)] p-6 shadow-[var(--site-shadow-lg)] sm:max-h-[90vh] sm:p-8",
+          "relative z-[101] flex max-h-[calc(100dvh-2rem)] w-full self-start flex-col overflow-hidden rounded-[var(--site-radius-xl)] p-6 shadow-[var(--site-shadow-lg)] sm:max-h-[90vh] sm:self-auto sm:p-8",
           modalSizeClassMap[size],
           className,
         )}
@@ -197,11 +236,17 @@ export function ModalShell({
             </div>
           </div>
         )}
-        <div className={cn("site-stack-section min-h-0 overflow-y-auto", contentClassName)}>
+        <div
+          className={cn(
+            "site-stack-section min-h-0 overflow-y-auto overscroll-contain",
+            contentClassName,
+          )}
+        >
           {children}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
@@ -224,6 +269,7 @@ export function DrawerShell({
   overlayClassName,
   panelId,
 }: Readonly<DrawerShellProps>) {
+  const isMounted = useOverlayMount();
   const titleId = useId();
   const descriptionId = useId();
   const panelRef = useRef<HTMLElement | null>(null);
@@ -233,69 +279,15 @@ export function DrawerShell({
     onCloseRef.current = onClose;
   }, [onClose]);
 
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
+  useOverlayScrollLock(isOpen, panelRef, onCloseRef);
 
-    const previouslyFocusedElement =
-      document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    queueMicrotask(() => {
-      const focusableElements = getFocusableElements(panelRef.current);
-      const initialFocusTarget = focusableElements[0] ?? panelRef.current;
-      initialFocusTarget?.focus();
-    });
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onCloseRef.current?.();
-        return;
-      }
-
-      if (event.key !== "Tab") {
-        return;
-      }
-
-      const focusableElements = getFocusableElements(panelRef.current);
-      if (focusableElements.length === 0) {
-        event.preventDefault();
-        panelRef.current?.focus();
-        return;
-      }
-
-      const firstElement = focusableElements[0];
-      const lastElement = focusableElements[focusableElements.length - 1];
-      const activeElement =
-        document.activeElement instanceof HTMLElement ? document.activeElement : null;
-
-      if (event.shiftKey && activeElement === firstElement) {
-        event.preventDefault();
-        lastElement.focus();
-      } else if (!event.shiftKey && activeElement === lastElement) {
-        event.preventDefault();
-        firstElement.focus();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.body.style.overflow = originalOverflow;
-      window.removeEventListener("keydown", handleKeyDown);
-      previouslyFocusedElement?.focus();
-    };
-  }, [isOpen]);
-
-  if (!isOpen) {
+  if (!isOpen || !isMounted) {
     return null;
   }
 
   const isBottom = side === "bottom";
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[100]">
       <div
         className={cn(overlayBaseClassName, overlayClassName)}
@@ -339,9 +331,17 @@ export function DrawerShell({
             </div>
           </div>
         )}
-        <div className={cn("site-stack-section overflow-y-auto pr-1", contentClassName)}>{children}</div>
+        <div
+          className={cn(
+            "site-stack-section overflow-y-auto overscroll-contain pr-1",
+            contentClassName,
+          )}
+        >
+          {children}
+        </div>
       </aside>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
