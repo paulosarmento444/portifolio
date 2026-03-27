@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { serverEnv } from '@/app/lib/env.server'
+import { serverEnv } from '@site/shared/server'
 
 const bodySchema = z.object({
   name: z.string(),

@@ -6,11 +6,11 @@ import {
   SiteAppShell,
   SiteToaster,
   buildThemeInitScript,
+  publicEnv,
 } from "@site/shared";
 import { getAuthSession } from "@site/auth";
 import { ChatbotWidget, defaultChatbotConfig } from "@site/chatbot";
 import Script from "next/script";
-import { publicEnv } from "./lib/env.public";
 import "./globals.css";
 
 const siteUrl = publicEnv.appUrl;

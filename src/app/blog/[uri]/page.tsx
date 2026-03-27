@@ -1,4 +1,4 @@
-import { publicEnv } from "@/app/lib/env.public";
+import { publicEnv } from "@site/shared";
 import { BlogPostPage } from "@site/blog";
 
 const readOptionalWordpressPublicUrl = () => {

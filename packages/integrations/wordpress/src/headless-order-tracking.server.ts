@@ -1,6 +1,6 @@
 import "server-only";
 
-import { serverEnv } from "@/app/lib/env.server";
+import { serverEnv } from "@site/shared/server";
 import {
   checkoutOrderTrackingViewSchema,
   type CheckoutOrderTrackingView,

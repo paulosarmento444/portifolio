@@ -1,7 +1,7 @@
 import "server-only";
 import crypto from "node:crypto";
 import axios from "axios";
-import { serverEnv } from "@/app/lib/env.server";
+import { serverEnv } from "@site/shared/server";
 
 export const woocommerceClient = axios.create({
   baseURL: `${serverEnv.wordpress.url}/wp-json/wc/v3`,

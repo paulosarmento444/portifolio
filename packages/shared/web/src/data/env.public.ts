@@ -36,10 +36,14 @@ const readPublicEnv = (
   }
 
   const legacyHint = options?.legacy?.length
-    ? ` (legacy: ${options.legacy.map(({ key: legacyKey }) => legacyKey).join(", ")})`
+    ? ` (legacy: ${options.legacy
+        .map(({ key: legacyKey }) => legacyKey)
+        .join(", ")})`
     : "";
 
-  throw new Error(`[env] Missing required public environment variable: ${key}${legacyHint}`);
+  throw new Error(
+    `[env] Missing required public environment variable: ${key}${legacyHint}`,
+  );
 };
 
 export const publicEnv = {

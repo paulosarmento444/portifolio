@@ -1,6 +1,6 @@
 import "server-only";
 
-import { serverEnv } from "@/app/lib/env.server";
+import { serverEnv } from "@site/shared/server";
 import { wordpressWooRestAdapter } from "./woocommerce-rest.adapter";
 
 export type WordpressRegisterUserInput = {

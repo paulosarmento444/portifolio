@@ -11,15 +11,6 @@ interface StoreToolbarProps {
   onViewModeChange: (mode: StoreViewMode) => void;
 }
 
-export const STORE_SORT_PRESETS = [
-  { value: "", label: "Relevância", sortBy: "", sortOrder: "" },
-  { value: "date:desc", label: "Mais recentes", sortBy: "date", sortOrder: "desc" },
-  { value: "price:asc", label: "Menor preço", sortBy: "price", sortOrder: "asc" },
-  { value: "price:desc", label: "Maior preço", sortBy: "price", sortOrder: "desc" },
-  { value: "rating:desc", label: "Melhor avaliação", sortBy: "rating", sortOrder: "desc" },
-  { value: "name:asc", label: "Nome A-Z", sortBy: "name", sortOrder: "asc" },
-] as const;
-
 export function StoreToolbar({
   onOpenFilters,
   activeFiltersCount,

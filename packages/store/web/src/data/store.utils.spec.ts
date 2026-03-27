@@ -1,6 +1,10 @@
 import { describe, expect, it } from "@jest/globals";
 import type { StoreProductDetail, StoreProductVariation } from "./store.types";
-import { resolveGallery } from "./store.utils";
+import {
+  buildDefaultStoreFilters,
+  countActiveCatalogFilters,
+  resolveGallery,
+} from "./store.utils";
 
 const buildMoney = (amount: number) => ({
   amount,
@@ -102,5 +106,36 @@ describe("resolveGallery", () => {
     expect(resolveGallery(product, variation).map((image) => image.id)).toEqual([
       "parent-1",
     ]);
+  });
+});
+
+describe("store catalog helpers", () => {
+  it("builds the default filter state from the current price bounds", () => {
+    expect(buildDefaultStoreFilters({ min: 50, max: 350 })).toEqual({
+      priceRange: [50, 350],
+      inStock: false,
+      onSale: false,
+      featured: false,
+      sortBy: "",
+      sortOrder: "",
+    });
+  });
+
+  it("counts active filters without duplicating the page-level logic in the component", () => {
+    expect(
+      countActiveCatalogFilters(
+        {
+          priceRange: [80, 200],
+          inStock: true,
+          onSale: false,
+          featured: true,
+          sortBy: "price",
+          sortOrder: "asc",
+        },
+        { min: 0, max: 300 },
+        "tenis",
+        "running",
+      ),
+    ).toBe(6);
   });
 });

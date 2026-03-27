@@ -1,7 +1,7 @@
 import "server-only";
 
 import crypto from "node:crypto";
-import { serverEnv } from "@/app/lib/env.server";
+import { serverEnv } from "@site/shared/server";
 import { wordpressWooRestAdapter } from "@site/integrations/wordpress/server";
 import type { WooOrder } from "../../wordpress/src/external/woocommerce.types";
 import type {

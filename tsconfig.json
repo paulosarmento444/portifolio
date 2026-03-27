@@ -78,8 +78,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "jest.config.mjs",
-    "src/app/lib/apolloClient.js"
+    "jest.config.mjs"
   ],
   "exclude": [
     "node_modules"

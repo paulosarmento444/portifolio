@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { DrawerShell, PageHeader, SectionShell, StatusBadge, SurfaceCard } from "@site/shared";
 import type { AccountOverviewView } from "@site/shared";
-import type { AccountMenu } from "../data/account.types";
+import {
+  ACCOUNT_MENU_LABELS,
+  useAccountDashboardState,
+} from "../data/hooks/use-account-dashboard-state.hook";
 import { AccountSidebar } from "./account-sidebar.component";
 import { AccountContent } from "./account-content.component";
 import { MobileMenuButton } from "./mobile-menu-button.component";
@@ -13,54 +14,19 @@ interface AccountDashboardClientProps {
   overview: AccountOverviewView;
 }
 
-const normalizeMenu = (value: string | null): AccountMenu => {
-  switch (value) {
-    case "orders":
-    case "account":
-    case "addresses":
-    case "logout":
-      return value;
-    default:
-      return "welcome";
-  }
-};
-
-const menuLabels: Record<AccountMenu, string> = {
-  welcome: "Visão geral",
-  orders: "Pedidos",
-  account: "Conta",
-  addresses: "Endereços",
-  logout: "Sair",
-};
-
 export function AccountDashboardClient({ overview }: AccountDashboardClientProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const [selectedMenu, setSelectedMenu] = useState<AccountMenu>(
-    normalizeMenu(searchParams.get("menu")),
-  );
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [customer, setCustomer] = useState(overview.customer ?? null);
-
-  const displayName = useMemo(
-    () => customer?.displayName || overview.viewer.displayName,
-    [customer?.displayName, overview.viewer.displayName],
-  );
-  const roleLabel = overview.viewer.roleLabels[0] || "Cliente";
-
-  useEffect(() => {
-    setSelectedMenu(normalizeMenu(searchParams.get("menu")));
-  }, [searchParams]);
-
-  const handleMenuClick = (menu: AccountMenu) => {
-    setSelectedMenu(menu);
-    setIsMobileMenuOpen(false);
-
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("menu", menu);
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  };
+  const {
+    selectedMenu,
+    currentMenuLabel,
+    isMobileMenuOpen,
+    setIsMobileMenuOpen,
+    customer,
+    setCustomer,
+    displayName,
+    userEmail,
+    roleLabel,
+    handleMenuClick,
+  } = useAccountDashboardState({ overview });
 
   return (
     <div className="site-page-shell site-page-shell-compact">
@@ -74,8 +40,8 @@ export function AccountDashboardClient({ overview }: AccountDashboardClientProps
           <div className="w-full lg:hidden">
             <MobileMenuButton
               isOpen={isMobileMenuOpen}
-              onToggle={() => setIsMobileMenuOpen((current) => !current)}
-              currentLabel={menuLabels[selectedMenu]}
+              onToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              currentLabel={currentMenuLabel}
               controlsId="account-mobile-navigation"
             />
           </div>
@@ -86,7 +52,7 @@ export function AccountDashboardClient({ overview }: AccountDashboardClientProps
         <div className="lg:hidden">
           <SurfaceCard tone="soft" padding="compact" className="site-stack-panel">
             <div className="flex flex-wrap items-center gap-2">
-              <StatusBadge tone="info">{menuLabels[selectedMenu]}</StatusBadge>
+              <StatusBadge tone="info">{currentMenuLabel}</StatusBadge>
               <StatusBadge tone="neutral">
                 {overview.orders.length} pedido{overview.orders.length === 1 ? "" : "s"}
               </StatusBadge>
@@ -103,7 +69,7 @@ export function AccountDashboardClient({ overview }: AccountDashboardClientProps
               selectedMenu={selectedMenu}
               onMenuClick={handleMenuClick}
               userName={displayName}
-              userEmail={customer?.email || overview.viewer.email}
+              userEmail={userEmail}
               roleLabel={roleLabel}
               orderCount={overview.orders.length}
             />
@@ -135,7 +101,7 @@ export function AccountDashboardClient({ overview }: AccountDashboardClientProps
           selectedMenu={selectedMenu}
           onMenuClick={handleMenuClick}
           userName={displayName}
-          userEmail={customer?.email || overview.viewer.email}
+          userEmail={userEmail}
           roleLabel={roleLabel}
           orderCount={overview.orders.length}
           mobile

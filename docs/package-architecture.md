@@ -40,6 +40,7 @@ This document records the final CoCart-first package architecture for `refatorar
 6. `packages/shared/web`
    - shared DTO/view-model contracts
    - shared validation helpers
+   - shared frontend runtime/config helpers
    - shared mapper harness
 7. `packages/integrations/wordpress`
    - editorial GraphQL adapter
@@ -75,13 +76,13 @@ This document records the final CoCart-first package architecture for `refatorar
 : may not import `src/app`, feature packages, or integration packages.
 
 `packages/integrations/cocart`
-: may import runtime/config helpers and shared contracts, but not feature packages or route components.
+: may import shared runtime/config helpers and shared contracts, but not feature packages or route components.
 
 `packages/integrations/wordpress`
-: may import runtime/config helpers and shared contracts, but not feature packages or route components.
+: may import shared runtime/config helpers and shared contracts, but not feature packages or route components.
 
 `packages/integrations/payments`
-: may import runtime/config helpers and shared contracts, but not feature packages or route components.
+: may import shared runtime/config helpers and shared contracts, but not feature packages or route components.
 
 ## Required rules for new code
 
@@ -108,10 +109,10 @@ These routes are already on the new architecture:
 
 ## Intentional route-local exceptions
 
-The rebuild preserves a small compatibility surface that is not yet package-migrated:
+The rebuild preserves a small compatibility surface that is route-local by nature:
 
-1. Home route sections under `src/app/page.tsx`.
-2. `src/app/components/categories-showcase.tsx`.
-3. `src/app/auth/forgot-password/*`.
+1. `layout.tsx` and app metadata composition.
+2. `api/*` transport handlers.
+3. app-global CSS and router-only type declarations.
 
 These are route-shell exceptions, not extension points and not ecommerce ownership paths.

@@ -39,10 +39,15 @@ const readEnv = (key: string, options?: EnvReadOptions): string => {
     ? ` (legacy: ${options.legacy.join(", ")})`
     : "";
 
-  throw new Error(`[env] Missing required environment variable: ${key}${legacyHint}`);
+  throw new Error(
+    `[env] Missing required environment variable: ${key}${legacyHint}`,
+  );
 };
 
-const readOptionalEnv = (key: string, options?: EnvReadOptions): string | null => {
+const readOptionalEnv = (
+  key: string,
+  options?: EnvReadOptions,
+): string | null => {
   const value = process.env[key];
 
   if (value) {

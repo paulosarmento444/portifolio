@@ -1,20 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import type { CatalogCategoryView } from "@site/shared";
 import { SectionShell } from "@site/shared";
-import {
-  buildStoreCategoryOptions,
-  filterAndSortCatalogProducts,
-  paginateProducts,
-  resolveStorePriceBounds,
-} from "../../data/store.utils";
-import {
-  DEFAULT_STORE_FILTERS,
-  type StoreCatalogProduct,
-  type StoreViewMode,
-} from "../../data/store.types";
+import type { CatalogCategoryView } from "@site/shared";
+import type { StoreCatalogProduct } from "../../data/store.types";
+import { useStoreCatalogState } from "../../data/hooks/use-store-catalog-state.hook";
 import { StoreBreadcrumbs } from "./store-breadcrumbs.component";
 import { StoreCatalogHeader } from "./store-catalog-header.component";
 import {
@@ -22,7 +11,7 @@ import {
   StoreFilterSidebarMobile,
 } from "./store-filter-sidebar.component";
 import { StoreGrid } from "./store-grid.component";
-import { STORE_SORT_PRESETS, StoreToolbar } from "./store-toolbar.component";
+import { StoreToolbar } from "./store-toolbar.component";
 
 interface StoreCatalogClientProps {
   initialProducts: StoreCatalogProduct[];
@@ -31,129 +20,39 @@ interface StoreCatalogClientProps {
 }
 
 const STORE_FILTER_DRAWER_ID = "store-filter-drawer";
-const PRODUCTS_PER_PAGE = 12;
 
 export function StoreCatalogClient({
   initialProducts,
   initialCategories,
   initialError = null,
 }: StoreCatalogClientProps) {
-  const searchParams = useSearchParams();
-  const priceBounds = useMemo(
-    () => resolveStorePriceBounds(initialProducts),
-    [initialProducts],
-  );
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<StoreViewMode>("grid");
-  const [showFilters, setShowFilters] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [filters, setFilters] = useState(() => ({
-    ...DEFAULT_STORE_FILTERS,
-    priceRange: [priceBounds.min, priceBounds.max] as [number, number],
-  }));
-
-  const categories = useMemo(
-    () => buildStoreCategoryOptions(initialCategories, initialProducts),
-    [initialCategories, initialProducts],
-  );
-
-  useEffect(() => {
-    const queryCategory = searchParams.get("category");
-    const querySearch = searchParams.get("search");
-
-    setSelectedCategoryId(
-      queryCategory && categories.some((category) => category.id === queryCategory)
-        ? queryCategory
-        : null,
-    );
-    setSearchTerm(querySearch ?? "");
-    setCurrentPage(1);
-  }, [searchParams, categories]);
-
-  const filteredProducts = useMemo(
-    () =>
-      filterAndSortCatalogProducts(
-        initialProducts,
-        selectedCategoryId,
-        searchTerm,
-        filters,
-        priceBounds,
-      ),
-    [initialProducts, selectedCategoryId, searchTerm, filters, priceBounds],
-  );
-
-  const { items: currentProducts, totalPages } = useMemo(
-    () => paginateProducts(filteredProducts, currentPage, PRODUCTS_PER_PAGE),
-    [filteredProducts, currentPage],
-  );
-
-  const activeFiltersCount = useMemo(() => {
-    let count = 0;
-
-    if (
-      filters.priceRange[0] > priceBounds.min ||
-      filters.priceRange[1] < priceBounds.max
-    ) {
-      count += 1;
-    }
-
-    if (filters.inStock) count += 1;
-    if (filters.onSale) count += 1;
-    if (filters.featured) count += 1;
-    if (filters.sortBy) count += 1;
-    if (selectedCategoryId) count += 1;
-    if (searchTerm) count += 1;
-
-    return count;
-  }, [filters, priceBounds, searchTerm, selectedCategoryId]);
-
-  const selectedCategoryName = selectedCategoryId
-    ? categories.find((category) => category.id === selectedCategoryId)?.name ?? null
-    : null;
-
-  const sortPreset =
-    filters.sortBy && filters.sortOrder ? `${filters.sortBy}:${filters.sortOrder}` : "";
-
-  const handleFilterChange = <TKey extends keyof typeof DEFAULT_STORE_FILTERS>(
-    key: TKey,
-    value: (typeof DEFAULT_STORE_FILTERS)[TKey],
-  ) => {
-    setCurrentPage(1);
-    setFilters((previous) => ({ ...previous, [key]: value }));
-  };
-
-  const clearFilters = () => {
-    setSearchTerm("");
-    setSelectedCategoryId(null);
-    setCurrentPage(1);
-    setShowFilters(false);
-    setFilters({
-      ...DEFAULT_STORE_FILTERS,
-      priceRange: [priceBounds.min, priceBounds.max] as [number, number],
-    });
-  };
-
-  const handleCategoryChange = (categoryId: string | null) => {
-    setCurrentPage(1);
-    setSelectedCategoryId(categoryId);
-  };
-
-  const handleSearchChange = (term: string) => {
-    setCurrentPage(1);
-    setSearchTerm(term);
-  };
-
-  const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleSortPresetChange = (value: string) => {
-    const selectedPreset = STORE_SORT_PRESETS.find((preset) => preset.value === value);
-    handleFilterChange("sortBy", selectedPreset?.sortBy ?? "");
-    handleFilterChange("sortOrder", selectedPreset?.sortOrder ?? "");
-  };
+  const {
+    categories,
+    priceBounds,
+    searchTerm,
+    selectedCategoryId,
+    selectedCategoryName,
+    viewMode,
+    setViewMode,
+    showFilters,
+    setShowFilters,
+    currentPage,
+    filters,
+    filteredProducts,
+    currentProducts,
+    totalPages,
+    activeFiltersCount,
+    sortPreset,
+    handleFilterChange,
+    clearFilters,
+    handleCategoryChange,
+    handleSearchChange,
+    handlePageChange,
+    handleSortPresetChange,
+  } = useStoreCatalogState({
+    initialProducts,
+    initialCategories,
+  });
 
   const sidebarProps = {
     searchTerm,

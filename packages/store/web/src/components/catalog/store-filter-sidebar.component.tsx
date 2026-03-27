@@ -21,7 +21,7 @@ import type {
     StorePriceBounds,
     StoreViewMode,
 } from "../../data/store.types";
-import { STORE_SORT_PRESETS } from "./store-toolbar.component";
+import { STORE_SORT_PRESETS } from "../../data/store-sort-presets";
 
 interface StoreFilterSidebarContentProps {
     searchTerm: string;

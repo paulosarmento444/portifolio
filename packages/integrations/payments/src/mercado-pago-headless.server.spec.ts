@@ -21,7 +21,7 @@ Object.assign(globalThis, {
   Response: TestResponse,
 });
 
-jest.mock("@/app/lib/env.server", () => ({
+jest.mock("@site/shared/server", () => ({
   serverEnv: {
     wordpress: {
       url: "https://buzios.solaresporte.com.br",

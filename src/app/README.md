@@ -45,6 +45,6 @@ These remain in `src/app` because they are app-specific integration seams, not r
 1. `layout.tsx` and the Next router shell itself;
 2. thin Next-specific runtime glue only when a feature cannot live inside `packages/*`;
 3. `api/*` transport handlers;
-4. app env/runtime glue in `lib/*`.
+4. route-local types or metadata that belong strictly to the Next app shell.
 
 New feature work should live in packages and use the `@site/*` aliases documented in [`../docs/package-architecture.md`](../docs/package-architecture.md).

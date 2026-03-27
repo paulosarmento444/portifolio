@@ -12,6 +12,7 @@ import type {
   StoreProductDetail,
   StoreProductVariation,
 } from "./store.types";
+import { DEFAULT_STORE_FILTERS } from "./store.types";
 
 export const buildStoreCategoryOptions = (
   categories: CatalogCategoryView[],
@@ -146,6 +147,38 @@ export const resolveStorePriceBounds = (
     min: 0,
     max: Math.max(roundedMax, 1000),
   };
+};
+
+export const buildDefaultStoreFilters = (
+  priceBounds: StorePriceBounds,
+): StoreCatalogFilters => ({
+  ...DEFAULT_STORE_FILTERS,
+  priceRange: [priceBounds.min, priceBounds.max],
+});
+
+export const countActiveCatalogFilters = (
+  filters: StoreCatalogFilters,
+  priceBounds: StorePriceBounds,
+  searchTerm: string,
+  selectedCategoryId: string | null,
+) => {
+  let count = 0;
+
+  if (
+    filters.priceRange[0] > priceBounds.min ||
+    filters.priceRange[1] < priceBounds.max
+  ) {
+    count += 1;
+  }
+
+  if (filters.inStock) count += 1;
+  if (filters.onSale) count += 1;
+  if (filters.featured) count += 1;
+  if (filters.sortBy) count += 1;
+  if (selectedCategoryId) count += 1;
+  if (searchTerm) count += 1;
+
+  return count;
 };
 
 export const paginateProducts = (
